@@ -43,6 +43,7 @@ const Login = () => {
             <div className="form-field-wrapper">
                 <label>Password:</label>
                 <input 
+                  required
                   type="password" 
                   name="password"
                   placeholder="Enter password..."
@@ -71,3 +72,4 @@ const Login = () => {
 }
 
 export default Login
+
