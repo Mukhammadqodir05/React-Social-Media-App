@@ -3,18 +3,18 @@ import './App.css'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import PrivateRoutes from './utils/PrivateRoutes'
 import { AuthProvider } from './utils/AuthContext'
-import Header from './components/Header'
 import Home from './pages/Home'
 import Profile from './pages/Profile'
 import Login from './pages/Login'
 import Register from './pages/Register'
+import LogOut from './components/logout'
 
 function App() {
 
   return (
     <Router>
         <AuthProvider>
-          <Header/>
+          <LogOut />
           <Routes>
             <Route path="/login" element={<Login/>}/>
             <Route path="/register" element={<Register/>}/>
