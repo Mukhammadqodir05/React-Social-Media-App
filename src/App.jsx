@@ -1,29 +1,28 @@
-
-import './App.css'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import PrivateRoutes from './utils/PrivateRoutes'
 import { AuthProvider } from './utils/AuthContext'
-import Home from './pages/Home'
-import Profile from './pages/Profile'
 import Login from './pages/Login'
 import Register from './pages/Register'
-import LogOut from './components/logout'
+import MainComponent from './components/MainComponent'
+import Profiles from './ProfileRoute/profile_route'
+
 
 function App() {
 
   return (
     <Router>
+       <main className='flex w-full items-center justify-center h-screen mainBg text-white overflow-hidden'>
         <AuthProvider>
-          <LogOut />
-          <Routes>
+           <Routes>
             <Route path="/login" element={<Login/>}/>
             <Route path="/register" element={<Register/>}/>
             <Route element={<PrivateRoutes />}>
-              <Route path="/" element={<Home/>}/>
-              <Route path="/profile" element={<Profile/>}/>
+              <Route path="/" element={<MainComponent/>}/>
+              <Route path="/username" element={<Profiles/>}/>
             </Route>
           </Routes>
         </AuthProvider>
+        </main>
     </Router>
   )
 }
