@@ -19,6 +19,7 @@ const LogOut = () => {
                <FaSignOutAlt size={27} className="cursor-pointer"/>
                <span className="hidden text-xl cursor-pointer font-medium font-serif sm:flex">Log out</span>
               </button>
+
             </>
             ):(
                 <Link className="btn" to="/login">Login</Link>

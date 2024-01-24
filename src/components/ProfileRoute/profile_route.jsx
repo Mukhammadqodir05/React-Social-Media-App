@@ -1,8 +1,8 @@
 import React from 'react'
-import SideBar from '../components/sideBar'
-import Profile from '../components/profile'
-import ProfileAccounts from '../components/profileAccounts'
-import BottomBar from '../components/bottomBar'
+import SideBar from '../HomeComponents/sideBar'
+import Profile from './profile'
+import ProfileAccounts from './profileAccounts'
+import BottomBar from '../HomeComponents/bottomBar'
 
 const Profiles = () => {
   return (

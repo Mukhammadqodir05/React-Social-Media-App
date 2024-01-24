@@ -1,27 +1,30 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import PrivateRoutes from './utils/PrivateRoutes'
 import { AuthProvider } from './utils/AuthContext'
-import Login from './pages/Login'
-import Register from './pages/Register'
-import MainComponent from './components/MainComponent'
-import Profiles from './ProfileRoute/profile_route'
+import Login from './Auth/Login'
+import Register from './Auth/Register'
+import Home from './components/HomeComponents/Home'
+import Profiles from './components/ProfileRoute/profile_route'
 
 
-function App() {
+const App = () => {
 
   return (
     <Router>
        <main className='flex w-full items-center justify-center h-screen mainBg text-white overflow-hidden'>
-        <AuthProvider>
+         <AuthProvider>
            <Routes>
-            <Route path="/login" element={<Login/>}/>
-            <Route path="/register" element={<Register/>}/>
+            {/* Public Routes */}
+            <Route path="/Users-login" element={<Login/>}/>
+            <Route path="/Users-register" element={<Register/>}/>
+            
+            {/* Private Routes */}
             <Route element={<PrivateRoutes />}>
-              <Route path="/" element={<MainComponent/>}/>
+              <Route path="/" element={<Home/>}/>
               <Route path="/username" element={<Profiles/>}/>
             </Route>
           </Routes>
-        </AuthProvider>
+         </AuthProvider>
         </main>
     </Router>
   )

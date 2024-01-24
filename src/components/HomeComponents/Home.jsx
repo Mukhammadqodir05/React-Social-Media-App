@@ -1,10 +1,10 @@
 import React from 'react'
 import SideBar from './sideBar'
 import BottomBar from './bottomBar'
-import ProfileAccounts from './profileAccounts'
+import ProfileAccounts from '../ProfileRoute/profileAccounts'
 import HomeFeed from './homeFeed'
 
-const MainComponent = () => {
+const Home = () => {
   return (
     <main className='flex  flex-row justify-center w-full h-screen overflow-hidden'>
     <div className='sideBarResize lg:w-[30%]'>
@@ -21,4 +21,4 @@ const MainComponent = () => {
   )
 }
 
-export default MainComponent
+export default Home

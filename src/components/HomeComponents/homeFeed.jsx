@@ -1,5 +1,5 @@
 import React from 'react';
-import { UsersData } from '../Data/HomeFeedData';
+import { UsersData } from '../../Data/HomeFeedData';
 import { GoComment } from "react-icons/go";
 import { FaRegHeart } from "react-icons/fa";
 import { MdVerified } from "react-icons/md";

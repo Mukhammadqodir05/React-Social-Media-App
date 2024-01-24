@@ -1,11 +1,10 @@
 import React from 'react';
 import {NavLink} from 'react-router-dom';
-import {FaSignOutAlt, FaSearch, FaPlusSquare, FaCompass, FaUser, FaFacebookMessenger, FaBell } from 'react-icons/fa';
+import {FaPlusSquare, FaCompass, FaUser, FaFacebookMessenger, FaBell } from 'react-icons/fa';
 import {AiFillHome} from "react-icons/ai";
-import LogOut from './logout';
+import LogOut from '../../Auth/logout';
 
 const SideBar = () => {
-
 
   const handleLogoClick = () =>{
     window.location.reload();
