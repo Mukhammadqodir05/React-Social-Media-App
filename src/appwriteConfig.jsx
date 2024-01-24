@@ -1,12 +1,14 @@
-import { Client, Account } from 'appwrite';
+import { Client, Account, Databases, Storage, Avatars } from 'appwrite';
 
-export const API_ENDPOINT = 'https://cloud.appwrite.io/v1'
-export const PROJECT_ID = 'YOU PROJECT ID HERE'
+const client = new Client();
 
-const client = new Client()
-    .setEndpoint(API_ENDPOINT) 
-    .setProject(PROJECT_ID);    
+client
+  .setEndpoint('https://cloud.appwrite.io/v1')
+  .setProject('65afd11be9e7d32c036e');
+  
 
+export const storage = new Storage(client);
+export const databases = new Databases(client);
 export const account = new Account(client);
-
+export const avatars = new Avatars(client);
 export default client;
