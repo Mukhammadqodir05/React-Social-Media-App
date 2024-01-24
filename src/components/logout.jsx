@@ -12,9 +12,6 @@ const LogOut = () => {
 
   return (
     <div className="header">
-        <div>
-            <Link id="header-logo" to="/">LOGO</Link>
-        </div>
 
         <div className="links--wrapper">
             {user ? (
