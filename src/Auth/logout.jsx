@@ -8,18 +8,17 @@ const LogOut = () => {
     const {user, logoutUser} = useAuth()
 
     const logoutClick = () => {
-        navigate('/login')
+        navigate('/Users-login')
     }
 
   return (
     <div className="">
             {user ? (
             <>
-              <button className="flex gap-5 p-2" onClick={logoutUser} >
-               <FaSignOutAlt size={27} className="cursor-pointer"/>
-               <span className="hidden text-xl cursor-pointer font-medium font-serif sm:flex">Log out</span>
+              <button className="flex gap-5" onClick={logoutUser} >
+                <FaSignOutAlt size={27} className="cursor-pointer"/>
+                <span className="hidden text-xl cursor-pointer font-medium font-serif sm:flex">Log out</span>
               </button>
-
             </>
             ):(
                 <Link className="btn" to="/login">Login</Link>

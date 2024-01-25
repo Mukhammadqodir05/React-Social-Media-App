@@ -55,7 +55,7 @@ const SideBar = () => {
             <span className="hidden text-xl font-medium font-serif sm:flex cursor-pointer">Profile</span>
           </li>
         </NavLink>
-          <div className='mt-[150px]' >
+          <div className='mt-[150px] p-2' >
              <LogOut />
           </div>
         </div>

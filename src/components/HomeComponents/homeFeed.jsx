@@ -5,8 +5,11 @@ import { FaRegHeart } from "react-icons/fa";
 import { MdVerified } from "react-icons/md";
 import { FiBarChart2 } from "react-icons/fi";
 import { TbHeartShare } from "react-icons/tb";
+import { useAuth } from '../../utils/AuthContext'
 
 const HomeFeed = () => {
+  const{user} = useAuth()
+
   return (
     <main className='flex flex-col items-center w-full h-full pt-10'>
       {UsersData.map((user) => (
