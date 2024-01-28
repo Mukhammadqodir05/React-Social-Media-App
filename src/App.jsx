@@ -4,7 +4,7 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import SignIn from './Auth/signIn';
 import SignUp from './Auth/signUp';
 import Home from './components/HomeComponents/Home'
-import Refresh from './components/HomeComponents/refresh';
+import Refresh from './components/HomeComponents/Refresh';
 
 const App = () => {
   const [currentPage, setCurrentPage] = useState('SignUp');
