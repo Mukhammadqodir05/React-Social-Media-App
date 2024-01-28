@@ -1,33 +1,35 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import PrivateRoutes from './utils/PrivateRoutes'
-import { AuthProvider } from './utils/AuthContext'
-import Login from './Auth/Login'
-import Register from './Auth/Register'
-import Home from './components/HomeComponents/Home'
-import Profiles from './components/ProfileRoute/profile_route'
-
+import React, { useState, useEffect } from 'react';
+import { auth } from './firebase';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import SignIn from './Auth/signIn';
+import SignUp from './Auth/signUp';
+import Home from './components/HomeComponents/home'
+import Refresh from './components/HomeComponents/refresh';
 
 const App = () => {
+  const [currentPage, setCurrentPage] = useState('SignUp');
+  const switchForm = (FormSwitch) => setCurrentPage(FormSwitch);
+  const [user, loading] = useAuthState(auth);
+
+  useEffect(() => {
+    if (!loading && user) {
+      setCurrentPage('Home');
+    }
+  }, [loading, user]);
 
   return (
-    <Router>
-       <main className='flex w-full items-center justify-center h-screen mainBg text-white overflow-hidden'>
-         <AuthProvider>
-           <Routes>
-            {/* Public Routes */}
-            <Route path="/Users-login" element={<Login/>}/>
-            <Route path="/Users-register" element={<Register/>}/>
-            
-            {/* Private Routes */}
-            <Route element={<PrivateRoutes />}>
-              <Route path="/" element={<Home/>}/>
-              <Route path="/username" element={<Profiles/>}/>
-            </Route>
-          </Routes>
-         </AuthProvider>
-        </main>
-    </Router>
-  )
-}
+    <main className='flex w-full items-center justify-center h-screen mainBg text-white overflow-hidden'>
+      {loading ? (
+       <Refresh />
+      ) : user ? (
+        <Home />
+      ) : currentPage === 'SignUp' ? (
+        <SignUp onFormSwitch={switchForm} />
+      ) : (
+        <SignIn onFormSwitch={switchForm} />
+      )}
+    </main>
+  );
+};
 
-export default App
+export default App;

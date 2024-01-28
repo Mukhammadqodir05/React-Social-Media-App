@@ -1,29 +1,19 @@
 import React from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { useAuth } from '../utils/AuthContext'
+import {auth} from '../firebase'
 import {FaSignOutAlt } from 'react-icons/fa';
 
-const LogOut = () => {
-    const navigate = useNavigate()
-    const {user, logoutUser} = useAuth()
 
-    const logoutClick = () => {
-        navigate('/Users-login')
-    }
+const LogOut = () => {
+         
+const signOut = () => {
+    signOut(auth)
+}
 
   return (
-    <div className="">
-            {user ? (
-            <>
-              <button className="flex gap-5" onClick={logoutUser} >
-                <FaSignOutAlt size={27} className="cursor-pointer"/>
-                <span className="hidden text-xl cursor-pointer font-medium font-serif sm:flex">Log out</span>
-              </button>
-            </>
-            ):(
-                <Link className="btn" to="/login">Login</Link>
-            )}
-    </div>
+    <button className="flex gap-5" onClick={() => auth.signOut()} >
+    <FaSignOutAlt size={27} className="cursor-pointer"/>
+    <span className="hidden text-xl cursor-pointer font-medium font-serif sm:flex">Log out</span>
+  </button>
   )
 }
 
