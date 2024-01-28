@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import react, { useEffect, useState } from 'react';
 
 const Profile = () => {
  
