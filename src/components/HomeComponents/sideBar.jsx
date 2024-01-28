@@ -3,6 +3,7 @@ import {NavLink} from 'react-router-dom';
 import {FaPlusSquare, FaCompass, FaUser, FaFacebookMessenger, FaBell } from 'react-icons/fa';
 import {AiFillHome} from "react-icons/ai";
 import LogOut from '../../Auth/logout';
+import TrendMedia from '/src/assets/TrendMedia.png'
 
 const SideBar = () => {
 
@@ -15,8 +16,8 @@ const SideBar = () => {
     <main className=" md:flex flex-col w-full h-screen">
       <ul className='flex flex-col items-center p-6 w-full mt-[10px]'>
         <li className="flex gap-5 cursor-pointer">
-          <h1 title='Trendnet' onClick={handleLogoClick} className='text-3xl sm:hidden font-serif font-medium'>𝑻</h1>
-          <h1 title='Trendnet' onClick={handleLogoClick} className="hidden text-3xl sm:flex">𝓣𝓻𝓮𝓷𝓭𝓷𝓮𝓽</h1>
+          <img src={TrendMedia} title='Trendnet' onClick={handleLogoClick} className='w-full max-w-20 sm:hidden' />
+          <h1 title='Trendnet' onClick={handleLogoClick} className="hidden ml-10 text-3xl sm:flex">𝓣𝓻𝓮𝓷𝓭𝓜𝓮𝓭𝓲𝓪</h1>
         </li>
         <div className='grid gap-5 mt-[60px]'>
         <NavLink to="/" className='rounded-md' activeclassname="active">

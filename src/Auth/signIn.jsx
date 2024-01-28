@@ -8,8 +8,8 @@ const SignIn = (props) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -29,7 +29,7 @@ const SignIn = (props) => {
 
   return (
     <main className="AuthenticationPageBg flex w-full items-center justify-center h-screen text-white p-3 overflow-hidden">
-      <div className=" container bg-transparent w-full h-full max-w-72 max-h-[500px] flex items-center flex-col rounded-3xl p-4">
+      <div className=" container bg-transparent w-full h-full max-w-80 max-h-[500px] flex items-center flex-col rounded-3xl p-4">
         <div className="space-y-2 text-sky-400">
           <BsPersonCircle className="text-9xl cursor-pointer" />
           <h1 className="text-center">Log in</h1>
@@ -55,7 +55,7 @@ const SignIn = (props) => {
               placeholder='Password'
             />
             <span
-              className='absolute right-2 top-1/2 transform -translate-y-1/2 cursor-pointer'
+              className='absolute right-7 top-1/2 transform -translate-y-1/2 cursor-pointer'
               onClick={() => setShowPassword(prevShow => !prevShow)}
             >
               {showPassword ? <FaEyeSlash /> : <FaEye />}
