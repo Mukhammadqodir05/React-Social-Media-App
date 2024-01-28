@@ -3,7 +3,7 @@ import { auth } from './firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import SignIn from './Auth/signIn';
 import SignUp from './Auth/signUp';
-import Home from './components/HomeComponents/home'
+import Home from './components/HomeComponents/Home'
 import Refresh from './components/HomeComponents/refresh';
 
 const App = () => {
