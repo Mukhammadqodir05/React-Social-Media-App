@@ -94,7 +94,7 @@ const SideBar = () => {
               <span className="hidden text-xl font-medium font-serif sm:flex cursor-pointer">Notifications</span>
             </li>
           </NavLink>
-          <NavLink  to={`/${userName}`}  className='rounded-md' activeclassname='active'>
+          <NavLink  to={`/profile/${userName}`}  className='rounded-md' activeclassname='active'>
           <li className="flex gap-5 p-2">
             <FaUser size={27} className="cursor-pointer"/>
             <span className="hidden text-xl font-medium font-serif sm:flex cursor-pointer">Profile</span>

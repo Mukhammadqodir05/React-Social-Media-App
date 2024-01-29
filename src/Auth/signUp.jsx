@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { auth, db } from '../firebase';
-import GoogleSignUp from './googleSignUp';
+// import GoogleSignUp from './googleSignUp';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { BsPersonCircle } from 'react-icons/bs';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
@@ -50,19 +50,19 @@ const SignUp = (props) => {
 
   return (
     <div className="AuthenticationPageBg flex w-full items-center justify-center h-screen p-3">
-      <div className="md:w-80 container bg-transparent w-full h-full max-w-80 max-h-[520px] flex items-center flex-col rounded-3xl p-4">
+      <div className="md:w-80 container bg-transparent w-full h-full max-w-80 max-h-[500px] flex items-center flex-col rounded-3xl p-4">
         <div className="space-y-2 text-sky-400">
-          <BsPersonCircle className="text-8xl cursor-pointer" />
+          <BsPersonCircle className="text-9xl cursor-pointer" />
           <h1 className="text-center">Register</h1>
         </div>
-        <div className="absolute mt-[390px]">
+        {/* <div className="absolute mt-[390px]">
           <GoogleSignUp/>
-        </div>
-        <div className='absolute mt-[560px]'>
+        </div> */}
+        <div className='absolute mt-[540px]'>
           {error && <p className="text-xl">{error}</p>}
           {loading && <p className="text-xl">Loading...</p>}
         </div>
-        <form onSubmit={handleSignUp} className="mt-[10px] text-white space-y-6 text-center">
+        <form onSubmit={handleSignUp} className="mt-[15px] text-white space-y-7 text-center">
           <input
             className="input outline-none py-1 p-1 bg-transparent border-b w-full max-w-[240px]"
             required
@@ -88,7 +88,7 @@ const SignUp = (props) => {
               placeholder='Password'
             />
             <span
-              className='absolute right-7 top-1/2 transform -translate-y-1/2 cursor-pointer'
+              className='absolute right-7 top-1/2 transform -translate-y-1/2 cursor-pointer text-black'
               onClick={() => setShowPassword(prevShow => !prevShow)}
             >
               {showPassword ? <FaEyeSlash /> : <FaEye />}
@@ -98,7 +98,7 @@ const SignUp = (props) => {
             Sign up
           </button>
         </form>
-        <div className='absolute flex gap-2 mt-[465px]'>
+        <div className='absolute flex gap-2 mt-[440px]'>
           <p className="text-sm">Already have an account?</p>
           <button
             className="underline text-sm hover:underline"
