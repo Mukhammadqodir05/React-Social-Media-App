@@ -4,8 +4,6 @@ import { FaHome, FaSignOutAlt, FaSearch, FaPlusSquare, FaCompass, FaUser, FaFace
 
 const ProfileAccounts = () => {
 
-
-
   const handleLogoClick = () =>{
     window.location.reload();
     window.location.href = ("/");

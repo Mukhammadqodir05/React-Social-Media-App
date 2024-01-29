@@ -1,18 +1,14 @@
 import React, { useState } from 'react';
 import { auth, db } from '../firebase';
-import GoogleButton from 'react-google-button';
-import { GoogleAuthProvider, signInWithRedirect, createUserWithEmailAndPassword } from 'firebase/auth';
+import GoogleSignUp from './googleSignUp';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { BsPersonCircle } from 'react-icons/bs';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { setDoc,doc} from 'firebase/firestore';
 
-const googleSignIn = () => {
-  const provider = new GoogleAuthProvider();
-  signInWithRedirect(auth, provider);
-};
+
 
 const SignUp = (props) => {
-  const [userName, setUserName] = useState('');
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -31,10 +27,10 @@ const SignUp = (props) => {
         const userDoc = {
           uid: newUser.user.uid,
           fullName: fullName,
-          userName: userName,
+          userName: email.split('@')[0],
           email: email,
           bio: "",
-          userPictureURL: "",
+          userPictureURL: '',
           followers: [],
           following: [],
           posts: [],
@@ -54,17 +50,19 @@ const SignUp = (props) => {
 
   return (
     <div className="AuthenticationPageBg flex w-full items-center justify-center h-screen p-3">
-      <div className="md:w-80 container bg-transparent w-full h-full max-w-80 max-h-[550px] flex items-center flex-col rounded-3xl p-4">
+      <div className="md:w-80 container bg-transparent w-full h-full max-w-80 max-h-[520px] flex items-center flex-col rounded-3xl p-4">
         <div className="space-y-2 text-sky-400">
           <BsPersonCircle className="text-8xl cursor-pointer" />
           <h1 className="text-center">Register</h1>
         </div>
-        <GoogleButton className="absolute mt-[420px]" onClick={googleSignIn} />
+        <div className="absolute mt-[390px]">
+          <GoogleSignUp/>
+        </div>
         <div className='absolute mt-[560px]'>
           {error && <p className="text-xl">{error}</p>}
           {loading && <p className="text-xl">Loading...</p>}
         </div>
-        <form onSubmit={handleSignUp} className="mt-[10px] text-white space-y-5 text-center">
+        <form onSubmit={handleSignUp} className="mt-[10px] text-white space-y-6 text-center">
           <input
             className="input outline-none py-1 p-1 bg-transparent border-b w-full max-w-[240px]"
             required
@@ -72,14 +70,6 @@ const SignUp = (props) => {
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
             placeholder="Full Name"
-          />
-          <input
-            className="input outline-none py-1 p-1 bg-transparent border-b w-full max-w-[240px]"
-            required
-            type="text"
-            value={userName}
-            onChange={(e) => setUserName(e.target.value)}
-            placeholder="Username"
           />
           <input
             className="input outline-none py-1 p-1 bg-transparent border-b w-full max-w-[240px]"
@@ -108,7 +98,7 @@ const SignUp = (props) => {
             Sign up
           </button>
         </form>
-        <div className='absolute flex gap-2 mt-[495px]'>
+        <div className='absolute flex gap-2 mt-[465px]'>
           <p className="text-sm">Already have an account?</p>
           <button
             className="underline text-sm hover:underline"

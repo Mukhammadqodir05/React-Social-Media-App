@@ -4,7 +4,7 @@ import Profile from './profile'
 import ProfileAccounts from './profileAccounts'
 import BottomBar from '../HomeComponents/bottomBar'
 
-const Profiles = () => {
+const AllPages = () => {
   return (
     <main className='flex gap- flex-row justify-center w-full h-screen overflow-hidden'>
     <div className='sideBarResize lg:w-[30%]'>
@@ -21,4 +21,4 @@ const Profiles = () => {
   )
 }
 
-export default Profiles
+export default AllPages

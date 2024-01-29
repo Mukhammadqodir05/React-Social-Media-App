@@ -1,25 +1,71 @@
-import react, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
+import { db, auth } from "../../firebase";
+import { query, where, getDocs, collection } from "firebase/firestore";
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { useParams } from "react-router-dom";
 
 const Profile = () => {
- 
+  const [data, setData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [user, loading] = useAuthState(auth); 
+  const [usernames, setUsername] = useState(""); 
+  const { username } = useParams();
+  
+  const fetchUserProfile = async () => {
+    if (!loading && user) { 
+      setIsLoading(true);
+      const uid = user.uid;
+      const q = query(collection(db, "users"), where("uid", "==", uid));
+      try {
+        console.log("Fetching user profile...");
+        const querySnapshot = await getDocs(q);
+        let userProfileData = [];
+        querySnapshot.forEach((doc) => {
+          userProfileData.push({ id: doc.id, ...doc.data() });
+        });
+        setData(userProfileData);
+      } catch (error) {
+        console.error("Error fetching user profile: ", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  };
+  
+  useEffect(() => {
+    fetchUserProfile();
+  }, [user, loading]); 
+  
+  useEffect(() => {
+    if (data.length > 0) {
+      setUsername(data[0].userName);
+    }
+  }, [data]);
+
+
+
+
   return (
-    <main className='flex flex-col w-full items-center justify-center h-full '>
-      {/* ... (existing code) */}
-      <div className='max-w-[900px] w-full h-full p-1'>
-        <div className='w-full flex flex-col items-center space-y-4'>
-          <div className='w-full rounded-md p-4'>
-            {/* Profile Information */}
-            <div className='flex items-center space-x-4'>
-              <div className='w-20 h-20 rounded-full bg-gray-300'></div>
-              <div>
-                <h2 className='text-lg font-bold'>Muhammad</h2>
-                <p className='text-sm'>@muhammad</p>
+    <main className="flex flex-col w-full items-center justify-center h-full pb-10 pt-10">
+      <div className="border-b borderBg borderBg w-full"></div>
+      <div className="max-w-[900px] w-full h-full p-3">
+        <div className="w-full flex flex-col  items-center space-y-5">
+          {data.map((profile) => (
+            <div key={profile.id} className="flex flex-col w-full gap-5">
+              <div className="flex items-center gap-6">
+                <img className="h-20 w-20 rounded-full bg-black" src={profile.userPictureURL} />
+                <div>
+                  <h2 className="text-xl font-bold">{profile.fullName}</h2>
+                  <p className="text-gray-500">@{profile.userName}</p>
+                </div>
               </div>
+              <div className="flex justify-between space-x-4 mt-4">
+                <button className="bg-blue-500 text-white px-4 py-2 rounded-md">Follow</button>
+                <button className="border border-gray-400 px-4 py-2 rounded-md">Message</button>
+              </div>
+               <p className="mt-4">{profile.bio}</p>
             </div>
-            <div>
-             
-            </div>
-          </div>
+          ))}
         </div>
       </div>
     </main>
@@ -27,40 +73,7 @@ const Profile = () => {
 };
 
 export default Profile;
-// const [selectedPost, setSelectedPost] = useState(null);
-  // const openPost = (post) => {
-  //   setSelectedPost(post);
-  // };
 
-  // const closePost = () => {
-  //   setSelectedPost(null);
-  // };
-  // {selectedPost && (
-  //   <div className='fixed flex flex-col p-4 top-0 left-0 right-0 z-10 w-full h-full items-center justify-center bg-black' onClick={closePost}>
-  //     <div className=' overflow-hidden justify-center items-center'>
-  //       <img className=' w-full max-w-[700px] max-h-[600px] h-full object-cover' src={selectedPost} alt='' />
-  // import { UsersData } from '../Data/HomeFeedData';
-  //     </div>
-  //     <div>
-  //       <h1>What's up</h1>
-  //     </div>
-  //   </div>
-  // )}
 
-//   <div className='w-full flex justify-center items-center pb-10'>
-//   <div className='ProfilePosts w-full gap-1 grid grid-cols-3 h-full sm:mb-14'>
-//     {UsersData.map((user) => (
-//     <div key={user.UserId} className='flex h-full justify-center items-center'>
-//       <div
-//          onClick={() => openPost(user.Posts)}
-//          className='aspect-[1.1] h-full w-full overflow-hidden'
-//       >
-//          <img className='h-full w-full object-cover' src={user.Posts} alt=''/>
-//       </div>
-//     </div>
-//   ))}
-// </div>
-// </div>
-  
 
 
