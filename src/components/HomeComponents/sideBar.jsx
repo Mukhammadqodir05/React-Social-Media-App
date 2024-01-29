@@ -1,56 +1,25 @@
-import React, { useEffect, useState } from "react";
+import React,{ useState,useEffect } from "react";
 import {NavLink} from 'react-router-dom';
 import {FaPlusSquare, FaCompass, FaUser, FaFacebookMessenger, FaBell } from 'react-icons/fa';
 import {AiFillHome} from "react-icons/ai";
 import LogOut from '../../Auth/logout';
 import TrendMedia from '/src/assets/TrendMedia.png'
 import { useParams } from 'react-router-dom';
-import { db, auth } from "../../firebase";
-import { query, where, getDocs, collection } from "firebase/firestore";
-import { useAuthState } from 'react-firebase-hooks/auth';
+import { useUserData } from '../../getUserData'; 
+
 
 const SideBar = () => {
-  const [data, setData] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [user, loading] = useAuthState(auth); 
-  const [userName, setUserName] = useState(""); 
-  const { username } = useParams();
-  
-  const fetchUserProfile = async () => {
-    if (!loading && user) { 
-      setIsLoading(true);
-      const uid = user.uid;
-      const q = query(collection(db, "users"), where("uid", "==", uid));
-      try {
-        console.log("Fetching user profile...");
-        const querySnapshot = await getDocs(q);
-        let userProfileData = [];
-        querySnapshot.forEach((doc) => {
-          userProfileData.push({ id: doc.id, ...doc.data() });
-        });
-        setData(userProfileData);
-      } catch (error) {
-        console.error("Error fetching user profile: ", error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-  };
+  const {username} = useParams()
+  const { userProfile } = useUserData(); 
+  const [userName, setUserName] = useState(null)
   
   useEffect(() => {
-    fetchUserProfile();
-  }, [user, loading]); 
-  
-  useEffect(() => {
-    if (data.length > 0) {
-      setUserName(data[0].userName);
+    if (userProfile && userProfile.length > 0) {
+      setUserName(userProfile[0].userName);
     }
-  }, [data]);
+  }, [userProfile]);
 
-  console.log(userName)
-  
-
-
+   
   const handleLogoClick = () =>{
     window.location.reload();
     window.location.href = ("/");
@@ -94,7 +63,7 @@ const SideBar = () => {
               <span className="hidden text-xl font-medium font-serif sm:flex cursor-pointer">Notifications</span>
             </li>
           </NavLink>
-          <NavLink  to={`/profile/${userName}`}  className='rounded-md' activeclassname='active'>
+          <NavLink  to={`/${userName}`}  className='rounded-md' activeclassname='active'>
           <li className="flex gap-5 p-2">
             <FaUser size={27} className="cursor-pointer"/>
             <span className="hidden text-xl font-medium font-serif sm:flex cursor-pointer">Profile</span>
@@ -103,6 +72,7 @@ const SideBar = () => {
           <div className='mt-[150px] p-2' >
              <LogOut />
           </div>
+
         </div>
       </ul>
     </main>

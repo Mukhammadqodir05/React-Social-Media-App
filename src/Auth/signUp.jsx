@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
 import { auth, db } from '../firebase';
-// import GoogleSignUp from './googleSignUp';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { BsPersonCircle } from 'react-icons/bs';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { setDoc,doc} from 'firebase/firestore';
-
 
 
 const SignUp = (props) => {
@@ -55,9 +53,6 @@ const SignUp = (props) => {
           <BsPersonCircle className="text-9xl cursor-pointer" />
           <h1 className="text-center">Register</h1>
         </div>
-        {/* <div className="absolute mt-[390px]">
-          <GoogleSignUp/>
-        </div> */}
         <div className='absolute mt-[540px]'>
           {error && <p className="text-xl">{error}</p>}
           {loading && <p className="text-xl">Loading...</p>}
