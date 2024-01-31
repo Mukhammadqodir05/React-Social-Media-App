@@ -18,7 +18,7 @@ const BottomBar = () => {
    
          
 return (
-     <main className="fixed BottomBar bottom-0 left-0 w-full border-t flex justify-around  p-3 text-white bg-[#3a1450] borderBg">
+     <main className="fixed z-10 BottomBar bottom-0 left-0 w-full border-t flex justify-around  p-3 text-white bg-[#3a1450] borderBg">
        <NavLink to="/" className='rounded-md' activeclassname="active">
             <li className="flex gap-5 p-2">
               <AiFillHome size={30} className="cursor-pointer" />

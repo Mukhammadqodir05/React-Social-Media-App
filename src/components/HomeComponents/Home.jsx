@@ -1,7 +1,7 @@
 import React from 'react'
 import SideBar from './sideBar'
 import BottomBar from './bottomBar'
-import ProfileAccounts from '../ProfileRoute/profileAccounts'
+import ProfileAccounts from '../ProfileComponents/profileAccounts'
 import HomeFeed from './homeFeed'
 
 const Home = () => {

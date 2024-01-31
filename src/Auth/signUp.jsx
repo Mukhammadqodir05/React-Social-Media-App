@@ -4,6 +4,7 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { BsPersonCircle } from 'react-icons/bs';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { setDoc,doc} from 'firebase/firestore';
+import Refresh from '../components/HomeComponents/Refresh'
 
 
 const SignUp = (props) => {
@@ -28,6 +29,8 @@ const SignUp = (props) => {
           userName: email.split('@')[0],
           email: email,
           bio: "",
+          location: "",
+          website: "",
           userPictureURL: '',
           followers: [],
           following: [],
@@ -36,8 +39,8 @@ const SignUp = (props) => {
         }
         await setDoc(doc(db, 'users', newUser.user.uid), userDoc);
         console.log(userDoc);
+        window.location.reload();
       }
-     
     } catch (error) {
       console.error(error);
       setError('Something went wrong. Please try again.');
@@ -45,7 +48,8 @@ const SignUp = (props) => {
       setLoading(false);
     }
   };
-
+ 
+     
   return (
     <div className="AuthenticationPageBg flex w-full items-center justify-center h-screen p-3">
       <div className="md:w-80 container bg-transparent w-full h-full max-w-80 max-h-[500px] flex items-center flex-col rounded-3xl p-4">
@@ -89,7 +93,7 @@ const SignUp = (props) => {
               {showPassword ? <FaEyeSlash /> : <FaEye />}
             </span>
           </div>
-          <button type="submit" className="w-full max-w-[240px] rounded-full py-2 text-white bg-[#2432cf]">
+          <button onClick={handleSignUp}  type="submit" className="w-full max-w-[240px] rounded-full py-2 text-white bg-[#2432cf]">
             Sign up
           </button>
         </form>

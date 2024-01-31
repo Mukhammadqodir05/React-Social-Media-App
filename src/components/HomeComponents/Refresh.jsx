@@ -2,7 +2,9 @@ import React from 'react'
 
 const Refresh = () => {
   return (
-    <div>Loading...</div>
+    <main className='flex justify-center items-center w-full h-screen'>
+      <div>Loading...</div>
+    </main>
   )
 }
 

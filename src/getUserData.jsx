@@ -4,6 +4,7 @@ import { db, auth } from "./firebase";
 import { query, where, getDocs, collection } from "firebase/firestore";
 import { useAuthState } from 'react-firebase-hooks/auth';
 
+
 const UserDataContext = createContext();
 
 const GetUserData = ({ children }) => {
@@ -30,7 +31,6 @@ const GetUserData = ({ children }) => {
   }, [])
 
 
-  console.log(allUsersData)
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -60,10 +60,11 @@ const GetUserData = ({ children }) => {
 
     fetchUserProfile();
   }, [user, loading]);
+ 
 
 
   return (
-    <UserDataContext.Provider value={{userProfile,allUsersData}}>
+    <UserDataContext.Provider value={{ userProfile, allUsersData, loading }}>
       {children}
     </UserDataContext.Provider>
   );

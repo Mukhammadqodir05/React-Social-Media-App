@@ -11,6 +11,7 @@ const App = () => {
   const switchForm = (FormSwitch) => setCurrentPage(FormSwitch);
   const [user, loading] = useAuthState(auth);
 
+
   useEffect(() => {
     if (!loading && user) {
       setCurrentPage('Home');
