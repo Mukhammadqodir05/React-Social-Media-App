@@ -3,22 +3,32 @@ import SideBar from '../HomeComponents/sideBar'
 import Profile from './profile'
 import ProfileAccounts from './profileAccounts'
 import BottomBar from '../HomeComponents/bottomBar'
+import { useUserData } from '../../getUserData'
+import Refresh from '../HomeComponents/Refresh'
 
 const AllPages = () => {
+  const { userProfile } = useUserData(); 
+ 
   return (
-    <main className='flex gap- flex-row justify-center w-full h-screen overflow-hidden'>
-    <div className='sideBarResize lg:w-[30%]'>
-      <SideBar />
-    </div>
-    <div className='lg:w-2/4 max-w-[650px] borderBg border-l border-r w-full overflow-y-auto'>
-     <Profile />
-    </div>
-    <div className='lg:w-[30%] hidden lg:flex '>
-      <ProfileAccounts />
-    </div>
-    <BottomBar />
-  </main>
-  )
+    <main className='flex flex-row justify-center w-full h-screen overflow-hidden'>
+        {userProfile ? (
+          <>
+            <div className='sideBarResize'>
+              <SideBar />
+            </div>
+            <div className='max-w-[650px] borderBg border-l border-r w-full overflow-y-auto'>
+              <Profile />
+            </div>
+            <div className='hidden profileAccounts'>
+              <ProfileAccounts />
+            </div>
+            <BottomBar />
+          </>
+        ) : (
+         <Refresh />
+        )}
+    </main>
+  );
 }
 
-export default AllPages
+export default AllPages;

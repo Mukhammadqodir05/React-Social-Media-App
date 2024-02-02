@@ -4,7 +4,6 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { BsPersonCircle } from 'react-icons/bs';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { setDoc,doc} from 'firebase/firestore';
-import Refresh from '../components/HomeComponents/Refresh'
 
 
 const SignUp = (props) => {
@@ -31,10 +30,12 @@ const SignUp = (props) => {
           bio: "",
           location: "",
           website: "",
+          userBannerURL: '',
           userPictureURL: '',
-          followers: [],
-          following: [],
-          posts: [],
+          followers: 0,
+          following: 0,
+          posts: 0,
+          likes: 0,
           timestamp:Date.now()
         }
         await setDoc(doc(db, 'users', newUser.user.uid), userDoc);

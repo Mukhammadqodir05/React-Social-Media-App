@@ -12,7 +12,7 @@ const signOut = () => {
   return (
     <button className="flex gap-5" onClick={() => auth.signOut()} >
     <FaSignOutAlt size={27} className="cursor-pointer"/>
-    <span className="hidden text-xl cursor-pointer font-medium font-serif sm:flex">Log out</span>
+    <span className="sidebarText text-xl cursor-pointer font-medium font-serif">Log out</span>
   </button>
   )
 }

@@ -11,6 +11,8 @@ body, html {
   background-image: linear-gradient(to right top, #1c0c24, #1e0d28, #200e2b, #220f2f, #240f33, #250f35, #250f36, #260f38, #250f38, #251038, #241038, #241038);
 }
 
+
+
 .active {
   background-image: linear-gradient(to right top, #d16ba5, #c777b9, #ba83ca, #aa8fd8, #9a9ae1, #8aa7ec, #79b3f4, #69bff8, #52cffe, #41dfff, #46eefa, #5ffbf1);
 }
@@ -27,58 +29,72 @@ body, html {
     background-image: linear-gradient(to right top, #3e1a7a, #49207d, #53267f, #5d2c82, #663385, #69338a, #6b338e, #6e3393, #6a2c9b, #6525a3, #5e1dab, #5515b4);
 }
 
+.mainBg{
+  background-image: linear-gradient(to right top, #1c0c24, #1e0d28, #200e2b, #220f2f, #240f33, #250f35, #250f36, #260f38, #250f38, #251038, #241038, #241038);
+}
 
 .borderBg{
     border-color: #4d4a50;
 }
 
-@media(min-width: 768px){
-    .ResizeProfilePage{
-       width: 740px;
-       margin-left: 145px;
-       justify-content: center;
-    }
+/* Left SideBar Resizing */
+@media (max-width: 1281px) {
+  .sidebarText{
+     display: none;
   }
-
-@media(min-width: 1024px){
-    .ResizeProfilePage{
-       width: 730px;
-       margin-left: 245px;
-       justify-content: center;
-    }
+}
+@media (min-width: 700px) {
+  .sideBarResize{
+    width: 100px;
   }
+}
 
-
-@media(min-width: 1224px){
-    .ResizeProfilePage{
-       width: 900px;
-       margin-left: 240px;
-       justify-content: center;
-    }
+@media (min-width: 1281px) {
+  .sideBarResize{
+    width: 25%;
   }
+  .sidebarLogo{
+    display: none;
+  }
+}
   
+.banner-image {
+  width: 100%; /* Fill the container's width */
+  height: 200px; /* Set a fixed height for the banner image */
+  object-fit: cover; /* Maintain the aspect ratio and crop if necessary */
+}
 
 
-  @media (max-width: 500px) {
-    .sideBarResize {
-      display: none;
-      width: 0;
-    }
-    .ProfilePosts{
-     padding-bottom: 70px;
-    }
-
-    .BottomBar {
-      display: flex;
-    }
+/* Rigt SideBar Resizing */
+@media (min-width: 1030px) {
+  .profileAccounts {
+    display: flex;
+    width: 30%;
   }
-  
-  @media (min-width: 501px) {
-    .BottomBar {
-      display: none;
-    }
+
+}
+
+/* BottomBar Resizing */
+@media (max-width: 500px) {
+  .sideBarResize {
+    display: none;
+    width: 0;
   }
+  .ProfilePosts{
+    padding-bottom: 70px;
+  }
+
+  .BottomBar {
+    display: flex;
+  }
+}
   
+@media (min-width: 501px) {
+  .BottomBar {
+    display: none;
+  }
+}
+
 ::-webkit-scrollbar{
   width: 0px;
 }

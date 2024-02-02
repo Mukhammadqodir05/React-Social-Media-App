@@ -10,7 +10,7 @@ const ProfileAccounts = () => {
   }
 
   return (
-    <main className=" md:flex flex-col w-full h-screen ">
+    <main className="md:flex flex-col w-full h-screen ">
       <ul className='flex flex-col items-center rounded-md p-6 w-full mt-[10px]'>
         <li className="flex gap-5 cursor-pointer">
           <h1 title='Trendnet' onClick={handleLogoClick} className='text-2xl sm:hidden font-serif font-medium'>𝑻</h1>
