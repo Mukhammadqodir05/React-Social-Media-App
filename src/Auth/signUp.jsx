@@ -32,9 +32,10 @@ const SignUp = (props) => {
           website: "",
           userBannerURL: '',
           userPictureURL: '',
-          followers: 0,
-          following: 0,
+          followers: [],
+          following: [],
           posts: 0,
+          postCount: 0,
           likes: 0,
           timestamp:Date.now()
         }

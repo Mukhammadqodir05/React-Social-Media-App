@@ -3,8 +3,6 @@ import { useState, useEffect } from 'react';
 import { db, auth } from "./firebase";
 import { query, where, getDocs, collection } from "firebase/firestore";
 import { useAuthState } from 'react-firebase-hooks/auth';
-
-
 const UserDataContext = createContext();
 
 const GetUserData = ({ children }) => {
@@ -12,9 +10,9 @@ const GetUserData = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [userProfile, setUserProfile] = useState(null);
   const [user, loading] = useAuthState(auth);
-  
 
-  useEffect(() =>{
+
+  useEffect(() => {
     const fetchAllData = async () => {
       try{
         const querySnapshot = await getDocs(collection(db, "users")) 
@@ -29,8 +27,6 @@ const GetUserData = ({ children }) => {
     };
     fetchAllData(); 
   }, [])
-
-
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -60,7 +56,6 @@ const GetUserData = ({ children }) => {
 
     fetchUserProfile();
   }, [user, loading]);
- 
 
 
   return (

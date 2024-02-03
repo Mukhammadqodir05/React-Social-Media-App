@@ -42,7 +42,7 @@ const UpdateProfile = () => {
   const remainingCharacters = MAX_BIO_LENGTH - bio.length;
   
 // LOCATION limitation
-const MAX_LOCATION_LENGTH = 50;
+const MAX_LOCATION_LENGTH = 25;
 const handleLocationChange = (e) => {
   const inputLocation = e.target.value;
   const limitedLocation = inputLocation.substring(0, MAX_LOCATION_LENGTH); 
@@ -51,7 +51,7 @@ const handleLocationChange = (e) => {
 const remainingLocationCharacters = MAX_LOCATION_LENGTH - location.length;
 
 // WEBSITE limitation
-const MAX_WEBSITE_LENGTH = 100;
+const MAX_WEBSITE_LENGTH = 60;
 const handleWebsiteChange = (e) => {
   const inputWebsite = e.target.value;
   const limitedWebsite = inputWebsite.substring(0, MAX_WEBSITE_LENGTH ); 
@@ -93,7 +93,6 @@ const remainingWebsiteCharacters = MAX_WEBSITE_LENGTH  - website.length;
     } catch (error) {
       console.error('Error updating document:', error);
       setSuccess(false)
-    } finally {
     }
   };
   
@@ -201,7 +200,7 @@ const remainingWebsiteCharacters = MAX_WEBSITE_LENGTH  - website.length;
                      Website <span className="text-gray-500 text-sm">{remainingWebsiteCharacters}/{MAX_WEBSITE_LENGTH}</span>
                   </label>
                   <input
-                  className="shadow bg-transparent border borderBg rounded w-full py-2 px-3 leading-tight outline-none"
+                  className="shadow bg-transparent border borderBg rounded w-full  py-2 px-3 leading-tight outline-none"
                   id="website"
                   type="text"
                   placeholder={currentUser.website}

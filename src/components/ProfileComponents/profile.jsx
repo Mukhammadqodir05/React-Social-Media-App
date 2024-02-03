@@ -1,18 +1,76 @@
-import React from "react";
+import React,{ useState, useEffect } from "react";
 import { useUserData } from '../../getUserData';
 import { Link, useParams } from "react-router-dom";
 import { IoMdArrowRoundBack } from "react-icons/io";
+import{ auth, db } from '../../firebase'
+import { doc, updateDoc,onSnapshot } from 'firebase/firestore';
+import { useAuthState } from 'react-firebase-hooks/auth';
 
 const Profile = () => {
   const { userProfile, allUsersData } = useUserData();
   const { username } = useParams();
   const currentUser = allUsersData?.find(user => user.userName === username);
+  const [user] = useAuthState(auth);
+  const [followersCount, setFollowersCount] = useState(currentUser?.followers.length);
+  const [followingCount, setFollowingCount] = useState(currentUser?.following.length);
+  const [isFollowed, setIsFollowed] = useState(userProfile[0]?.following.includes(currentUser?.uid));
 
   const timestamp = new Date(currentUser?.timestamp);
   const monthNames = ["January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
+  "July", "August", "September", "October", "November", "December"
   ];
   const joinedDate = `Joined ${monthNames[timestamp.getMonth()]} ${timestamp.getFullYear()}`;
+  
+  useEffect(() => {
+    const unsubscribe = onSnapshot(doc(db, "users", currentUser?.uid), (doc) => {
+      setFollowersCount(doc.data().followers.length);
+      setFollowingCount(doc.data().following.length);
+      setIsFollowed(doc.data().followers.includes(userProfile[0]?.uid));
+    });
+  
+    return () => unsubscribe();
+  }, [user.uid, currentUser?.uid]);
+  
+
+  const handleFollowAction = async (e) => {
+    e.preventDefault();
+  
+    try {
+      const userRef = doc(db, "users", user.uid);
+      const userRef2 = doc(db, "users", currentUser.uid);
+  
+      if(userProfile[0]?.following.includes(currentUser?.uid)){
+        const index = userProfile[0].following.indexOf(currentUser?.uid);
+        userProfile[0].following.splice(index, 1); 
+
+      } else {
+        userProfile[0].following.push(currentUser?.uid); 
+      }
+  
+      if(currentUser?.followers.includes(userProfile[0]?.uid)){
+        const index = currentUser.followers.indexOf(userProfile[0]?.uid);
+        currentUser.followers.splice(index, 1); 
+      } else {
+        currentUser.followers.push(userProfile[0]?.uid); 
+      }
+  
+      const newData = {
+        following: userProfile[0].following,
+      };
+
+      const newData2 = {
+        followers: currentUser.followers,
+      };
+      
+      await updateDoc(userRef, newData);
+      await updateDoc(userRef2, newData2);
+  
+      console.log('Document updated successfully');
+    } catch (error) {
+      console.error('Error updating document:', error);
+    }
+  };
+  
 
   return (
     <main className="flex flex-col w-full items-center justify-center h-full pt-0 pb-10">
@@ -21,7 +79,7 @@ const Profile = () => {
        <Link to='/'><IoMdArrowRoundBack  size={30}/></Link>
        </div>
         <div className="relative">
-        <div className="w-full h-full max-h-[200px]">
+        <div className=" flex justify-center items-center w-full h-full max-h-[200px]">
           {currentUser.userBannerURL ? (
               <img className="w-full max-w-[650px] object-cover aspect-square h-full max-h-[200px]" src={currentUser.userBannerURL} alt="" />
             ) : (<h1 className="w-full max-w-[650px] object-cover aspect-square h-full max-h-[200px] bg-[#524444]" src={currentUser.userBannerURL} alt="" />
@@ -30,7 +88,7 @@ const Profile = () => {
 
           </div>
           <div className="p-2 absolute w-full flex justify-between gap-2">
-          {currentUser.userBannerURL ? (
+          {currentUser.userPictureURL ? (
             <img
               className="w-full mt-[-73px] bg-black object-cover aspect-square h-full max-h-32 max-w-32 rounded-full border-2 border-white"
               src={currentUser.userPictureURL}
@@ -39,17 +97,15 @@ const Profile = () => {
                className="w-full mt-[-73px] bg-black aspect-square h-full max-h-32 max-w-32 rounded-full border-4 border-black"
                src={currentUser.userPictureURL}
           />)}
-          
-            {userProfile && (
-              <div className="relative mt-4">
+                {userProfile && (
+               <div className="relative mt-4">
                 {username !== userProfile[0]?.userName && (
-                  <button className="bg-white text-black px-4 py-2  rounded-full">Follow</button>
-                )}
+                  <button onClick={handleFollowAction} className="bg-white text-black px-4 py-2 rounded-full">
+                    {isFollowed? 'Followed' : 'Follow'} 
+                  </button>
+                )}               
                 {username === userProfile[0].userName && (
-                  <Link
-                    to={`/${currentUser.userName}/edit`}
-                    className="border border-blue-500 text-blue-500 px-4 py-2 rounded-full"
-                  >
+                  <Link to={`/${currentUser.userName}/edit`} className="border border-blue-500 text-blue-500 px-4 py-2 rounded-full">
                     Edit Profile
                   </Link>
                 )}
@@ -65,10 +121,15 @@ const Profile = () => {
               <p className="mt-4">{currentUser.bio}</p>
             :''} 
             <div className="flex flex-col text-gray-500 mt-2">
-              {currentUser.website?
-                <p className="w-full">🌐{currentUser.website}</p>
-              :''}
-              <div className="w-full grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))]">
+              {currentUser.website && (
+                 <p className="mt-4 w-full overflow-hidden whitespace-nowrap overflow-ellipsis">
+                    🌐
+                    <a href={currentUser.website} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">
+                      {currentUser.website}
+                    </a>
+                  </p>
+                )}
+              <div  className="w-full grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))]">
                 <p>⏳{joinedDate}</p>
                 {currentUser.location?
                   <p>📍{currentUser.location}</p>
@@ -77,15 +138,15 @@ const Profile = () => {
             </div>
             <div className="grid grid-cols-3 gap-5 mt-4 max-w-[300px]">
               <div className="flex gap-1">
-                <p className="font-bold">{currentUser.following}</p>
+                <p className="font-bold">{followingCount}</p>
                 <p className="text-gray-500">Following</p>
               </div>
               <div className="flex gap-1">
-                <p className="font-bold">{currentUser.followers}</p>
+                <p className="font-bold">{followersCount}</p>
                 <p className="text-gray-500">Followers</p>
               </div>
               <div className="flex gap-1">
-                <p className="font-bold">{currentUser.posts}</p>
+                <p className="font-bold">{currentUser.postCount}</p>
                 <p className="text-gray-500">Posts</p>
               </div>
             </div>
@@ -95,16 +156,31 @@ const Profile = () => {
             <p>Loading user profile...</p>
           </div>
         )}
+
+        {/* Post here */}
       <div className="flex w-full border-t borderBg border-gray-300 "></div>
-        <div className="grid grid-cols-3 gap-1 w-full p-1 pb-20 ">
-          <img src="src/assets/Verified copy.jpg" className='object-cover aspect-square w-full h-full '/>
-          <img src="src/assets/Verified copy.jpg" className='object-cover aspect-square w-full h-full '/>
-          <img src="src/assets/Verified copy.jpg" className='object-cover aspect-square w-full h-full '/>
-          <img src="src/assets/mishary2.png" className='object-cover aspect-square w-full h-full'/>
-        </div>
+      <div className="flex flex-col justify-center">
+      {currentUser.posts && currentUser.posts.length > 0 ? (
+        <div className="grid grid-cols-3 gap-1 w-full p-1 pb-20">
+            {currentUser.posts.map((post) => (
+              <img
+                src={post}
+                className="object-cover aspect-square w-full h-full"
+              />
+          
+            ))}
+          </div>
+         ) : (
+          <div className="w-full h-40 flex p-8 md:p-0 justify-center md:items-center">
+            <h1 className="">Oops, you have no post!</h1>
+          </div>
+        )}
+      </div>
       </div>
     </main>
   );
 };
 
 export default Profile;
+
+
