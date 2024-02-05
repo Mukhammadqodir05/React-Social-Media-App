@@ -35,8 +35,6 @@ const SignUp = (props) => {
           posts: [],
           followers: [],
           following: [],
-          postCount: 0,
-          likes: 0,
           timestamp:Date.now()
         }
         await setDoc(doc(db, 'users', newUser.user.uid), userDoc);

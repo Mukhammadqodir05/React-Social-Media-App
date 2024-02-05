@@ -1,60 +1,65 @@
 import React, { useRef, useState } from 'react';
 import { auth, db, storage } from '../../firebase';
-import { doc, updateDoc, onSnapshot } from 'firebase/firestore';
+import { doc, updateDoc } from 'firebase/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useUserData } from '../../getUserData';
 import { TiCameraOutline } from 'react-icons/ti';
 import { ref, uploadString, getDownloadURL} from 'firebase/storage'
+import { IoMdClose } from "react-icons/io";
+import { Link } from 'react-router-dom';
 
 const Post = () => {
   const [selectedFiles, setSelectedFiles] = useState([]); 
+  const [success, setSuccess] = useState(false); 
   const [user] = useAuthState(auth);
   const fileRef = useRef(null);
   const { userProfile } = useUserData();
-  
-   
+
   
   const handleUploadData = async (e) => {
     e.preventDefault();
-    const storageRef = ref(storage, `posts/${user.uid}`);
-    let url = '';
-    
     try {
-      if (selectedFiles) {
-        await uploadString(storageRef, selectedFiles, "data_url")
-        url = await getDownloadURL(ref(storage, `posts/${user.uid}`)) 
-      }
-      
+      const storageRef = ref(storage, `posts/${user.uid}/${Date.now()}_${selectedFiles.name}`); // Use a unique storage reference for each image
+      await uploadString(storageRef, selectedFiles, "data_url");
+      const url = await getDownloadURL(storageRef); 
+  
       const userRef = doc(db, "users", user.uid);
-      
       const newPost = {
-        image: selectedFiles,
+        image: url,
         caption: e.target.caption.value,
         likes: 0,
-        comments: []
+        comments: [],
+        timestamp: new Date().toISOString()  
       };
-    
+  
       await updateDoc(userRef, {
         posts: [...userProfile[0].posts, newPost]
       });
-   
+  
+      setSuccess(true);
       console.log('Document updated successfully');
     } catch (error) {
       console.error('Error updating document:', error);
+    } finally {
+      setTimeout(() => {
+        setSuccess(false);
+      }, 2000);
     }
   };
   
   
- 
   return (
-    <main className='flex w-full text-black h-screen justify-center items-center'>
-      <div className="w-full max-w-md border rounded bg-white p-4 shadow-lg">
+    <main className='flex w-full h-screen justify-center items-center p-1'>
+      <div className="w-full AuthenticationPageBg max-w-md border rounded p-4">
+       <div className='flex justify-between w-full'>
          <h2 className="text-2xl font-bold mb-4">Create a Post</h2>
-           <div className="flex justify-center items-center w-full h-[250px] relative overflow-hidden outline-none mt-2 mb-4">
-               <img className=' border-2 border-white' src={ selectedFiles} alt="" />
+         {userProfile && <Link to={`/${userProfile[0]?.userName}`}><IoMdClose title='close' size={37} className='hover:bg-[#000000] hover:bg-opacity-30 rounded-full cursor-pointer'/></Link>}
+            </div>
+             <div className="flex rounded-md bg-black justify-center items-center w-full h-[290px] relative overflow-hidden outline-none mt-2 mb-4">
+              <img className=' border-2 border-white' src={selectedFiles} alt="" />
                 <div className='absolute inset-0 flex items-center justify-center'>
                  <div className='flex bg-black p-2 rounded-full bg-opacity-70'>
-                  <TiCameraOutline onClick={() => fileRef.current.click()} className='cursor-pointer text-white text-xl'/>
+                  <TiCameraOutline onClick={() => fileRef.current.click()} className='cursor-pointer text-white text-7xl'/>
                   <input type="file" 
                     hidden ref={fileRef} 
                     onChange={(e) => {
@@ -69,21 +74,26 @@ const Post = () => {
                </div>
              </div>
            </div>
-          <form onSubmit={handleUploadData}>
+          <form className='text-black' onSubmit={handleUploadData}>
           <textarea
             name="caption" 
-            className="w-full border p-2 mb-4"
+            className="w-full border p-2 mb-4 rounded-md outline-none"
             placeholder="What's happening?"
             rows="4"
           />
           <button
             type="submit"
-            className="bg-blue-500 text-white rounded p-2 px-4 hover:bg-blue-600"
+            className="PostButton text-2xl font-medium font-serif w-full text-white rounded p-2 hover:bg-blue-600"
           >
             Post
           </button>
         </form>
-      </div>
+        </div>
+        {success && (
+        <div className='w-full max-w-md fixed h-[50px] top-4 flex justify-center items-center bg-white rounded-md text-black'>
+            <p className=' text-xl'>Your image has been successfully uploaded.</p>
+        </div>
+      )}
     </main>
   );
 };

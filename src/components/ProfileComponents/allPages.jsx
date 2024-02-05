@@ -1,7 +1,7 @@
 import React from 'react'
 import SideBar from '../HomeComponents/sideBar'
 import Profile from './profile'
-import ProfileAccounts from './profileAccounts'
+import RightSideBar from './rightSidebar'
 import BottomBar from '../HomeComponents/bottomBar'
 import { useUserData } from '../../getUserData'
 import Refresh from '../HomeComponents/Refresh'
@@ -19,8 +19,8 @@ const AllPages = () => {
             <div className='max-w-[650px] borderBg border-l border-r w-full overflow-y-auto'>
               <Profile />
             </div>
-            <div className='hidden profileAccounts'>
-              <ProfileAccounts />
+            <div className='hidden pl-6 RightSideBar'>
+              <RightSideBar />
             </div>
             <BottomBar />
           </>

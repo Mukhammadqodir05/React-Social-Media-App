@@ -1,15 +1,13 @@
 import React,{ useState,useEffect } from "react";
-import {NavLink} from 'react-router-dom';
-import {FaPlusSquare, FaCompass, FaUser, FaFacebookMessenger, FaBell } from 'react-icons/fa';
+import {Link, NavLink} from 'react-router-dom';
+import {FaPlusSquare, FaCompass, FaFacebookMessenger, FaBell } from 'react-icons/fa';
 import {AiFillHome} from "react-icons/ai";
 import LogOut from '../../Auth/logout';
 import TrendMedia from '/src/assets/TrendMedia.png'
-import { useParams } from 'react-router-dom';
 import { useUserData } from '../../getUserData'; 
 
 
 const SideBar = () => {
-  const {username} = useParams()
   const { userProfile } = useUserData(); 
   const [userName, setUserName] = useState(null)
   
@@ -19,7 +17,7 @@ const SideBar = () => {
     }
   }, [userProfile]);
 
-   
+
   const handleLogoClick = () =>{
     window.location.reload();
     window.location.href = ("/");
@@ -39,7 +37,7 @@ const SideBar = () => {
               <span className="sidebarText text-xl font-medium font-serif cursor-pointer">Home</span>
             </li>
           </NavLink>
-          <NavLink to="/post" className='rounded-full' activeclassname='active'>
+          <NavLink to={`/${userName}/post`} className='rounded-full' activeclassname='active'>
             <li className="flex gap-5 p-3 hover:bg-[#2f2d2d] hover:bg-opacity-70 rounded-full">
               <FaPlusSquare size={27} className="cursor-pointer"/>
               <span className="sidebarText text-xl font-medium font-serif cursor-pointer">Post</span>
@@ -63,13 +61,18 @@ const SideBar = () => {
               <span className="sidebarText text-xl font-medium font-serif cursor-pointer">Notifications</span>
             </li>
           </NavLink>
-          <NavLink to={`/${userName}`}  className='rounded-full' activeclassname='active'>
-          <li className="flex gap-5 p-3 hover:bg-[#2f2d2d] hover:bg-opacity-70 rounded-full">
-            <FaUser size={27} className="cursor-pointer"/>
+          <Link to={`/${userName}`}  className='rounded-full' activeclassname='active'>
+          <li className="flex items-center gap-5 p-3 hover:bg-[#2f2d2d] hover:bg-opacity-70 rounded-full">
+            {userProfile[0]?.userPictureURL ? 
+                 <img
+                   className="w-full  bg-black object-cover aspect-square h-full max-h-10 max-w-10 rounded-full border-2 border-white"
+                   src={userProfile[0]?.userPictureURL}
+                /> : <h1 className="w-full bg-black object-cover aspect-square h-full max-h-10 max-w-10 rounded-full border-2 border-white"/> 
+            }
             <span className="sidebarText text-xl font-medium font-serif cursor-pointer">Profile</span>
           </li>
-        </NavLink>
-          <div className='mt-[130px] p-3 hover:bg-[#2f2d2d] hover:bg-opacity-70 rounded-full'>
+        </Link>
+          <div className='mt-[110px] p-3 hover:bg-[#2f2d2d] hover:bg-opacity-70 rounded-full'>
              <LogOut />
           </div>
         </div>

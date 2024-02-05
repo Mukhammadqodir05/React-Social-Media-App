@@ -11,7 +11,9 @@ body, html {
   background-image: linear-gradient(to right top, #1c0c24, #1e0d28, #200e2b, #220f2f, #240f33, #250f35, #250f36, #260f38, #250f38, #251038, #241038, #241038);
 }
 
-
+.PostButton{
+  background-image: linear-gradient(to right top, #22171d, #461a38, #691759, #8a0f81, #a800ae, #b411c5, #be1fdd, #c72df6, #c63df8, #c54af9, #c555fa, #c45ffb);
+}
 
 .active {
   background-image: linear-gradient(to right top, #d16ba5, #c777b9, #ba83ca, #aa8fd8, #9a9ae1, #8aa7ec, #79b3f4, #69bff8, #52cffe, #41dfff, #46eefa, #5ffbf1);
@@ -20,6 +22,7 @@ body, html {
 .container{
     background-image: linear-gradient(to left top, #3e1a7a, #421b73, #441c6c, #451d65, #461f5f, #491f63, #4b1e68, #4e1e6c, #531c7d, #56198e, #5717a1, #5515b4);
 }
+
 
 .input::placeholder {
     color: rgb(201, 181, 181);
@@ -34,7 +37,7 @@ body, html {
 }
 
 .borderBg{
-    border-color: #4d4a50;
+  border-color: #4d4a50;
 }
 
 /* Left SideBar Resizing */
@@ -45,7 +48,7 @@ body, html {
 }
 @media (min-width: 700px) {
   .sideBarResize{
-    width: 100px;
+    width: 80px;
   }
 }
 
@@ -66,8 +69,8 @@ body, html {
 
 
 /* Rigt SideBar Resizing */
-@media (min-width: 1030px) {
-  .profileAccounts {
+@media (min-width: 1050px) {
+  .RightSideBar {
     display: flex;
     width: 30%;
   }
@@ -76,6 +79,9 @@ body, html {
 
 /* BottomBar Resizing */
 @media (max-width: 500px) {
+  .homeFeed{
+   margin-bottom: 60px;
+  }
   .sideBarResize {
     display: none;
     width: 0;

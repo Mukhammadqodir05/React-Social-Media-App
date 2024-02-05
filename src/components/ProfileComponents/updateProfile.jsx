@@ -101,7 +101,7 @@ const remainingWebsiteCharacters = MAX_WEBSITE_LENGTH  - website.length;
     {currentUser? 
       <div className="flex flex-col w-full sm:max-w-[600px] h-full">
        <div className='flex p-3 items-center fixed h-12 w-full max-w-[600px]'>
-         <Link to={`/${currentUser.userName}`} ><IoMdArrowRoundBack className='text-[35px] cursor-pointer'/></Link>
+         <Link className='hover:bg-[#363535] rounded-full p-2' to={`/${currentUser.userName}`} ><IoMdArrowRoundBack className='text-[25px] cursor-pointer'/></Link>
          </div>
           <div className='flex flex-col w-full h-full justify-center items-center overflow-scroll pt-1 mt-[48px]'>
            <div className="w-full flex flex-col ">
@@ -135,7 +135,6 @@ const remainingWebsiteCharacters = MAX_WEBSITE_LENGTH  - website.length;
                   </div>
                 </div>
               </div>
-
               {/* PROFILE IMAGE starts here */}
               <div className='flex mt-[-63px] w-32 h-32 ml-2 rounded-full bg-gray-500 relative'>
                <img className='rounded-full object-cover aspect-square border-2 border-white' src={ selectedImage || currentUser.userPictureURL } alt="" />
