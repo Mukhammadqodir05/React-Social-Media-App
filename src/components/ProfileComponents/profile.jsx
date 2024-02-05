@@ -5,6 +5,7 @@ import { IoMdArrowRoundBack } from "react-icons/io";
 import{ auth, db } from '../../firebase'
 import { doc, updateDoc,onSnapshot } from 'firebase/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
+import { IoPersonCircleSharp } from "react-icons/io5";
 
 const Profile = () => {
   const { userProfile, allUsersData } = useUserData();
@@ -124,10 +125,9 @@ const Profile = () => {
                   className="w-full mt-[-73px] bg-black object-cover aspect-square h-full max-h-36 max-w-36 rounded-full border-2 border-white"
                   src={currentUser.userPictureURL}
                 />
-              ) : (<h1
-                  className="w-full mt-[-73px] bg-black aspect-square h-full max-h-32 max-w-32 rounded-full border-4 border-black"
-                  src={currentUser.userPictureURL}
-              />)}
+              ) : (<div
+                  className="w-full flex justify-center items-center mt-[-73px] bg-black aspect-square h-full max-h-32 max-w-32 rounded-full border-4"
+              ><IoPersonCircleSharp className="flex w-full h-full"/></div>)}
                     {userProfile && (
                   <div className="relative mt-4">
                     {username !== userProfile[0]?.userName && (

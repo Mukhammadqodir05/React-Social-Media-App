@@ -1,8 +1,9 @@
 import React,{useState,useEffect} from 'react';
 import { Link, NavLink } from 'react-router-dom';
-import { FaPlusSquare, FaCompass, FaUser, FaBell } from 'react-icons/fa';
+import { FaPlusSquare, FaCompass, FaBell } from 'react-icons/fa';
 import {AiFillHome} from "react-icons/ai";
 import { useUserData } from '../../getUserData'; 
+import { IoPersonCircleSharp } from "react-icons/io5";
 
 const BottomBar = () => {
   const { userProfile } = useUserData(); 
@@ -43,9 +44,7 @@ const BottomBar = () => {
                    className="w-full  bg-black object-cover aspect-square h-full max-h-10 max-w-10 rounded-full border-2 border-white"
                    src={userProfile[0]?.userPictureURL}
                 /> : 
-                <h1
-                   className="w-full p-[18px] flex bg-black rounded-full border-2 border-white"
-                />
+                <div className='rounded-full bg-gray-300 flex items-center justify-center mr-2 '><IoPersonCircleSharp size={36}/></div>
             }
           </li>
         </Link>

@@ -55,7 +55,7 @@ const SignIn = (props) => {
               placeholder='Password'
             />
             <span
-              className='absolute right-7 top-1/2 transform -translate-y-1/2 cursor-pointer'
+              className='absolute right-7 top-1/2 transform -translate-y-1/2 cursor-pointer text-black'
               onClick={() => setShowPassword(prevShow => !prevShow)}
             >
               {showPassword ? <FaEyeSlash /> : <FaEye />}

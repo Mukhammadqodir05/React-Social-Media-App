@@ -5,7 +5,7 @@ import {AiFillHome} from "react-icons/ai";
 import LogOut from '../../Auth/logout';
 import TrendMedia from '/src/assets/TrendMedia.png'
 import { useUserData } from '../../getUserData'; 
-
+import { IoPersonCircleSharp } from "react-icons/io5";
 
 const SideBar = () => {
   const { userProfile } = useUserData(); 
@@ -67,7 +67,7 @@ const SideBar = () => {
                  <img
                    className="w-full  bg-black object-cover aspect-square h-full max-h-10 max-w-10 rounded-full border-2 border-white"
                    src={userProfile[0]?.userPictureURL}
-                /> : <h1 className="w-full bg-black object-cover aspect-square h-full max-h-10 max-w-10 rounded-full border-2 border-white"/> 
+                /> :  <div className='rounded-full bg-gray-300 flex items-center justify-center mr-2 '><IoPersonCircleSharp size={36}/></div>
             }
             <span className="sidebarText text-xl font-medium font-serif cursor-pointer">Profile</span>
           </li>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useUserData } from '../../getUserData';
 import { Link } from 'react-router-dom';
+import { IoPersonCircleSharp } from "react-icons/io5";
 
 const RightSideBar = () => {
   const { allUsersData, userProfile } = useUserData();
@@ -22,11 +23,14 @@ const RightSideBar = () => {
               <div key={user.id} className='flex w-full items-center justify-between p-2 border-b borderBg'>
                 <div className='flex items-center'>
                 <Link to={`/${user?.userName}`}>
-                  <img
-                    src={user.userPictureURL}
-                    alt='User profile'
-                    className='w-8 h-8 rounded-full mr-2'
-                  />
+                {user.userPictureURL ? 
+                 <img
+                   src={user.userPictureURL}
+                   alt='User profile'
+                   className='w-8 h-8 rounded-full mr-2'
+                    /> 
+                    : <div className=' rounded-full bg-gray-300 flex items-center justify-center mr-2'><IoPersonCircleSharp size={30}/></div>
+                    }
                   </Link>
                   <div>
                    <Link to={`/${user?.userName}`}>
