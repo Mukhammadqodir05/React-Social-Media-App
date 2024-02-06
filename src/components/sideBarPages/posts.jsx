@@ -9,17 +9,32 @@ import { IoMdClose } from "react-icons/io";
 import { Link } from 'react-router-dom';
 
 const Post = () => {
+  const [loading, setLoading] = useState(false);
+  const [isButtonDisabled, setButtonDisabled] = useState(false);
+  const [error, setError] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState([]); 
   const [success, setSuccess] = useState(false); 
   const [user] = useAuthState(auth);
   const fileRef = useRef(null);
   const { userProfile } = useUserData();
-
+  
+  const validateImage = (image) => {
+      if(!image.name.match(/\.(jpg|jpeg|png|gif)$/)){
+        setButtonDisabled((prev) => !prev)
+          setError(true)
+      }
+      else{
+        setButtonDisabled(false)
+        setError(false)
+      }
+  }
   
   const handleUploadData = async (e) => {
     e.preventDefault();
+    setLoading(true)
+    
     try {
-      const storageRef = ref(storage, `posts/${user.uid}/${Date.now()}_${selectedFiles.name}`); // Use a unique storage reference for each image
+      const storageRef = ref(storage, `posts/${user.uid}/${Date.now()}_${selectedFiles.name}`); 
       await uploadString(storageRef, selectedFiles, "data_url");
       const url = await getDownloadURL(storageRef); 
   
@@ -44,8 +59,13 @@ const Post = () => {
       setTimeout(() => {
         setSuccess(false);
       }, 2000);
+      setLoading(false)
     }
   };
+
+  setTimeout(() =>{
+    setError(false)
+  }, 5000) 
   
   
   return (
@@ -53,7 +73,7 @@ const Post = () => {
       <div className="w-full AuthenticationPageBg max-w-md border rounded p-4">
        <div className='flex justify-between w-full'>
          <h2 className="text-2xl font-bold mb-4">Create a Post</h2>
-         {userProfile && <Link to={`/${userProfile[0]?.userName}`}><IoMdClose title='close' size={37} className='hover:bg-[#000000] hover:bg-opacity-30 rounded-full cursor-pointer'/></Link>}
+          {userProfile && <Link to={`/${userProfile[0]?.userName}`}><IoMdClose title='close' size={37} className='hover:bg-[#000000] hover:bg-opacity-30 rounded-full cursor-pointer'/></Link>}
             </div>
              <div className="flex rounded-md bg-black justify-center items-center w-full h-[290px] relative overflow-hidden outline-none mt-2 mb-4">
               <img className=' border-2 border-white' src={selectedFiles} alt="" />
@@ -63,6 +83,7 @@ const Post = () => {
                   <input type="file" 
                     hidden ref={fileRef} 
                     onChange={(e) => {
+                    validateImage(e.target.files[0])
                     const file = e.target.files[0]; 
                     const reader = new FileReader();
                     reader.onload = function(event) {
@@ -84,11 +105,17 @@ const Post = () => {
           <button
             type="submit"
             className="PostButton text-2xl font-medium font-serif w-full text-white rounded p-2 hover:bg-blue-600"
-          >
-            Post
+            disabled={isButtonDisabled}
+         >
+          {loading? 'Uploading...' : 'Post' }
           </button>
         </form>
         </div>
+        {error && (
+        <div className='w-full max-w-md fixed h-[50px] top-4 flex justify-center items-center bg-white rounded-md text-black'>
+            <p className=' text-xl'>Ops, only jpg, jpeg, png, or gif are allowed</p>
+        </div>
+      )}
         {success && (
         <div className='w-full max-w-md fixed h-[50px] top-4 flex justify-center items-center bg-white rounded-md text-black'>
             <p className=' text-xl'>Your image has been successfully uploaded.</p>
