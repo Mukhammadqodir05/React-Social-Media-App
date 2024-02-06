@@ -15,8 +15,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       <Routes>
         <Route path="/" element={<App />} />
         <Route path="/:username" element={<MainProfileRoute />} />
-        <Route path="/:username/edit" element={<Suspense fallback={<div>Loading...</div>}><LazyUpdateProfile /></Suspense>} />
-        <Route path="/:username/post" element={<Suspense fallback={<div>Loading...</div>}><LazyPost /></Suspense>} />
+        <Route path="/:username/edit" element={<Suspense fallback={<div className='flex w-full h-screen'>Loading...</div>}><LazyUpdateProfile /></Suspense>} />
+        <Route path="/:username/post" element={<Suspense fallback={<div className='flex w-full h-screen'>Loading...</div>}><LazyPost /></Suspense>} />
       </Routes>
     </GetUserData>
   </BrowserRouter>,
