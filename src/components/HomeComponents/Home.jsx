@@ -16,7 +16,7 @@ const Home = () => {
           <div className='sideBarResize '>
             <SideBar />
           </div>
-          <div className='w-full homeFeed max-w-[650px] borderBg border-l border-r overflow-y-auto '>
+          <div className='w-full homeFeed max-w-[650px] borderBg border-l border-r'>
             <HomeFeed />
           </div>
           <div className='hidden pl-6 RightSideBar'>

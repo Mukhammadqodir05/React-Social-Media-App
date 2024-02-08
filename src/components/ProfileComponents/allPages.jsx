@@ -16,7 +16,7 @@ const AllPages = () => {
             <div className='sideBarResize'>
               <SideBar />
             </div>
-            <div className='max-w-[650px] borderBg border-l border-r w-full overflow-y-auto'>
+            <div className='max-w-[650px] borderBg border-l border-r w-full'>
               <Profile />
             </div>
             <div className='hidden pl-6 RightSideBar'>

@@ -23,6 +23,20 @@ body, html {
     background-image: linear-gradient(to left top, #3e1a7a, #421b73, #441c6c, #451d65, #461f5f, #491f63, #4b1e68, #4e1e6c, #531c7d, #56198e, #5717a1, #5515b4);
 }
 
+.active-tab {
+  position: relative;
+}
+.active-tab::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  width: 40%;
+  height: 7px;
+  background-color: #a600ff; 
+  border-radius: 5px; 
+}
+
+
 
 .input::placeholder {
     color: rgb(201, 181, 181);

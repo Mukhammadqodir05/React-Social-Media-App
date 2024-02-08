@@ -18,6 +18,8 @@ const Profile = () => {
   const [posts, setPosts] = useState(currentUser?.posts.map(post => post))
   const [isFollowed, setIsFollowed] = useState(userProfile[0]?.following.includes(currentUser?.uid));
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedPost, setSelectedPost] = useState(null);
+
   
   function formatCount(count) {
     if (count >= 1000000) {
@@ -105,13 +107,14 @@ const Profile = () => {
     </div> 
   } else {
     return (
-      <main className="flex flex-col w-full items-center justify-center h-full pt-0 pb-10">
-        <div className="max-w-[900px] w-full h-full ">
-         <div className="flex gap-10 items-center w-full h-14 p-2 bg-black bg-opacity-50">
+     <main className="flex flex-col w-full items-center justify-center h-full pt-0 pb-10">
+       <div className="max-w-[900px] w-full h-full">
+         <div className="flex gap-10 items-center w-full h-14 p-2">
           <Link className="hover:bg-[#363535] rounded-full p-2" title="Back to home" to='/'><IoMdArrowRoundBack  size={30}/></Link>
            <h1 className="text-xl cursor-pointer font-medium">{currentUser.fullName}</h1>
             </div>
-             <div className="relative">
+            <div className="w-full h-full overflow-y-auto pb-9">
+             <div className="relative ">
               <div className=" flex justify-center items-center w-full h-full max-h-[200px]">
               {currentUser.userBannerURL ? (
                   <img className="w-full max-w-[650px] object-cover aspect-square h-full max-h-[200px]" src={currentUser.userBannerURL} alt="" />
@@ -144,7 +147,6 @@ const Profile = () => {
                 )}
               </div>
             </div>
-  
             {currentUser ? (
               <div className="p-2 mt-[80px] w-full">
                 <h1 className="text-xl font-medium">{currentUser.fullName}</h1>
@@ -188,17 +190,46 @@ const Profile = () => {
                   <p className="text-gray-500">Posts</p>
                 </div>
               </div>
-              {/* Post here */}
+
+      {/* Posts here */}
               <div className="flex w-full border-t borderBg border-gray-300 "></div>
               <div className="grid grid-cols-3 gap-1 w-full p-1 pb-20">
-              {posts.map((post, index) => (
+               {posts.map((post, index) => (
+                post.type === 'image' ? (
                   <img
                     key={index}
-                    src={post.image}
+                    src={post.media}
                     className="object-cover aspect-square w-full h-full"
+                    alt="Posted image"
                   />
-                ))}
+                ) : post.type === 'video' ? (
+                  <div key={index} className="relative">
+                    <video
+                      className="object-cover aspect-square w-full h-full"
+                      onClick={() => setSelectedPost((post))}
+                    >
+                      <source src={post.media} type="video/mp4" />
+                      Your browser does not support the video tag.
+                    </video>
+                    {selectedPost === post && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-75">
+                        <video
+                          className="object-cover h-full"
+                          controls
+                          autoPlay
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <source src={post.media} type="video/mp4" />
+                          Your browser does not support the video tag.
+                        </video>
+                        {/* Add comments display here */}
+                      </div>
+                    )}
+                  </div>
+                ) : null
+              ))}
             </div>
+          </div>
           </div>
        </main>
      );

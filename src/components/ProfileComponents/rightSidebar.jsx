@@ -3,19 +3,11 @@ import { useUserData } from '../../getUserData';
 import { Link } from 'react-router-dom';
 import { IoPersonCircleSharp } from "react-icons/io5";
 
-
 const RightSideBar = () => {
   const { allUsersData, userProfile } = useUserData();
 
   return (
     <main className='flex flex-col items-center w-full h-full p-1'>
-      <div className='w-full bg-black bg-opacity-30 p-2 mt-4 rounded-md'>
-        <textarea
-          type='text'
-          placeholder='Search new for trends...'
-          className='w-full p-2 rounded-md border borderBg bg-black bg-opacity-30 focus:outline-none'
-        />
-      </div>
       {allUsersData && (
         <div className='w-full mt-4'>
           <div className='bg-black bg-opacity-30 p-4 rounded-md shadow'>

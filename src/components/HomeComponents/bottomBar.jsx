@@ -1,6 +1,6 @@
 import React,{useState,useEffect} from 'react';
 import { Link, NavLink } from 'react-router-dom';
-import { FaPlusSquare, FaCompass, FaBell } from 'react-icons/fa';
+import { FaPlusSquare, FaBell } from 'react-icons/fa';
 import {AiFillHome} from "react-icons/ai";
 import { useUserData } from '../../getUserData'; 
 import { IoPersonCircleSharp } from "react-icons/io5";
@@ -22,21 +22,16 @@ const BottomBar = () => {
               <AiFillHome size={27} className="cursor-pointer" />
             </li>
           </NavLink>
-          <NavLink to="/explore" className='rounded-full' activeclassname='active'>
-            <li className="flex gap-5 p-2">
-              <FaCompass size={27} className="cursor-pointer"/>
-            </li>
-          </NavLink>
           <NavLink to={`/${userName}/post`} className='rounded-full' activeclassname='active'>
             <li className="flex gap-5 p-2">
               <FaPlusSquare size={27} className="cursor-pointer"/>
             </li>
           </NavLink>
-          <NavLink to="/notifications" className='rounded-full' activeclassname='active'>
+          <div className='rounded-full' activeclassname='active'>
             <li className="flex gap-5 p-2">
               <FaBell size={27} className="cursor-pointer"/>
             </li>
-          </NavLink>
+          </div>
           <Link to={`/${userName}`}  className='rounded-full' activeclassname='active'>
           <li className="flex gap-5 hover:bg-[#2f2d2d] hover:bg-opacity-70 rounded-full">
             {userProfile[0]?.userPictureURL ? 

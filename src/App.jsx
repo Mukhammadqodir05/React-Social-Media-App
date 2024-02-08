@@ -6,6 +6,7 @@ import SignUp from './Auth/signUp';
 import Home from './components/HomeComponents/Home'
 import Refresh from './components/HomeComponents/Refresh';
 
+
 const App = () => {
   const [currentPage, setCurrentPage] = useState('SignUp');
   const switchForm = (FormSwitch) => setCurrentPage(FormSwitch);
@@ -29,6 +30,7 @@ const App = () => {
       ) : (
         <SignIn onFormSwitch={switchForm} />
       )}
+
     </main>
   );
 };
