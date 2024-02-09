@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { GoComment } from "react-icons/go";
 import { FaRegHeart } from "react-icons/fa";
 import { FiBarChart2 } from "react-icons/fi";
@@ -13,12 +13,49 @@ const ImageCard = ({ user, post }) => {
   const [liked, setLiked] = useState(false);
   const [newComment, setNewComment] = useState('');
   const [showComments, setShowComments] = useState(false);
+  const videoRef = useRef(null);
+  const [isInView, setIsInView] = useState(false);
+  
+  
   const toggleComments = () => {
     setShowComments(!showComments);
   };
   const handleLike = () => {
     setLiked(!liked);
   };
+
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.play();
+            entry.target.muted = false;
+            setIsInView(true);
+          } else {
+            entry.target.pause();
+            entry.target.muted = true;
+          }
+        });
+      },
+      {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.5,
+      }
+    );
+
+    if (videoRef.current) {
+      observer.observe(videoRef.current);
+    }
+
+    return () => {
+      if (videoRef.current) {
+        observer.unobserve(videoRef.current);
+      }
+    };
+  }, []);
 
   return (
     <div className='w-full p-4 border-t borderBg mb-2'>
@@ -42,32 +79,27 @@ const ImageCard = ({ user, post }) => {
         </p>
       </div>
       <div className='flex flex-col p-2 gap-7'>
-        <div className='flex justify-center items-center'>
-          <div className='flex w-full max-w-[500px] max-h-[550px] border borderBg p-2 rounded-[10px]'>
-          {post.type === 'image' ? (
-            <img
-              src={post.media}
-              className="object-cover aspect-square w-full h-full"
-              alt="Posted image"
-            />
-           ) : post.type === 'video' ? (
-            <video
-              className="object-cover aspect-square w-full h-full"
-              autoPlay
-              loop
-              onClick={(e) => {
-                  if (e.target.paused) {
-                      e.target.play();
-                  } else {
-                      e.target.pause();
-                  }
-              }}
-            >
-              <source src={post.media} type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
-           ) : ''}
-          </div>
+      <div className='flex justify-center items-center'>
+      <div className='flex w-full max-w-[500px] max-h-[650px] border borderBg p-2 rounded-[10px]'>
+      {post.type === 'image' ? (
+        <img
+          src={post.media}
+          className="object-cover aspect-square w-full h-full"
+          alt="Posted image"
+        />
+       ) : post.type === 'video' ? (
+        <video
+          ref={videoRef}
+          className="w-full h-full  max-w-[500px] max-h-[570px]"
+          autoPlay
+          loop
+          muted
+          controls
+        >
+          <source src={post.media} type="video/mp4" />
+        </video>
+      ) : ''}
+    </div>
         </div>
         <div className='flex justify-around'>
           <div className='flex items-center justify-center space-x-1' onClick={toggleComments}>
@@ -105,6 +137,14 @@ const ImageCard = ({ user, post }) => {
     </div>
   );
 };
+
+// onClick={(e) => {
+//   if (e.target.paused) {
+//       e.target.play();
+//   } else {
+//       e.target.pause();
+//   }
+// }}
 
 
   
