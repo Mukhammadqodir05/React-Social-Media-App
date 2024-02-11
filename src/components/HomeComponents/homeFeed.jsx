@@ -8,6 +8,9 @@ import { Link } from 'react-router-dom';
 import { IoPersonCircleSharp } from "react-icons/io5";
 import Explore from '../sideBarPages/explore';
 import { FaCompass } from 'react-icons/fa';
+import { onSnapshot } from 'firebase/firestore';
+import { db } from '../../firebase';
+import { collection } from 'firebase/firestore';
 
 const ImageCard = ({ user, post }) => {
   const [liked, setLiked] = useState(false);
@@ -105,7 +108,7 @@ const ImageCard = ({ user, post }) => {
            <FaRegHeart size={20} className={liked ? 'text-red-500 cursor-pointer' : 'text-gray-600 cursor-pointer'} />
            <span className='text-xs  text-gray-600'>{liked ? (post.likes)+1
               : (
-              (post.likes)
+              (post.likes+0)
               )}
             </span>
          </div>
@@ -128,26 +131,33 @@ const ImageCard = ({ user, post }) => {
 
   
 const HomeFeed = () => {
-  const { allUsersData } = useUserData();
   const [display, setDisplay] = useState(false);
   const [activeTab, setActiveTab] = useState('ForYou');
+  const [allPosts, setAllPosts] = useState([]);
 
-  let allPosts = [];
-
-  if (allUsersData) {
-    allUsersData.forEach((user) => {
-      if (user.posts && Array.isArray(user.posts)) {
-        user.posts.forEach((post) => {
-          const postWithUser = {
-            user: user,  
-            post: post  
-          };
-          allPosts.push(postWithUser);
-        });
-      }
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(db, "users"), (querySnapshot) => {
+      const updatedPosts = [];
+      querySnapshot.forEach((doc) => {
+        const user = doc.data();
+        if (user.posts && Array.isArray(user.posts)) {
+          user.posts.forEach((post) => {
+            const postWithUser = {
+              user: user,
+              post: post
+            };
+            updatedPosts.push(postWithUser);
+          });
+        }
+      });
+      updatedPosts.sort((a, b) => new Date(b.post.timestamp) - new Date(a.post.timestamp));
+      setAllPosts(updatedPosts);
     });
-    
-    allPosts.sort((a, b) => new Date(b.post.timestamp) - new Date(a.post.timestamp));
+  
+    return () => unsubscribe();
+  }, []);
+  
+    // allPosts.sort((a, b) => new Date(b.post.timestamp) - new Date(a.post.timestamp));
 
     return (
     <main className='flex flex-col items-center w-full h-full'>
@@ -184,9 +194,8 @@ const HomeFeed = () => {
         )}
       </main>
     );
-  } else {
-    return null;
-  }
+
+ 
 };
 
 export default HomeFeed;
