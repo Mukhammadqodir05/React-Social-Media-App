@@ -6,6 +6,7 @@ import{ auth, db } from '../../firebase'
 import { doc, updateDoc,onSnapshot } from 'firebase/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { IoPersonCircleSharp } from "react-icons/io5";
+import { IoClose } from "react-icons/io5";
 
 const Profile = () => {
   const { userProfile, allUsersData } = useUserData();
@@ -19,6 +20,20 @@ const Profile = () => {
   const [isFollowed, setIsFollowed] = useState(userProfile[0]?.following.includes(currentUser?.uid));
   const [isLoading, setIsLoading] = useState(true);
   const [selectedPost, setSelectedPost] = useState(null);
+  const [isPostSelected, setIsPostSelected] = useState(false);
+  const [selectedPostType, setSelectedPostType] = useState(null);
+
+  const handleVideoClick = (post) => {
+    setSelectedPost(post.media);
+    setSelectedPostType('video');
+    setIsPostSelected(true);
+  };
+
+  const handleImageClick = (post) => {
+    setSelectedPost(post.media);
+    setSelectedPostType('image');
+    setIsPostSelected(true);
+  };
 
   
   function formatCount(count) {
@@ -192,45 +207,47 @@ const Profile = () => {
               </div>
 
       {/* Posts here */}
-              <div className="flex w-full border-t borderBg border-gray-300 "></div>
-              <div className="grid grid-cols-3 gap-1 w-full p-1 pb-20">
-               {posts.map((post, index) => (
-                post.type === 'image' ? (
-                  <img
-                    key={index}
-                    src={post.media}
-                    className="object-cover aspect-square w-full h-full"
-                    alt="Posted image"
-                  />
-                ) : post.type === 'video' ? (
-                  <div key={index} className="relative">
-                    <video
-                      className="object-cover aspect-square w-full h-full"
-                      onClick={() => setSelectedPost((post))}
-                    >
-                      <source src={post.media} type="video/mp4" />
-                      Your browser does not support the video tag.
-                    </video>
-                    {selectedPost === post && (
-                      <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-75">
-                        <video
-                          className="object-cover h-full"
-                          controls
-                          autoPlay
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <source src={post.media} type="video/mp4" />
-                          Your browser does not support the video tag.
-                        </video>
-                        {/* Add comments display here */}
-                      </div>
-                    )}
-                  </div>
-                ) : null
-              ))}
+          <div className="flex w-full border-t borderBg border-gray-300 "></div>
+            <div className="grid grid-cols-3 gap-1 w-full p-1 pb-20">
+              {posts.map((post, index) => (
+              post.type === 'image' ? (
+            <img onClick={() => handleImageClick(post)}
+              key={index}
+              src={post.media}
+              className="object-cover aspect-square w-full h-full"
+              alt="Posted image"
+            />
+          ) : post.type === 'video' ? (
+            <div key={index} className="relative">
+              <video
+                className="object-cover aspect-square w-full h-full"
+                onClick={() => handleVideoClick(post)}
+              >
+                <source src={post.media} type="video/mp4" />
+              </video>
+            </div>
+          ) : null
+        ))}
+
             </div>
           </div>
           </div>
+        
+          {isPostSelected && (
+            <div className="absolute flex p-1">
+              <div onClick={() => setIsPostSelected(false)} className="absolute bg-black  z-10 cursor-pointer">
+                <IoClose size={30} />
+              </div>
+              {selectedPostType === 'video' ? (
+                <video className="object-cover w-[400px] h-[550px]" controls autoPlay muted>
+                  <source src={selectedPost} type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
+              ) : selectedPostType === 'image' ? (
+                <img className="object-cover aspect-square h-full max-h-[550px] w-full max-w-[500px]" src={selectedPost} alt="Selected Image" />
+              ) : null}
+            </div>
+          )}
        </main>
      );
   };

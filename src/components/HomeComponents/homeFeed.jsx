@@ -24,14 +24,13 @@ const ImageCard = ({ user, post }) => {
     setLiked(!liked);
   };
 
-
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.play();
-            entry.target.muted = false;
+            entry.target.muted = true; // Setting the video to be initially muted
             setIsInView(true);
           } else {
             entry.target.pause();
@@ -80,7 +79,7 @@ const ImageCard = ({ user, post }) => {
       </div>
       <div className='flex flex-col p-2 gap-7'>
       <div className='flex justify-center items-center'>
-      <div className='flex w-full max-w-[500px] max-h-[650px] border borderBg p-2 rounded-[10px]'>
+      <div className='flex w-full max-w-[500px] max-h-[600px] border borderBg p-2 rounded-[10px]'>
       {post.type === 'image' ? (
         <img
           src={post.media}
@@ -90,13 +89,14 @@ const ImageCard = ({ user, post }) => {
        ) : post.type === 'video' ? (
         <video
           ref={videoRef}
-          className="w-full h-full  max-w-[500px] max-h-[570px]"
+          className=" w-full h-full max-w-[500px] max-h-[570px]"
           autoPlay
           loop
           muted
           controls
         >
           <source src={post.media} type="video/mp4" />
+          Your browser does not support the video tag.
         </video>
       ) : ''}
     </div>
@@ -137,14 +137,6 @@ const ImageCard = ({ user, post }) => {
     </div>
   );
 };
-
-// onClick={(e) => {
-//   if (e.target.paused) {
-//       e.target.play();
-//   } else {
-//       e.target.pause();
-//   }
-// }}
 
 
   
