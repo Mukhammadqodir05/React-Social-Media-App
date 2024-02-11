@@ -11,15 +11,10 @@ import { FaCompass } from 'react-icons/fa';
 
 const ImageCard = ({ user, post }) => {
   const [liked, setLiked] = useState(false);
-  const [newComment, setNewComment] = useState('');
-  const [showComments, setShowComments] = useState(false);
   const videoRef = useRef(null);
-  const [isInView, setIsInView] = useState(false);
+
   
-  
-  const toggleComments = () => {
-    setShowComments(!showComments);
-  };
+ 
   const handleLike = () => {
     setLiked(!liked);
   };
@@ -30,8 +25,7 @@ const ImageCard = ({ user, post }) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.play();
-            entry.target.muted = true; // Setting the video to be initially muted
-            setIsInView(true);
+            entry.target.muted = true; 
           } else {
             entry.target.pause();
             entry.target.muted = true;
@@ -102,7 +96,7 @@ const ImageCard = ({ user, post }) => {
     </div>
         </div>
         <div className='flex justify-around'>
-          <div className='flex items-center justify-center space-x-1' onClick={toggleComments}>
+          <div className='flex items-center justify-center space-x-1'>
             <GoComment size={20} className='curtext-gray-600 cursor-pointer' />
             <span className='text-xs text-gray-600'>{post.comments.length} Comments</span>
           </div>
@@ -126,13 +120,6 @@ const ImageCard = ({ user, post }) => {
             <span className='text-xs text-gray-600'>{post.shares}</span>
           </div>
         </div>
-        {showComments && (
-        <div className=''>
-          {post.comments.map((comment, index) => (
-            <div key={index} className='flex justify-start max-w-[550px] overflow-hidden'>{comment}</div>
-          ))}
-        </div>
-      )}
       </div>
     </div>
   );

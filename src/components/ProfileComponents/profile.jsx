@@ -83,7 +83,7 @@ const Profile = () => {
     try {
       const userRef = doc(db, "users", user.uid);
       const userRef2 = doc(db, "users", currentUser.uid);
-  
+             
       if(userProfile[0]?.following.includes(currentUser?.uid)){
         const index = userProfile[0].following.indexOf(currentUser?.uid);
         userProfile[0].following.splice(index, 1); 
@@ -115,6 +115,7 @@ const Profile = () => {
       console.error('Error updating document:', error);
     }
   };
+
   
   if (isLoading) {
     return <div className="flex justify-center items-center w-full h-screen">
