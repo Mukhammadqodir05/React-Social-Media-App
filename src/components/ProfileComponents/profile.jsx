@@ -7,6 +7,7 @@ import { doc, updateDoc,onSnapshot } from 'firebase/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { IoPersonCircleSharp } from "react-icons/io5";
 import { IoClose } from "react-icons/io5";
+import { HashLoader, GridLoader, FadeLoader } from 'react-spinners';
 
 const Profile = () => {
   const { userProfile, allUsersData } = useUserData();
@@ -117,11 +118,13 @@ const Profile = () => {
   };
 
   
-  if (isLoading) {
-    return <div className="flex justify-center items-center w-full h-screen">
-        <p className="">Loading...</p>
+if (isLoading) {
+    return (
+    <div className="flex justify-center items-center w-full h-screen">
+      <FadeLoader color='#F9008E' size={50} loading={true} /> 
     </div> 
-  } else {
+)
+} else {
     return (
      <main className="flex flex-col w-full items-center justify-center h-full pt-0 pb-10">
        <div className="max-w-[900px] w-full h-full">

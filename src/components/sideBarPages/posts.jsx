@@ -7,12 +7,13 @@ import { TiCameraOutline } from 'react-icons/ti';
 import { ref, uploadString, getDownloadURL} from 'firebase/storage'
 import { IoMdClose } from "react-icons/io";
 import { Link } from 'react-router-dom';
+import Refresh from '../HomeComponents/Refresh'
+import { GridLoader } from 'react-spinners';
 
 const Post = () => {
   const [loading, setLoading] = useState(false);
   const [type, setType] = useState('');
   const [video, setVideo] = useState(null);
-  const [isButtonDisabled, setButtonDisabled] = useState(false);
   const [error, setError] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState([]); 
   const [success, setSuccess] = useState(false); 
@@ -21,10 +22,12 @@ const Post = () => {
   const { userProfile } = useUserData();
   const videoRef = useRef();
   
+
+
   const handleUploadData = async (e) => {
     e.preventDefault();
     setLoading(true)
-    
+
     try {
       const storageRef = ref(storage, `posts/${user.uid}/${Date.now()}_${selectedFiles.name}`); 
       await uploadString(storageRef, selectedFiles, "data_url");
@@ -62,9 +65,11 @@ const Post = () => {
     setError(false)
   }, 5000) 
   
-  
+  if(userProfile){
   return (
-    <main className='flex w-full h-screen justify-center items-center p-1'>
+   <main className='flex w-full h-screen justify-center items-center p-1'>
+     { !loading ?
+     <>
       <div className="w-full AuthenticationPageBg max-w-md border rounded p-4">
        <div className='flex justify-between w-full'>
          <h2 className="text-2xl font-bold mb-4">Create a Post</h2>
@@ -115,36 +120,45 @@ const Post = () => {
           </div>
 
 
-         {/* Form here */}
-          <form className='text-black' onSubmit={handleUploadData}>
-          <textarea
-            name="caption" 
-            className="w-full border p-2 mb-4 rounded-md outline-none"
-            placeholder="What's happening?"
-            rows="4"
-          />
-          <button
-            type="submit"
-            className="PostButton text-2xl font-medium font-serif w-full text-white rounded p-2 hover:bg-blue-600"
-            disabled={isButtonDisabled}
-         >
-          {loading? 'Uploading...' : 'Post' }
-          </button>
-        </form>
-        </div>
-        {error && (
-        <div className='w-full max-w-md fixed h-[50px] top-4 flex justify-center items-center bg-white rounded-md text-black'>
-            <p className=' text-xl'>Ops, only jpg, jpeg, png, or gif are allowed</p>
-        </div>
-      )}
-        {success && (
-        <div className='w-full max-w-md fixed h-[50px] top-4 flex justify-center items-center bg-white rounded-md text-black'>
-            <p className=' text-xl'>Your image has been successfully uploaded.</p>
-        </div>
-      )}
-    </main>
+          {/* Form here */}
+        <form className='text-black' onSubmit={handleUploadData}>
+            <textarea
+              name="caption" 
+              className="w-full border p-2 mb-4 rounded-md outline-none"
+              placeholder="Tell us about the post ..."
+              rows="4"
+            />
+            <button
+              type="submit"
+              className="PostButton text-2xl font-medium font-serif w-full text-white rounded p-2 hover:bg-blue-600"
+          >
+            {loading? 'Uploading...' : 'Post' }
+            </button>
+          </form> 
+          </div>
+          {error && (
+          <div className='w-full max-w-md fixed h-[50px] top-4 flex justify-center items-center bg-white rounded-md text-black'>
+              <p className=' text-xl'>Ops, only jpg, jpeg, png, or gif are allowed</p>
+          </div>
+        )}
+          {success && (
+          <div className='w-full max-w-md fixed h-[50px] top-4 flex justify-center items-center bg-white rounded-md text-black'>
+              <p className=' text-xl'>Your image has been successfully uploaded.</p>
+          </div>
+        )}
+        </> 
+        : (
+            <GridLoader color='#F9008E' size={50} loading={true} /> 
+          )}
+     </main>
   );
-};
+} 
 
+else{
+  return(
+    <Refresh />
+  )
+}
+};
 export default Post;
 

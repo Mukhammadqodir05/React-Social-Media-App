@@ -7,6 +7,7 @@ import { TbCameraPlus } from "react-icons/tb";
 import { Link,useParams } from 'react-router-dom';
 import { IoMdArrowRoundBack } from "react-icons/io";
 import { ref, uploadString, getDownloadURL } from 'firebase/storage'
+import { HashLoader } from 'react-spinners';
 
 const UpdateProfile = () => {
   const [selectedImage, setSelectedImage] = useState('')
@@ -98,6 +99,8 @@ const remainingWebsiteCharacters = MAX_WEBSITE_LENGTH  - website.length;
   
   return (
   <main className='flex flex-col w-full h-screen items-center justify-center bg-black'>
+   { !loading? 
+    <>
     {currentUser? 
       <div className="flex flex-col w-full sm:max-w-[600px] h-full">
        <div className='flex p-3 items-center fixed h-12 w-full max-w-[600px]'>
@@ -221,8 +224,12 @@ const remainingWebsiteCharacters = MAX_WEBSITE_LENGTH  - website.length;
           </div>
          </div>
         :  (
-         <p>Loading...</p>
+          <HashLoader color='#F9008E' size={150} loading={true} /> 
      )}
+      </> :
+      (
+        <HashLoader color='#F9008E' size={150} loading={true} /> 
+      )}
   </main>
   );
 };

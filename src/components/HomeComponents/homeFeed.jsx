@@ -128,13 +128,12 @@ const ImageCard = ({ user, post }) => {
   );
 };
 
-
   
 const HomeFeed = () => {
   const [display, setDisplay] = useState(false);
   const [activeTab, setActiveTab] = useState('ForYou');
   const [allPosts, setAllPosts] = useState([]);
-
+  
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, "users"), (querySnapshot) => {
       const updatedPosts = [];
@@ -156,8 +155,6 @@ const HomeFeed = () => {
   
     return () => unsubscribe();
   }, []);
-  
-    // allPosts.sort((a, b) => new Date(b.post.timestamp) - new Date(a.post.timestamp));
 
     return (
     <main className='flex flex-col items-center w-full h-full'>

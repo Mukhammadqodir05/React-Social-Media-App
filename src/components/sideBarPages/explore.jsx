@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useUserData } from '../../getUserData';
 import { IoPersonCircleSharp } from 'react-icons/io5';
 import { Link } from 'react-router-dom';
-import rocket  from '/src/assets/rocket.png'
+import Interactify from'/src/assets/Interactify.png'
 
 const Explore = () => {
   const { allUsersData, userProfile } = useUserData();
@@ -48,8 +48,8 @@ const Explore = () => {
           ))
         ): (
           <div className='flex flex-col w-full h-screen justify-center items-center p-2'>
-            <h1 className='font-extrabold font-serif text-3xl'>Welcome to Interactify!</h1>
-            <img src={rocket} />
+            <h1 className='font-extrabold font-serif text-3xl gradient-text'>Welcome to Interactify!</h1>
+            <img className='w-96 ' src={Interactify}/>
         </div>
         )}  
         </div>

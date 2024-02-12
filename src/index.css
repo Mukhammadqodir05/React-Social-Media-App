@@ -11,6 +11,15 @@ body, html {
   background-image: linear-gradient(to right top, #1c0c24, #1e0d28, #200e2b, #220f2f, #240f33, #250f35, #250f36, #260f38, #250f38, #251038, #241038, #241038);
 }
 
+.gradient-text {
+  background: linear-gradient(to right, #F9008E, #F733A2, #F44CB4, #F060C6, #EB71D5, #E373DD, #DB76E4, #D179EB, #C071EF, #AD6AF2, #9664F7, #785FFB);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  padding-bottom: 10px; /* Adjust this value as needed */
+}
+
+
 .PostButton{
   background-image: linear-gradient(to right top, #22171d, #461a38, #691759, #8a0f81, #a800ae, #b411c5, #be1fdd, #c72df6, #c63df8, #c54af9, #c555fa, #c45ffb);
 }
