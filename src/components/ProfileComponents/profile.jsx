@@ -3,11 +3,16 @@ import { useUserData } from '../../getUserData';
 import { Link, useParams } from "react-router-dom";
 import { IoMdArrowRoundBack } from "react-icons/io";
 import{ auth, db } from '../../firebase'
-import { doc, updateDoc,onSnapshot } from 'firebase/firestore';
+import { doc, updateDoc, onSnapshot } from 'firebase/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { IoPersonCircleSharp } from "react-icons/io5";
 import { IoClose } from "react-icons/io5";
-import { HashLoader, GridLoader, FadeLoader } from 'react-spinners';
+import { FadeLoader } from 'react-spinners';
+import { MdOutlineSlowMotionVideo, MdClose } from "react-icons/md";
+import { MdDeleteOutline } from "react-icons/md";
+import { BsThreeDots } from "react-icons/bs";
+import { LiaUserEditSolid } from "react-icons/lia";
+import { BiSolidEditAlt } from "react-icons/bi";
 
 const Profile = () => {
   const { userProfile, allUsersData } = useUserData();
@@ -21,22 +26,15 @@ const Profile = () => {
   const [isFollowed, setIsFollowed] = useState(userProfile[0]?.following.includes(currentUser?.uid));
   const [isLoading, setIsLoading] = useState(true);
   const [selectedPost, setSelectedPost] = useState(null);
+  const [clickedIndex, setClickedIndex] = useState(null);
   const [isPostSelected, setIsPostSelected] = useState(false);
   const [selectedPostType, setSelectedPostType] = useState(null);
-
-  const handleVideoClick = (post) => {
-    setSelectedPost(post.media);
-    setSelectedPostType('video');
-    setIsPostSelected(true);
-  };
-
-  const handleImageClick = (post) => {
-    setSelectedPost(post.media);
-    setSelectedPostType('image');
-    setIsPostSelected(true);
-  };
-
+  const [showPauseIcon, setShowPauseIcon] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [showOptions, setShowOptions] = useState(false);
   
+  
+  // Formating
   function formatCount(count) {
     if (count >= 1000000) {
       if (count % 1000000 === 0) {
@@ -64,6 +62,8 @@ const Profile = () => {
   ];
   const joinedDate = `Joined ${monthNames[timestamp.getMonth()]} ${timestamp.getFullYear()}`;
   
+
+  // Real-Time Database 
   useEffect(() => {
     const unsubscribe = onSnapshot(doc(db, "users", currentUser?.uid), (doc) => {
       setFollowersCount(doc.data().followers.length);
@@ -78,6 +78,7 @@ const Profile = () => {
   }, [user.uid, currentUser?.uid]);
 
 
+//  Handle Follow 
   const handleFollowAction = async (e) => {
     e.preventDefault();
   
@@ -117,7 +118,47 @@ const Profile = () => {
     }
   };
 
+
+// Handle Video Ckick
+  const handleVideoClick = (post, index) => {
+    setSelectedPost(post);
+    setSelectedPostType('video');
+    setIsPostSelected(true);
+    setClickedIndex(index);
+  };
+
+  // Handle Image Ckick
+  const handleImageClick = (post, index) => {
+    setSelectedPost(post);
+    setSelectedPostType('image');
+    setIsPostSelected(true);
+    setClickedIndex(index);
+  };
+
+
+  // Handle Delete
+  const handleDeletePost = async () => {
+      try {
+        setShowConfirmation(false)
+        const userRef = doc(db, "users", user.uid);
+
+        if (clickedIndex !== -1) {
+            userProfile[0].posts.splice(clickedIndex, 1); 
+            const updatedData = {
+                posts: userProfile[0].posts,
+            };
+            await updateDoc(userRef, updatedData);
+            console.log('Post deleted successfully');
+        } else {
+            console.log('Post not found in the user\'s posts array');
+        }
+      } catch (error) {
+          console.error('Error deleting post:', error);
+      }
+  };
+
   
+
 if (isLoading) {
     return (
     <div className="flex justify-center items-center w-full h-screen">
@@ -158,8 +199,8 @@ if (isLoading) {
                       </button>
                     )}               
                     {username === userProfile[0].userName && (
-                      <Link to={`/${currentUser.userName}/edit`} className="border border-blue-500 text-blue-500 px-4 py-2 rounded-full">
-                        Edit Profile
+                      <Link to={`/${currentUser.userName}/edit`} className=" text-[#e600ff]">
+                        <LiaUserEditSolid title="edit" size={35} />
                       </Link>
                     )}
                   </div>
@@ -210,48 +251,147 @@ if (isLoading) {
                 </div>
               </div>
 
-      {/* Posts here */}
-          <div className="flex w-full border-t borderBg border-gray-300 "></div>
+                {/* Posts here */}
+            <div className="flex w-full border-t borderBg border-gray-300 "></div>
             <div className="grid grid-cols-3 gap-1 w-full p-1 pb-20">
-              {posts.map((post, index) => (
-              post.type === 'image' ? (
-            <img onClick={() => handleImageClick(post)}
-              key={index}
-              src={post.media}
-              className="object-cover aspect-square w-full h-full"
-              alt="Posted image"
-            />
-          ) : post.type === 'video' ? (
-            <div key={index} className="relative">
-              <video
-                className="object-cover aspect-square w-full h-full"
-                onClick={() => handleVideoClick(post)}
-              >
-                <source src={post.media} type="video/mp4" />
-              </video>
+                {posts.map((post, index) => (
+                    post.type === 'image' ? (
+                        <img
+                            onClick={() => handleImageClick(post, posts.length - 1 - index)}
+                            key={index}
+                            src={post.media}
+                            className="object-cover aspect-square w-full h-full"
+                            alt="Posted image"
+                        />
+                    ) : post.type === 'video' ? (
+                        <div key={index} className="relative">
+                            <video
+                                className="object-cover aspect-square w-full h-full"
+                                onClick={() => handleVideoClick(post, posts.length - 1 - index)} 
+                            >
+                                <source src={post.media} type="video/mp4" />
+                            </video>
+                        </div>
+                    ) : null
+                ))}
             </div>
-          ) : null
-        ))}
-
             </div>
-          </div>
-          </div>
+            </div>
         
-          {isPostSelected && (
-            <div className="absolute flex p-1">
-              <div onClick={() => setIsPostSelected(false)} className="absolute bg-black  z-10 cursor-pointer">
-                <IoClose size={30} />
+          { isPostSelected && (
+            <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-90 z-50 p-1">
+              <div className="flex bg-black w-full max-w-[700px] lg:max-w-[1200px] flex-col-reverse lg:flex-row">
+                <div className="w-full flex justify-center items-center relative">
+                  {selectedPostType === 'video' ? (
+                    <video className="w-full max-w-[500px] lg:max-w-[560px] xl:max-w-[600px] 2xl:max-w-[630px] aspect-square" 
+                      autoPlay
+                      loop
+                      onClick={(e) => {
+                          if (e.target.paused) {
+                              e.target.play();
+                              setShowPauseIcon(false);
+                          } else {
+                              e.target.pause();
+                              setShowPauseIcon(true);
+                          }
+                      }}
+                    >
+                      <source src={selectedPost.media} type="video/mp4" />
+                    </video>
+
+                  ) : selectedPostType === 'image' ? (
+                    <img className="object-cover w-full h-full max-h-[500px] lg:max-h-[560px] xl:max-h-[600px] 2xl:max-h-[630px] aspect-square" src={selectedPost.media} alt="Selected Post" />
+                  ) : null }
+                  { showPauseIcon && 
+                    <div className="absolute z-10 cursor-pointer ">
+                      <MdOutlineSlowMotionVideo size={70}/>
+                    </div>
+                  }
+                </div>
+
+                {/* Comments, Delete Button, Owner Profile Section */}
+                <div className="flex flex-col w-full max-w-[700px] h-full max-h-[700px] lg:max-w-[500px] justify-between items-center bg-black">
+                  <div className="flex  border-b borderBg w-full max-w-[700px] max-h-24 lg:max-w-[500px] justify-between items-center p-2">
+                    <Link to={`/${userProfile[0]?.userName}`} className="flex items-center">
+                      {currentUser?.userPictureURL ? (
+                        <img className='h-10 w-10 rounded-full border-2' src={currentUser?.userPictureURL} alt='' />
+                      ) : (
+                        <div className='rounded-full bg-gray-300 flex items-center justify-center'><IoPersonCircleSharp size={40} /></div>
+                      )}
+                      <span className="ml-2 max-w-[300px] w-full overflow-hidden overflow-ellipsis text-nowrap">{currentUser.fullName}</span>
+                    </Link>
+
+                    { username === userProfile[0].userName && (
+                    <div>
+                      <button className=" hover:text-slate-500" title="options" onClick={() => setShowOptions((prev) => !prev)}>< BsThreeDots size={30}/></button>
+                      
+                      { showOptions && (
+                          <div className="fixed top-0 left-0 z-50 w-full h-full flex items-center justify-center bg-black bg-opacity-50 p-2">
+                            <div className="w-full border borderBg max-w-[400px] max-h-[300px] p-3 rounded shadow-md bg-black text-white">
+                              <button
+                                  className="block w-full text-left py-3 px-2 border-b borderBg text-red-500 border-t hover:bg-[#2d2929] focus:outline-none"
+                                  onClick={() => { setShowConfirmation(true); setShowOptions((prev) => !prev) }}
+                                >
+                               <div className="flex items-center gap-4">
+                                  <MdDeleteOutline size={30} className="mr-2 inline-block" />
+                                  <span>delete</span>
+                                  </div>
+                                </button>
+                                <button
+                                  className="block w-full text-left py-3 px-2 border-b borderBg  border-t hover:bg-[#2d2929] focus:outline-none"
+                                  
+                                >
+                                <div className="flex items-center gap-4">
+                                  < BiSolidEditAlt size={30} className="mr-2 inline-block" />
+                                  <span>edit</span>
+                                  </div>
+                                </button>
+                            
+                              <button
+                                onClick={() => setShowOptions((prev) => !prev)}
+                                className="block w-full text-left hover:bg-[#2d2929] py-3 px-2 border-b borderBg focus:outline-none"
+                              >
+                                <div className="flex items-center gap-4">
+                                  <MdClose size={30}/> 
+                                  <span>back</span>
+                                </div>
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                     
+                      {showConfirmation && (
+                          <div className="fixed top-0 left-0 z-50 w-full h-full flex items-center justify-center bg-black bg-opacity-50 p-2">
+                              <div className="bg-white p-4 rounded shadow-md">
+                                  <p className="text-lg text-black">Are you sure you want to delete this post?</p>
+                                  <div className="flex justify-end mt-4">
+                                      <button className="bg-red-500 text-white px-4 py-2 mr-2 rounded" onClick={handleDeletePost}>Confirm</button>
+                                      <button className="bg-gray-300 text-gray-800 px-4 py-2 rounded" onClick={() => setShowConfirmation(false)}>Cancel</button>
+                                  </div>
+                              </div>
+                          </div>
+                      )}
+                      
+                    </div>
+                    )}
+                  </div>
+
+                  {/* Comments Section */}
+                  <div className="lg:flex w-full h-full lg:flex-col hidden bg-black">
+                    <div className="p-4">
+                      {selectedPost.caption}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Close Icon */}
+                <div onClick={() => setIsPostSelected(false)} className="absolute top-2 right-2 text-white cursor-pointer">
+                  <IoClose size={30} />
+                </div>
               </div>
-              {selectedPostType === 'video' ? (
-                <video className="object-cover w-[400px] h-[550px]" controls autoPlay muted>
-                  <source src={selectedPost} type="video/mp4" />
-                  Your browser does not support the video tag.
-                </video>
-              ) : selectedPostType === 'image' ? (
-                <img className="object-cover aspect-square h-full max-h-[550px] w-full max-w-[500px]" src={selectedPost} alt="Selected Image" />
-              ) : null}
             </div>
           )}
+
        </main>
      );
   };

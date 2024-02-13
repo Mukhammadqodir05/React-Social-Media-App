@@ -16,7 +16,7 @@ body, html {
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
-  padding-bottom: 10px; /* Adjust this value as needed */
+  padding-bottom: 10px; 
 }
 
 
