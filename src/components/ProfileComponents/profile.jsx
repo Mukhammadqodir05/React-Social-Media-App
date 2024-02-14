@@ -6,13 +6,13 @@ import{ auth, db } from '../../firebase'
 import { doc, updateDoc, onSnapshot } from 'firebase/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { IoPersonCircleSharp } from "react-icons/io5";
-import { IoClose } from "react-icons/io5";
 import { FadeLoader } from 'react-spinners';
-import { MdOutlineSlowMotionVideo, MdClose } from "react-icons/md";
+import { MdClose } from "react-icons/md";
 import { MdDeleteOutline } from "react-icons/md";
 import { BsThreeDots } from "react-icons/bs";
 import { LiaUserEditSolid } from "react-icons/lia";
 import { BiSolidEditAlt } from "react-icons/bi";
+import { TbPlayerPlayFilled } from "react-icons/tb";
 
 const Profile = () => {
   const { userProfile, allUsersData } = useUserData();
@@ -279,42 +279,44 @@ if (isLoading) {
             </div>
         
           { isPostSelected && (
-            <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-90 z-50 p-1">
-              <div className="flex bg-black w-full max-w-[700px] lg:max-w-[1200px] flex-col-reverse lg:flex-row">
-                <div className="w-full flex justify-center items-center relative">
-                  {selectedPostType === 'video' ? (
-                    <video className="w-full max-w-[500px] lg:max-w-[560px] xl:max-w-[600px] 2xl:max-w-[630px] aspect-square" 
-                      autoPlay
-                      loop
-                      onClick={(e) => {
-                          if (e.target.paused) {
-                              e.target.play();
-                              setShowPauseIcon(false);
-                          } else {
-                              e.target.pause();
-                              setShowPauseIcon(true);
-                          }
-                      }}
-                    >
-                      <source src={selectedPost.media} type="video/mp4" />
-                    </video>
-
-                  ) : selectedPostType === 'image' ? (
-                    <img className="object-cover w-full h-full max-h-[500px] lg:max-h-[560px] xl:max-h-[600px] 2xl:max-h-[630px] aspect-square" src={selectedPost.media} alt="Selected Post" />
-                  ) : null }
+            <div className="fixed flex-col top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-90 z-50">
+              <div className="flex lg:mt-0 bg-black w-full max-w-[700px] lg:max-w-[1200px] flex-col-reverse lg:flex-row">
+                <div className="w-full border-b lg:border borderBg flex justify-center items-center relative">
                   { showPauseIcon && 
-                    <div className="absolute z-10 cursor-pointer ">
-                      <MdOutlineSlowMotionVideo size={70}/>
-                    </div>
-                  }
+                      <div className="absolute flex items-center bg-black rounded-full bg-opacity-50 p-4">
+                        <TbPlayerPlayFilled size={60}/>
+                      </div>
+                    }
+                    {selectedPostType === 'video' ? (
+                      <video className="w-full cursor-pointer max-w-[500px] lg:max-w-[560px] xl:max-w-[600px] 2xl:max-w-[630px] aspect-square" 
+                        autoPlay
+                        loop
+                        muted
+                        onClick={(e) => {
+                            if (e.target.paused) {
+                                e.target.play();
+                                setShowPauseIcon(false);
+                            } else {
+                                e.target.pause();
+                                setShowPauseIcon(true);
+                            }
+                        }}
+                      >
+                        <source className="" src={selectedPost.media} type="video/mp4" />
+                      </video>
+                      
+
+                    ) : selectedPostType === 'image' ? (
+                      <img className="object-cover w-full h-full max-h-[500px] lg:max-h-[560px] xl:max-h-[600px] 2xl:max-h-[630px] aspect-square" src={selectedPost.media} alt="Selected Post" />
+                    ) : null }
                 </div>
 
                 {/* Comments, Delete Button, Owner Profile Section */}
-                <div className="flex flex-col w-full max-w-[700px] h-full max-h-[700px] lg:max-w-[500px] justify-between items-center bg-black">
-                  <div className="flex  border-b borderBg w-full max-w-[700px] max-h-24 lg:max-w-[500px] justify-between items-center p-2">
+                 <div className="flex flex-col w-full max-w-[700px] h-full max-h-[700px] lg:max-w-[500px] justify-between items-center bg-black">
+                  <div className="flex border-t lg:border lg:border-l-0 borderBg w-full max-w-[700px] max-h-24 lg:max-w-[500px] justify-between items-center p-2">
                     <Link to={`/${userProfile[0]?.userName}`} className="flex items-center">
                       {currentUser?.userPictureURL ? (
-                        <img className='h-10 w-10 rounded-full border-2' src={currentUser?.userPictureURL} alt='' />
+                        <img className='h-10 w-12 rounded-full border-2' src={currentUser?.userPictureURL} alt='' />
                       ) : (
                         <div className='rounded-full bg-gray-300 flex items-center justify-center'><IoPersonCircleSharp size={40} /></div>
                       )}
@@ -346,7 +348,7 @@ if (isLoading) {
                                   <span>edit</span>
                                   </div>
                                 </button>
-                            
+                              
                               <button
                                 onClick={() => setShowOptions((prev) => !prev)}
                                 className="block w-full text-left hover:bg-[#2d2929] py-3 px-2 border-b borderBg focus:outline-none"
@@ -385,13 +387,22 @@ if (isLoading) {
                 </div>
 
                 {/* Close Icon */}
-                <div onClick={() => setIsPostSelected(false)} className="absolute top-2 right-2 text-white cursor-pointer">
-                  <IoClose size={30} />
+                <div onClick={() => setIsPostSelected(false)} className="absolute hidden top-2 right-2 lg:flex text-white cursor-pointer">
+                  <MdClose size={30} onClick={() => setShowPauseIcon(false)} />
+                </div>
+
+                <div onClick={() => setIsPostSelected(false)} className="flex w-full  max-w-[700px] p-2 bg-black lg:hidden text-white cursor-pointer">
+                  <IoMdArrowRoundBack size={30} onClick={() => setShowPauseIcon(false)} />
+                  <h1 className="text-xl font-medium ml-40">Back</h1>
                 </div>
               </div>
+                 <div className="flex w-full max-w-[700px] flex-col lg:hidden bg-black overflow-y-auto h-full">
+                    <div className="p-4">
+                      {selectedPost.caption} 
+                    </div>
+                </div>
             </div>
           )}
-
        </main>
      );
   };
