@@ -10,10 +10,12 @@ import { FaCompass } from 'react-icons/fa';
 import { onSnapshot } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { collection } from 'firebase/firestore';
+import { GridLoader, HashLoader } from 'react-spinners';
 
 const ImageCard = ({ user, post }) => {
   const [liked, setLiked] = useState(false);
   const videoRef = useRef(null);
+
 
   
  
@@ -51,6 +53,7 @@ const ImageCard = ({ user, post }) => {
       }
     };
   }, []);
+
 
   return (
     <div className='w-full p-4 border-t borderBg mb-2'>
@@ -155,9 +158,10 @@ const HomeFeed = () => {
     return () => unsubscribe();
   }, []);
 
-    return (
+
+  return (
     <main className='flex flex-col items-center w-full h-full'>
-      <div className='flex w-full items-center justify-between border-b borderBg'>
+     <div className='flex w-full items-center justify-between border-b borderBg'>
       <div
         onClick={() => {
           setDisplay(false);
@@ -175,20 +179,30 @@ const HomeFeed = () => {
         <FaCompass size={25} />
         <h1>Explore</h1>
       </div>
-    </div>
-
-      {!display? <div className='w-full h-full overflow-y-auto'>
-          {allPosts.map((postWithUser, index) => {
-            return (
-              <ImageCard key={index} user={postWithUser.user} post={postWithUser.post} />
-            );
-          })}
-        </div> :(
+     </div>
+    
+      {!display ? 
+        <div className='w-full h-full overflow-y-auto'>
+          {allPosts.length !== 0 ? (
+            <>
+              {allPosts.map((postWithUser, index) => (
+                <ImageCard key={index} user={postWithUser.user} post={postWithUser.post} />
+              ))}
+            </>
+          ) : (
+            <div className='flex justify-center items-center w-full h-full'>
+              <HashLoader color='#F9008E' size={150} loading={true} /> 
+            </div>
+          )}
+        </div> 
+        : (
           <div className='flex w-full overflow-y-auto'>
             <Explore />
           </div>
-        )}
-      </main>
+        )
+      }
+    </main>
+    
     );
 
  

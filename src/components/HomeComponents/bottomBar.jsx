@@ -36,7 +36,7 @@ const BottomBar = () => {
           <li className="flex gap-5 hover:bg-[#2f2d2d] hover:bg-opacity-70 rounded-full">
             {userProfile[0]?.userPictureURL ? 
                  <img
-                   className="w-full  bg-black object-cover aspect-square h-full max-h-10 max-w-10 rounded-full border-2 border-white"
+                   className="bg-black object-cover aspect-square  h-10 w-10 rounded-full border-2 border-white"
                    src={userProfile[0]?.userPictureURL}
                 /> : 
                 <div className='rounded-full bg-gray-300 flex items-center justify-center mr-2 '><IoPersonCircleSharp size={36}/></div>

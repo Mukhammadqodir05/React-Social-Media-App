@@ -81,10 +81,6 @@ const Profile = () => {
   }, [user.uid, currentUser?.uid]);
 
 
-//  Handle Follow 
- 
-
-
 // Handle Video Ckick
   const handleVideoClick = (post, index) => {
     setSelectedPost(post);
@@ -227,28 +223,35 @@ if (isLoading) {
 
                 {/* Posts here */}
             <div className="flex w-full border-t borderBg border-gray-300 "></div>
-            <div className="grid grid-cols-3 gap-1 w-full p-1 pb-20">
-                {posts.map((post, index) => (
-                    post.type === 'image' ? (
-                        <img
-                            onClick={() => handleImageClick(post, index)}
-                            key={index}
-                            src={post.media}
-                            className="object-cover aspect-square w-full h-full"
-                            alt="Posted image"
-                        />
-                    ) : post.type === 'video' ? (
-                        <div key={index} className="relative">
-                            <video
-                                className="object-cover aspect-square w-full h-full"
-                                onClick={() => handleVideoClick(post, index)} 
-                            >
-                                <source src={post.media} type="video/mp4" />
-                            </video>
-                        </div>
-                    ) : null
-                ))}
-            </div>
+             { posts.length !== 0 ? (
+                  <div className="grid grid-cols-3 gap-1 w-full p-1 pb-20">
+                      {posts.map((post, index) => (
+                          <div key={index} className="relative">
+                              {post.type === 'image' ? (
+                                  <img
+                                      onClick={() => handleImageClick(post, index)}
+                                      src={post.media}
+                                      className="object-cover aspect-square w-full h-full cursor-pointer"
+                                      alt="Posted image"
+                                  />
+                              ) : post.type === 'video' ? (
+                                  <video
+                                      className="object-cover aspect-square w-full h-full cursor-pointer"
+                                      onClick={() => handleVideoClick(post, index)}
+                                  >
+                                      <source src={post.media} type="video/mp4" />
+                                  </video>
+                              ) : null}
+                          </div>
+                      ))}
+                  </div>
+              ) : (
+                  <div className="flex justify-center items-center w-full sm:h-40 h-28">
+                      <h1 className="font-bold text-xl text-gray-400">
+                          Looks like you've not posted yet.
+                      </h1>
+                  </div>
+              )}
             </div>
             </div>
         
