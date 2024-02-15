@@ -9,7 +9,7 @@ const Refresh = () => {
         <img className='w-80 mb-4' src={Interactify} alt="Interactify Logo" />
       </div>
       <div className='flex absolute bottom-10'>
-        <h1 className='font-bold text-5xl gradient-text'>Interactify</h1>
+        <h1 className='font-bold text-5xl gradient-text'>Trendmedia</h1>
       </div>
     </main>
   );

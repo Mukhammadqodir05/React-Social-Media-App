@@ -27,8 +27,8 @@ const SideBar = () => {
     <main className=" md:flex flex-col w-full h-screen">
       <ul className='flex flex-col items-center p-3 w-full pt-10'>
         <li className="flex gap-5 cursor-pointer">
-          <img src={Interactify} title='Interactify' onClick={handleLogoClick} className='w-20 sidebarLogo'/>
-          <h1 title='Interactify' onClick={handleLogoClick} className="sidebarText font-serif ml-3 font-extrabold text-3xl gradient-text">Interactify</h1>
+          <img src={Interactify} title='Interactify' onClick={handleLogoClick} className='w-[70px] sidebarLogo'/>
+          <h1 title='Interactify' onClick={handleLogoClick} className="sidebarText font-serif ml-3 font-extrabold text-3xl gradient-text">Trendmedia</h1>
         </li>
         <div className='grid gap-5 mt-[30px]'>
         <NavLink to="/" className='rounded-full' activeclassname="active">

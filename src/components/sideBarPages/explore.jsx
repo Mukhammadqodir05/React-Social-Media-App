@@ -48,7 +48,7 @@ const Explore = () => {
           ))
         ): (
           <div className='flex flex-col w-full h-screen justify-center items-center p-2'>
-            <h1 className='font-extrabold font-serif text-3xl gradient-text'>Welcome to Interactify!</h1>
+            <h1 className='font-extrabold font-serif text-3xl gradient-text'>Welcome to Trendmedia!</h1>
             <img className='w-96 ' src={Interactify}/>
         </div>
         )}  
