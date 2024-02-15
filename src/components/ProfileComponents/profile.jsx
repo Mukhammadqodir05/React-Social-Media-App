@@ -291,7 +291,6 @@ if (isLoading) {
                       <video className="w-full cursor-pointer max-w-[500px] lg:max-w-[560px] xl:max-w-[600px] 2xl:max-w-[630px] aspect-square" 
                         autoPlay
                         loop
-                        muted
                         onClick={(e) => {
                             if (e.target.paused) {
                                 e.target.play();
@@ -391,9 +390,8 @@ if (isLoading) {
                   <MdClose size={30} onClick={() => setShowPauseIcon(false)} />
                 </div>
 
-                <div onClick={() => setIsPostSelected(false)} className="flex w-full  max-w-[700px] p-2 bg-black lg:hidden text-white cursor-pointer">
+                <div onClick={() => setIsPostSelected(false)} className="flex w-full max-w-[700px] p-3 bg-black lg:hidden text-white cursor-pointer">
                   <IoMdArrowRoundBack size={30} onClick={() => setShowPauseIcon(false)} />
-                  <h1 className="text-xl font-medium ml-40">Back</h1>
                 </div>
               </div>
                  <div className="flex w-full max-w-[700px] flex-col lg:hidden bg-black overflow-y-auto h-full">
