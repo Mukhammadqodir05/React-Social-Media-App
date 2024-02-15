@@ -1,9 +1,10 @@
 import React,{ useState, useEffect } from "react";
+import  FollowFunction from '../Hooks/FollowFunction'
 import { useUserData } from '../../getUserData';
 import { Link, useParams } from "react-router-dom";
 import { IoMdArrowRoundBack } from "react-icons/io";
-import{ auth, db } from '../../firebase'
-import { doc, updateDoc, onSnapshot } from 'firebase/firestore';
+import{ auth, db, storage } from '../../firebase'
+import { doc, updateDoc, onSnapshot, arrayRemove } from 'firebase/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { IoPersonCircleSharp } from "react-icons/io5";
 import { FadeLoader } from 'react-spinners';
@@ -13,8 +14,10 @@ import { BsThreeDots } from "react-icons/bs";
 import { LiaUserEditSolid } from "react-icons/lia";
 import { BiSolidEditAlt } from "react-icons/bi";
 import { TbPlayerPlayFilled } from "react-icons/tb";
+import { deleteObject, ref } from "firebase/storage";
 
 const Profile = () => {
+  const {handleFollowAction} = FollowFunction()
   const { userProfile, allUsersData } = useUserData();
   const { username } = useParams();
   const currentUser = allUsersData?.find(user => user.userName === username);
@@ -79,44 +82,7 @@ const Profile = () => {
 
 
 //  Handle Follow 
-  const handleFollowAction = async (e) => {
-    e.preventDefault();
-  
-    try {
-      const userRef = doc(db, "users", user.uid);
-      const userRef2 = doc(db, "users", currentUser.uid);
-             
-      if(userProfile[0]?.following.includes(currentUser?.uid)){
-        const index = userProfile[0].following.indexOf(currentUser?.uid);
-        userProfile[0].following.splice(index, 1); 
-
-      } else {
-        userProfile[0].following.push(currentUser?.uid); 
-      }
-  
-      if(currentUser?.followers.includes(userProfile[0]?.uid)){
-        const index = currentUser.followers.indexOf(userProfile[0]?.uid);
-        currentUser.followers.splice(index, 1); 
-      } else {
-        currentUser.followers.push(userProfile[0]?.uid); 
-      }
-  
-      const newData = {
-        following: userProfile[0].following,
-      };
-
-      const newData2 = {
-        followers: currentUser.followers,
-      };
-      
-      await updateDoc(userRef, newData);
-      await updateDoc(userRef2, newData2);
-  
-      console.log('Document updated successfully');
-    } catch (error) {
-      console.error('Error updating document:', error);
-    }
-  };
+ 
 
 
 // Handle Video Ckick
@@ -134,28 +100,36 @@ const Profile = () => {
     setIsPostSelected(true);
     setClickedIndex(index);
   };
-
-
-  // Handle Delete
+  
+ 
   const handleDeletePost = async () => {
-      try {
-        setShowConfirmation(false)
+    try {
+        setShowConfirmation(false);
         const userRef = doc(db, "users", user.uid);
 
+       
         if (clickedIndex !== -1) {
-            userProfile[0].posts.splice(clickedIndex, 1); 
+            const postToDelete = userProfile[0].posts[clickedIndex];
+            const mediaUrl = postToDelete.media;
+            const storageRef = ref(storage, mediaUrl);
+            await deleteObject(storageRef);
+
+            // Remove the post from the posts array using splice
+            userProfile[0].posts.splice(clickedIndex, 1);
+
             const updatedData = {
                 posts: userProfile[0].posts,
             };
+
             await updateDoc(userRef, updatedData);
-            console.log('Post deleted successfully');
+            console.log('Post and media deleted successfully');
         } else {
             console.log('Post not found in the user\'s posts array');
         }
-      } catch (error) {
-          console.error('Error deleting post:', error);
-      }
-  };
+    } catch (error) {
+        console.error('Error deleting post or media:', error);
+    }
+};
 
   
 
@@ -257,7 +231,7 @@ if (isLoading) {
                 {posts.map((post, index) => (
                     post.type === 'image' ? (
                         <img
-                            onClick={() => handleImageClick(post, posts.length - 1 - index)}
+                            onClick={() => handleImageClick(post, index)}
                             key={index}
                             src={post.media}
                             className="object-cover aspect-square w-full h-full"
@@ -267,7 +241,7 @@ if (isLoading) {
                         <div key={index} className="relative">
                             <video
                                 className="object-cover aspect-square w-full h-full"
-                                onClick={() => handleVideoClick(post, posts.length - 1 - index)} 
+                                onClick={() => handleVideoClick(post, index)} 
                             >
                                 <source src={post.media} type="video/mp4" />
                             </video>

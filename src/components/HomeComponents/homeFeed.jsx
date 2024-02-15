@@ -3,7 +3,6 @@ import { GoComment } from "react-icons/go";
 import { FaRegHeart } from "react-icons/fa";
 import { FiBarChart2 } from "react-icons/fi";
 import { TbHeartShare } from "react-icons/tb";
-import { useUserData } from '../../getUserData'; 
 import { Link } from 'react-router-dom';
 import { IoPersonCircleSharp } from "react-icons/io5";
 import Explore from '../sideBarPages/explore';

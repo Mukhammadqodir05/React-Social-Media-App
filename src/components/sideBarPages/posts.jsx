@@ -32,7 +32,7 @@ const Post = () => {
       const storageRef = ref(storage, `posts/${user.uid}/${Date.now()}_${selectedFiles.name}`); 
       await uploadString(storageRef, selectedFiles, "data_url");
       const url = await getDownloadURL(storageRef); 
-      const id = user.uid + selectedFiles.name
+      const id = user.uid + "_" + Date.now();
   
       const userRef = doc(db, "users", user.uid);
       const newPost = {
@@ -46,7 +46,7 @@ const Post = () => {
       };
   
       await updateDoc(userRef, {
-        posts: [...userProfile[0].posts, newPost]
+        posts: [newPost, ...userProfile[0].posts]
       });
   
       setSuccess(true);
