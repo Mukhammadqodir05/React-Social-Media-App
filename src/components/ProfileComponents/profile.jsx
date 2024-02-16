@@ -4,21 +4,21 @@ import { useUserData } from '../../getUserData';
 import { Link, useParams } from "react-router-dom";
 import { IoMdArrowRoundBack } from "react-icons/io";
 import{ auth, db, storage } from '../../firebase'
-import { doc, updateDoc, onSnapshot, arrayRemove } from 'firebase/firestore';
+import { doc, updateDoc, onSnapshot } from 'firebase/firestore';
+import { deleteObject, ref } from "firebase/storage";
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { IoPersonCircleSharp } from "react-icons/io5";
-import { FadeLoader } from 'react-spinners';
+import { FadeLoader,ClipLoader } from 'react-spinners';
 import { MdClose } from "react-icons/md";
 import { MdDeleteOutline } from "react-icons/md";
 import { BsThreeDots } from "react-icons/bs";
 import { LiaUserEditSolid } from "react-icons/lia";
 import { BiSolidEditAlt } from "react-icons/bi";
 import { TbPlayerPlayFilled } from "react-icons/tb";
-import { deleteObject, ref } from "firebase/storage";
 
 const Profile = () => {
   const {handleFollowAction} = FollowFunction()
-  const { userProfile, allUsersData } = useUserData();
+  const { userProfile, allUsersData, loading } = useUserData();
   const { username } = useParams();
   const currentUser = allUsersData?.find(user => user.userName === username);
   const [user] = useAuthState(auth);
@@ -27,7 +27,6 @@ const Profile = () => {
   const [postCount, setPostCount] = useState(currentUser?.posts.length);
   const [posts, setPosts] = useState(currentUser?.posts.map(post => post))
   const [isFollowed, setIsFollowed] = useState(userProfile[0]?.following.includes(currentUser?.uid));
-  const [isLoading, setIsLoading] = useState(true);
   const [selectedPost, setSelectedPost] = useState(null);
   const [clickedIndex, setClickedIndex] = useState(null);
   const [isPostSelected, setIsPostSelected] = useState(false);
@@ -35,8 +34,9 @@ const Profile = () => {
   const [showPauseIcon, setShowPauseIcon] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
-  
-  
+  const [editPosts, setEditPosts] = useState(false);
+  const [updatedCaption, setUpdatedCaption] = useState('');
+
   // Formating
   function formatCount(count) {
     if (count >= 1000000) {
@@ -74,7 +74,6 @@ const Profile = () => {
       setIsFollowed(doc.data().followers.includes(userProfile[0]?.uid));
       setPostCount(doc.data().posts.length)
       setPosts(doc.data().posts.map(post => post).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)))
-      setIsLoading(false);
     });
   
     return () => unsubscribe();
@@ -98,6 +97,7 @@ const Profile = () => {
   };
   
  
+  // Delete The Post
   const handleDeletePost = async () => {
     try {
         setShowConfirmation(false);
@@ -125,11 +125,40 @@ const Profile = () => {
     } catch (error) {
         console.error('Error deleting post or media:', error);
     }
-};
+  };
 
-  
 
-if (isLoading) {
+// Edit The Post
+  const handleEditPost = async (e) => {
+    e.preventDefault();
+
+    try {
+        const userRef = doc(db, "users", user.uid);
+
+        if (clickedIndex !== -1) {
+            const postToEdit = userProfile[0].posts[clickedIndex];
+
+            postToEdit.caption = updatedCaption;
+
+            const updatedData = {
+                posts: userProfile[0].posts,
+            };
+
+            await updateDoc(userRef, updatedData);
+            setEditPosts((prev) => !prev)
+            setIsPostSelected((prev) => !prev)
+           
+            console.log('Post edited successfully');
+        } else {
+            console.log('Post not found in the user\'s posts array');
+        }
+    } catch (error) {
+        console.error('Error editing post:', error);
+    }
+  };
+
+
+if (loading) {
     return (
     <div className="flex justify-center items-center w-full h-screen">
       <FadeLoader color='#F9008E' size={50} loading={true} /> 
@@ -255,6 +284,7 @@ if (isLoading) {
             </div>
             </div>
         
+        {/* Show Posts */}
           { isPostSelected && (
             <div className="fixed flex-col top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-90 z-50">
               <div className="flex lg:mt-0 bg-black w-full max-w-[700px] lg:max-w-[1200px] flex-col-reverse lg:flex-row">
@@ -315,9 +345,10 @@ if (isLoading) {
                                   <span>delete</span>
                                   </div>
                                 </button>
+
                                 <button
                                   className="block w-full text-left py-3 px-2 border-b borderBg  border-t hover:bg-[#2d2929] focus:outline-none"
-                                  
+                                   onClick={() => {setShowOptions((prev) => !prev); setEditPosts((prev) => !prev)}}
                                 >
                                 <div className="flex items-center gap-4">
                                   < BiSolidEditAlt size={30} className="mr-2 inline-block" />
@@ -378,6 +409,29 @@ if (isLoading) {
                 </div>
             </div>
           )}
+
+            {editPosts && (
+              <div className="fixed top-0 left-0 z-50 w-full h-full flex items-center justify-center bg-black bg-opacity-50 p-2">
+                <div className="w-full flex flex-col justify-center max-w-[400px] h-full max-h-[300px] p-4 rounded shadow-md bg-gray-800 text-white">
+                  <div className="flex justify-end mt-[-50px] text-white cursor-pointer">
+                    <MdClose size={30} onClick={() => setEditPosts(false)} />
+                  </div>
+                  <h2 className="text-2xl font-bold mb-4 text-center mt-[15px]">Edit Post</h2>
+                  <form onSubmit={handleEditPost} className="flex flex-col gap-4">
+                    <label className="text-lg">Edit The Caption:</label>
+                    <input
+                      className="bg-gray-700 text-white px-3 py-2 rounded focus:outline-none"
+                      type="text"
+                      value={updatedCaption}
+                      onChange={(e) => setUpdatedCaption(e.target.value)}
+                    />
+                    <button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 rounded">
+                      Update Post
+                    </button>
+                  </form>
+                </div>
+              </div>
+            )}
        </main>
      );
   };
