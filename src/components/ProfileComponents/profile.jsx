@@ -129,33 +129,37 @@ const Profile = () => {
 
 
 // Edit The Post
-  const handleEditPost = async (e) => {
-    e.preventDefault();
+const handleEditPost = async (e) => {
+  e.preventDefault();
 
-    try {
-        const userRef = doc(db, "users", user.uid);
+  try {
+    const userRef = doc(db, "users", user.uid);
 
-        if (clickedIndex !== -1) {
-            const postToEdit = userProfile[0].posts[clickedIndex];
+    if (clickedIndex !== -1) {
+      const postToEdit = userProfile[0].posts[clickedIndex];
 
-            postToEdit.caption = updatedCaption;
+      if (postToEdit) {
+        postToEdit.caption = updatedCaption;
 
-            const updatedData = {
-                posts: userProfile[0].posts,
-            };
+        const updatedData = {
+          posts: userProfile[0].posts,
+        };
 
-            await updateDoc(userRef, updatedData);
-            setEditPosts((prev) => !prev)
-            setIsPostSelected((prev) => !prev)
-           
-            console.log('Post edited successfully');
-        } else {
-            console.log('Post not found in the user\'s posts array');
-        }
-    } catch (error) {
-        console.error('Error editing post:', error);
+        await updateDoc(userRef, updatedData);
+        setEditPosts((prev) => !prev);
+        setIsPostSelected(false);
+        console.log('Post edited successfully');
+      } else {
+        console.log('Post not found in the user\'s posts array');
+      }
+    } else {
+      console.log('Invalid clickedIndex value');
     }
-  };
+  } catch (error) {
+    console.error('Error editing post:', error);
+  } 
+};
+
 
 
 if (loading) {
