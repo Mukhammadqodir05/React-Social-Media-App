@@ -141,11 +141,36 @@ const Post = () => {
               <p className=' text-xl'>Ops, only jpg, jpeg, png, or gif are allowed</p>
           </div>
         )}
-          {success && (
-          <div className='w-full max-w-md fixed h-[50px] top-4 flex justify-center items-center bg-white rounded-md text-black'>
-              <p className=' text-xl'>Your image has been successfully uploaded.</p>
+        {/* Success Message */}
+        {success && (
+          <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center z-50">
+           <div className='flex justify-center items-center w-full max-w-[600px] h-full max-h-[600px] bg-white rounded-lg'>
+              <svg width="400" height="400">
+                <circle
+                  fill="none"
+                  stroke="#a91bb6" 
+                  stroke-width="20"
+                  cx="200"
+                  cy="200"
+                  r="190"
+                  strokeLinecap="round"
+                  transform="rotate(-90 200 200)"
+                  className="circle"
+                />
+                <polyline
+                  fill="none"
+                  stroke="#750be6"
+                  points="88,214 173,284 304,138"
+                  strokeWidth="24"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="tick"
+                />
+              </svg>
+            </div>
           </div>
-        )}
+          )}
+
         </> 
         : (
             <GridLoader color='#F9008E' size={50} loading={true} /> 

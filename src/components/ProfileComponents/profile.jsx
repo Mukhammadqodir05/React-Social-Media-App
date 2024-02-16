@@ -259,7 +259,7 @@ if (loading) {
              { posts.length !== 0 ? (
                   <div className="grid grid-cols-3 gap-1 w-full p-1 pb-20">
                       {posts.map((post, index) => (
-                          <div key={index} className="relative">
+                          <div key={post.id} className="relative">
                               {post.type === 'image' ? (
                                   <img
                                       onClick={() => handleImageClick(post, index)}
@@ -315,9 +315,8 @@ if (loading) {
                         <source className="" src={selectedPost.media} type="video/mp4" />
                       </video>
                       
-
                     ) : selectedPostType === 'image' ? (
-                      <img className="object-cover w-full h-full max-h-[500px] lg:max-h-[560px] xl:max-h-[600px] 2xl:max-h-[630px] aspect-square" src={selectedPost.media} alt="Selected Post" />
+                      <img className="object-cover w-full h-full  aspect-square" src={selectedPost.media} alt="Selected Post" />
                     ) : null }
                 </div>
 
