@@ -28,7 +28,7 @@ const RightSideBar = () => {
                   <div>
                    <Link to={`/${user?.userName}`}>
                     <p className='font-bold w-full max-w-[120px] xl:max-w-[155px] 2xl:max-w-[250px] overflow-hidden overflow-ellipsis text-nowrap'>{user.fullName}</p>
-                    <p className='text-gray-500 text-base '>@{user.userName}</p>
+                    <p className='text-gray-500 text-base font-bold w-full max-w-[120px] xl:max-w-[155px] 2xl:max-w-[250px] overflow-hidden overflow-ellipsis text-nowrap'>@{user.userName}</p>
                    </Link>
                   </div>
                 </div>

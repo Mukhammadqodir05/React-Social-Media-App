@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useUserData } from '../../getUserData';
 import { useParams } from "react-router-dom";
 import { auth, db } from '../../firebase';
@@ -8,10 +9,12 @@ const FollowFunction = () => {
   const { userProfile, allUsersData } = useUserData();
   const { username } = useParams();
   const currentUser = allUsersData?.find(user => user.userName === username);
-  const [user] = useAuthState(auth);
+  const [ user ] = useAuthState(auth);
+  const [ isFollowing, setIsFollowing ] = useState(false);
 
   const handleFollowAction = async (e) => {
     e.preventDefault();
+    setIsFollowing(true)
 
     try {
       const userRef = doc(db, "users", user.uid);
@@ -46,9 +49,12 @@ const FollowFunction = () => {
     } catch (error) {
       console.error('Error updating document:', error);
     }
+    finally{
+      setIsFollowing(false)
+    }
   };
 
-  return { handleFollowAction };
+  return { handleFollowAction, isFollowing };
 };
 
 export default FollowFunction;

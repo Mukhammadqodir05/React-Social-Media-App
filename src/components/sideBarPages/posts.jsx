@@ -37,6 +37,7 @@ const Post = () => {
       const userRef = doc(db, "users", user.uid);
       const newPost = {
         id: id,
+        createdBy: user.uid,
         media: url,
         type: type,
         caption: e.target.caption.value,
@@ -132,7 +133,7 @@ const Post = () => {
             <input
               name='hashtag'
               className="w-full border p-2 rounded-md outline-none"
-              placeholder="Input some hashtags ..."
+              placeholder="Input hashtags with #..."
             />
             <button
               type="submit"
@@ -155,7 +156,7 @@ const Post = () => {
                 <circle
                   fill="none"
                   stroke="#a91bb6" 
-                  stroke-width="20"
+                  strokeWidth="20"
                   cx="200"
                   cy="200"
                   r="190"

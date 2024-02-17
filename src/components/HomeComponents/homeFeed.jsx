@@ -10,7 +10,7 @@ import { FaCompass } from 'react-icons/fa';
 import { onSnapshot } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { collection } from 'firebase/firestore';
-import { GridLoader, HashLoader } from 'react-spinners';
+import { HashLoader } from 'react-spinners';
 
 const ImageCard = ({ user, post }) => {
   const [liked, setLiked] = useState(false);
@@ -192,7 +192,7 @@ const HomeFeed = () => {
             </>
           ) : (
             <div className='flex justify-center items-center w-full h-full'>
-              <HashLoader color='#F9008E' size={150} loading={true} /> 
+              <HashLoader color='#F9008E' size={200} loading={true} /> 
             </div>
           )}
         </div> 

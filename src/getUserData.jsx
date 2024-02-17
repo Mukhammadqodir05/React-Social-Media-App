@@ -9,38 +9,31 @@ const UserDataContext = createContext();
 
 const GetUserData = ({ children }) => {
   const [allUsersData, setAllUsersData] = useState(null)
-  const [isLoading, setIsLoading] = useState(true);
   const [userProfile, setUserProfile] = useState(null);
   const [user, loading] = useAuthState(auth);
   
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(collection(db, "users"), (snapshot) => {
-      let allUsersData = [];
-      snapshot.docChanges().forEach((change) => {
-        const { id } = change.doc;
-        const data = change.doc.data();
-        if (change.type === "added") {
-          allUsersData.push({ id, ...data });
-        } else if (change.type === "modified") {
-          // Handle modified data if needed
-        } else if (change.type === "removed") {
-          // Handle removed data if needed
-        }
-      });
-      setAllUsersData(allUsersData);
-    });
-  
-    return () => unsubscribe();
-  }, []);
-  
+    const fetchAllData = async () => {
+      try{
+        const querySnapshot = await getDocs(collection(db, "users")) 
+        let AllUsersData = [];
+        querySnapshot.forEach((doc) => {
+            AllUsersData.push({ id: doc.id, ...doc.data() });
+        });
+        setAllUsersData(AllUsersData); 
+      }catch(error){
+         console.log(error)
+      }
+    };
+    fetchAllData(); 
+  }, [])
 
 
 
   useEffect(() => {
     const fetchUserProfile = async () => {
       if (!loading && user) {
-        setIsLoading(true);
         const uid = user.uid;
         const q = query(collection(db, "users"), where("uid", "==", uid));
         try {
@@ -56,9 +49,7 @@ const GetUserData = ({ children }) => {
           }
         } catch (error) {
           console.error("Error fetching user profile: ", error);
-        } finally {
-          setIsLoading(false);
-        }
+        } 
       }
     };
 
