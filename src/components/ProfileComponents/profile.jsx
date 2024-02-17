@@ -15,10 +15,11 @@ import { BsThreeDots } from "react-icons/bs";
 import { LiaUserEditSolid } from "react-icons/lia";
 import { BiSolidEditAlt } from "react-icons/bi";
 import { TbPlayerPlayFilled } from "react-icons/tb";
+import { SlUserFollowing } from "react-icons/sl";
 
 const Profile = () => {
   const { handleFollowAction, isFollowing } = FollowFunction()
-  const { userProfile, allUsersData,  } = useUserData();
+  const { userProfile, allUsersData } = useUserData();
   const { username } = useParams();
   const currentUser = allUsersData?.find(user => user.userName === username);
   const [user] = useAuthState(auth);
@@ -195,12 +196,19 @@ const Profile = () => {
                         { username === userName && (
                         <div className="relative mt-4">
                           { username !== userProfile[0]?.userName && (
-                            <button onClick={handleFollowAction} className="bg-white text-black px-4 py-2 rounded-full">
-                              { isFollowed? 'Followed' : 'Follow'} 
+                            <button onClick={handleFollowAction} className="bg-white follow px-4 p-3 mr-2 rounded-full">
+                            { !isFollowing? ( isFollowed? <SlUserFollowing size={25} /> : 'FOLLOW')
+                             : (
+                              <div className="flex gap-2 animate-bounce ">
+                                <h1 className="bg-white rounded-full p-2" />
+                                <h1 className="bg-white rounded-full p-2" />
+                                <h1 className="bg-white rounded-full p-2" />
+                              </div>
+                             )}
                             </button>
                           )}               
                           {username === userProfile[0].userName && (
-                            <Link to={`/${currentUser?.userName}/edit`} className=" text-[#e600ff]">
+                            <Link to={`/${currentUser?.userName}/edit`} className=" text-[#e600ff] mr-10">
                               <LiaUserEditSolid title="edit" size={35} />
                             </Link>
                           )}
@@ -273,7 +281,7 @@ const Profile = () => {
                           ))}
                       </div>
                     ) : (
-                      <div className="flex justify-center items-center w-full sm:h-40 h-28">
+                      <div className="flex p-2 justify-center items-center w-full sm:h-40 h-28">
                         <h1 className="font-bold text-xl text-gray-400">
                             Looks like there are no posts yet 🤔
                         </h1>
