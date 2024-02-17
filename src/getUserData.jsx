@@ -1,7 +1,7 @@
 import { createContext, useContext } from 'react';
 import { useState, useEffect } from 'react';
 import { db, auth } from "./firebase";
-import { query, where, getDocs, collection } from "firebase/firestore";
+import { query, where, getDocs, collection, onSnapshot } from "firebase/firestore";
 import { useAuthState } from 'react-firebase-hooks/auth';
 
 
@@ -15,20 +15,25 @@ const GetUserData = ({ children }) => {
   
 
   useEffect(() => {
-    const fetchAllData = async () => {
-      try{
-        const querySnapshot = await getDocs(collection(db, "users")) 
-        let AllUsersData = [];
-        querySnapshot.forEach((doc) => {
-            AllUsersData.push({ id: doc.id, ...doc.data() });
-        });
-        setAllUsersData(AllUsersData); 
-      }catch(error){
-         console.log(error)
-      }
-    };
-    fetchAllData(); 
-  }, [])
+    const unsubscribe = onSnapshot(collection(db, "users"), (snapshot) => {
+      let allUsersData = [];
+      snapshot.docChanges().forEach((change) => {
+        const { id } = change.doc;
+        const data = change.doc.data();
+        if (change.type === "added") {
+          allUsersData.push({ id, ...data });
+        } else if (change.type === "modified") {
+          // Handle modified data if needed
+        } else if (change.type === "removed") {
+          // Handle removed data if needed
+        }
+      });
+      setAllUsersData(allUsersData);
+    });
+  
+    return () => unsubscribe();
+  }, []);
+  
 
 
 
