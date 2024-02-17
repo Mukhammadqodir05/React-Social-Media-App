@@ -6,13 +6,14 @@ import { useUserData } from '../../getUserData';
 import { TbCameraPlus } from "react-icons/tb";
 import { Link,useParams } from 'react-router-dom';
 import { IoMdArrowRoundBack } from "react-icons/io";
-import { ref, uploadString, getDownloadURL } from 'firebase/storage'
+import { ref, uploadString, getDownloadURL, deleteObject } from 'firebase/storage'
 import { HashLoader } from 'react-spinners';
+import { MdDeleteForever } from "react-icons/md";
 
 const UpdateProfile = () => {
   const [selectedImage, setSelectedImage] = useState('')
   const [selectedBanner, setSelectedBanner] = useState('')
-  const {allUsersData} = useUserData(); 
+  const { allUsersData } = useUserData(); 
   const [fullName, setFullName] = useState('');
   const [website, setWebsite] = useState('');
   const [bio, setBio] = useState('');
@@ -23,7 +24,9 @@ const UpdateProfile = () => {
   const bannerFileRef = useRef(null);
   const { username } = useParams();
   const currentUser = allUsersData?.find(user => user.userName === username);
+  const [doesBannerExist, setDoesBannerExist] = useState(currentUser?.userBannerURL);
  
+
   // FULLNAME limitation
   const MAX_FULLNAME_LENGTH = 35;
   const handleFullNameChange = (e) => {
@@ -61,6 +64,7 @@ const handleWebsiteChange = (e) => {
 const remainingWebsiteCharacters = MAX_WEBSITE_LENGTH  - website.length;
 
 
+  // Handle Update The User Data
   const handleUpdateData = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -96,7 +100,27 @@ const remainingWebsiteCharacters = MAX_WEBSITE_LENGTH  - website.length;
       setSuccess(false)
     }
   };
-  
+
+  // Handle Delete The Banner Image 
+  const handleDeleteBannerURL = async () => {
+    try {
+        const userRef = doc(db, "users", user.uid);
+
+        const bannerToDelete = currentUser?.userBannerURL
+        const storageRef = ref(storage, bannerToDelete);
+        await deleteObject(storageRef);
+      
+        await updateDoc(userRef, {
+          userBannerURL: ''
+        });
+
+        console.log('Banner image deleted successfully');
+
+    } catch (error) {
+        console.error('Error deleting post or media:', error);
+    }
+};
+
   return (
   <main className='flex flex-col w-full h-screen items-center justify-center bg-black'>
    { !loading? 
@@ -111,15 +135,19 @@ const remainingWebsiteCharacters = MAX_WEBSITE_LENGTH  - website.length;
             
              {/* BANNER IMAGE starts here */}
               <div className="w-full relative h-[200px] overflow-hidden outline-none mt-20">
-              { currentUser.userBannerURL || selectedBanner ?
+              { doesBannerExist || selectedBanner ?
                 <img 
                   className="w-full h-full bg-[#958c8c] object-cover aspect-square max-h-[200px]" 
-                  src={selectedBanner || currentUser.userBannerURL} 
+                  src={selectedBanner || doesBannerExist} 
                   alt="" 
                 />
               :""
               }  
-                <div className="absolute inset-0 flex items-center justify-center">
+              <div className="absolute gap-4 inset-0 flex items-center justify-center"> 
+                { doesBannerExist && <div onClick={handleDeleteBannerURL} className="flex bg-black p-2 rounded-full bg-opacity-70">
+                      < MdDeleteForever onClick={() => setDoesBannerExist(null)} className="cursor-pointer text-white text-xl" />
+                    </div>
+                }
                   <div className="flex bg-black p-2 rounded-full bg-opacity-70">
                     <TbCameraPlus onClick={() => bannerFileRef.current.click()} className="cursor-pointer text-white text-xl" />
                     <input 

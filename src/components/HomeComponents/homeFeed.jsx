@@ -72,9 +72,10 @@ const ImageCard = ({ user, post }) => {
         </div>
       </div>
       <div className='flex mt-2 ml-2 justify-start max-w-[550px] overflow-hidden'>
-        <p className='flex'>
-          {post.caption} 
-        </p>
+        <div className="flex flex-col p-2">
+            <h2>{post.caption}</h2>
+            <p className="text-sm text-gray-500">{post.hashtag}</p>
+         </div>
       </div>
       <div className='flex flex-col p-2 gap-7'>
       <div className='flex justify-center items-center'>

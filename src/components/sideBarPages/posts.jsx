@@ -36,10 +36,11 @@ const Post = () => {
   
       const userRef = doc(db, "users", user.uid);
       const newPost = {
-        media: url,
         id: id,
+        media: url,
         type: type,
         caption: e.target.caption.value,
+        hashtag: e.target.hashtag.value,
         likes: [],
         comments: [],
         timestamp: new Date().toISOString()  
@@ -70,7 +71,7 @@ const Post = () => {
    <main className='flex w-full h-screen justify-center items-center p-1'>
      { !loading ?
      <>
-      <div className="w-full AuthenticationPageBg max-w-md border rounded p-4">
+      <div className="w-full AuthenticationPageBg max-w-md border rounded p-3">
        <div className='flex justify-between w-full'>
          <h2 className="text-2xl font-bold mb-4">Create a Post</h2>
           {userProfile && <Link to={`/${userProfile[0]?.userName}`}><IoMdClose title='close' size={37} className='hover:bg-[#000000] hover:bg-opacity-30 rounded-full cursor-pointer'/></Link>}
@@ -121,12 +122,17 @@ const Post = () => {
 
 
           {/* Form here */}
-        <form className='text-black' onSubmit={handleUploadData}>
+        <form className='flex flex-col gap-4 text-black' onSubmit={handleUploadData}>
             <textarea
               name="caption" 
-              className="w-full border p-2 mb-4 rounded-md outline-none"
+              className="w-full border p-1 rounded-md outline-none"
               placeholder="Tell us about the post ..."
-              rows="4"
+              rows="3"
+            />
+            <input
+              name='hashtag'
+              className="w-full border p-2 rounded-md outline-none"
+              placeholder="Input some hashtags ..."
             />
             <button
               type="submit"

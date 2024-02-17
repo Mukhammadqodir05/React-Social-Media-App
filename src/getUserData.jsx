@@ -39,7 +39,6 @@ const GetUserData = ({ children }) => {
         const uid = user.uid;
         const q = query(collection(db, "users"), where("uid", "==", uid));
         try {
-          console.log("Fetching user profile...");
           const querySnapshot = await getDocs(q);
           if (querySnapshot.empty) {
             setUserProfile(null);

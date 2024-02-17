@@ -36,6 +36,7 @@ const Profile = () => {
   const [showOptions, setShowOptions] = useState(false);
   const [editPosts, setEditPosts] = useState(false);
   const [updatedCaption, setUpdatedCaption] = useState('');
+  const [updatedHashtag, setUpdatedHashtag] = useState('');
 
   // Formating
   function formatCount(count) {
@@ -102,7 +103,6 @@ const Profile = () => {
     try {
         setShowConfirmation(false);
         const userRef = doc(db, "users", user.uid);
-
        
         if (clickedIndex !== -1) {
             const postToDelete = userProfile[0].posts[clickedIndex];
@@ -119,6 +119,7 @@ const Profile = () => {
 
             await updateDoc(userRef, updatedData);
             console.log('Post and media deleted successfully');
+            setIsPostSelected(false);
         } else {
             console.log('Post not found in the user\'s posts array');
         }
@@ -129,36 +130,37 @@ const Profile = () => {
 
 
 // Edit The Post
-const handleEditPost = async (e) => {
-  e.preventDefault();
+  const handleEditPost = async (e) => {
+    e.preventDefault();
 
-  try {
-    const userRef = doc(db, "users", user.uid);
+    try {
+      const userRef = doc(db, "users", user.uid);
 
-    if (clickedIndex !== -1) {
-      const postToEdit = userProfile[0].posts[clickedIndex];
+      if (clickedIndex !== -1) {
+        const postToEdit = userProfile[0].posts[clickedIndex];
 
-      if (postToEdit) {
-        postToEdit.caption = updatedCaption;
+        if (postToEdit) {
+          postToEdit.caption = updatedCaption;
+          postToEdit.hashtag = updatedHashtag;
 
-        const updatedData = {
-          posts: userProfile[0].posts,
-        };
+          const updatedData = {
+            posts: userProfile[0].posts,
+          };
 
-        await updateDoc(userRef, updatedData);
-        setEditPosts((prev) => !prev);
-        setIsPostSelected(false);
-        console.log('Post edited successfully');
+          await updateDoc(userRef, updatedData);
+          setEditPosts((prev) => !prev);
+          setIsPostSelected(false);
+          console.log('Post edited successfully');
+        } else {
+          console.log('Post not found in the user\'s posts array');
+        }
       } else {
-        console.log('Post not found in the user\'s posts array');
+        console.log('Invalid clickedIndex value');
       }
-    } else {
-      console.log('Invalid clickedIndex value');
-    }
-  } catch (error) {
-    console.error('Error editing post:', error);
-  } 
-};
+    } catch (error) {
+      console.error('Error editing post:', error);
+    } 
+  };
 
 
 
@@ -255,187 +257,199 @@ if (loading) {
               </div>
 
                 {/* Posts here */}
-            <div className="flex w-full border-t borderBg border-gray-300 "></div>
-             { posts.length !== 0 ? (
-                  <div className="grid grid-cols-3 gap-1 w-full p-1 pb-20">
-                      {posts.map((post, index) => (
-                          <div key={post.id} className="relative">
-                              {post.type === 'image' ? (
-                                  <img
-                                      onClick={() => handleImageClick(post, index)}
-                                      src={post.media}
-                                      className="object-cover aspect-square w-full h-full cursor-pointer"
-                                      alt="Posted image"
-                                  />
-                              ) : post.type === 'video' ? (
-                                  <video
-                                      className="object-cover aspect-square w-full h-full cursor-pointer"
-                                      onClick={() => handleVideoClick(post, index)}
-                                  >
-                                      <source src={post.media} type="video/mp4" />
-                                  </video>
-                              ) : null}
-                          </div>
-                      ))}
-                  </div>
-              ) : (
-                  <div className="flex justify-center items-center w-full sm:h-40 h-28">
-                      <h1 className="font-bold text-xl text-gray-400">
-                          Looks like you've not posted yet.
-                      </h1>
-                  </div>
-              )}
-            </div>
-            </div>
-        
-        {/* Show Posts */}
-          { isPostSelected && (
-            <div className="fixed flex-col top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-90 z-50">
-              <div className="flex lg:mt-0 bg-black w-full max-w-[700px] lg:max-w-[1200px] flex-col-reverse lg:flex-row">
-                <div className="w-full border-b lg:border borderBg flex justify-center items-center relative">
-                  { showPauseIcon && 
-                      <div className="absolute flex items-center bg-black rounded-full bg-opacity-50 p-4">
-                        <TbPlayerPlayFilled size={60}/>
-                      </div>
-                    }
-                    {selectedPostType === 'video' ? (
-                      <video className="w-full cursor-pointer max-w-[500px] lg:max-w-[560px] xl:max-w-[600px] 2xl:max-w-[630px] aspect-square" 
-                        autoPlay
-                        loop
-                        onClick={(e) => {
-                            if (e.target.paused) {
-                                e.target.play();
-                                setShowPauseIcon(false);
-                            } else {
-                                e.target.pause();
-                                setShowPauseIcon(true);
-                            }
-                        }}
-                      >
-                        <source className="" src={selectedPost.media} type="video/mp4" />
-                      </video>
-                      
-                    ) : selectedPostType === 'image' ? (
-                      <img className="object-cover w-full h-full  aspect-square" src={selectedPost.media} alt="Selected Post" />
-                    ) : null }
-                </div>
-
-                {/* Comments, Delete Button, Owner Profile Section */}
-                 <div className="flex flex-col w-full max-w-[700px] h-full max-h-[700px] lg:max-w-[500px] justify-between items-center bg-black">
-                  <div className="flex border-t lg:border lg:border-l-0 borderBg w-full max-w-[700px] max-h-24 lg:max-w-[500px] justify-between items-center p-2">
-                    <Link to={`/${userProfile[0]?.userName}`} className="flex items-center">
-                      {currentUser?.userPictureURL ? (
-                        <img className='h-10 w-12 rounded-full border-2' src={currentUser?.userPictureURL} alt='' />
-                      ) : (
-                        <div className='rounded-full bg-gray-300 flex items-center justify-center'><IoPersonCircleSharp size={40} /></div>
-                      )}
-                      <span className="ml-2 max-w-[300px] w-full overflow-hidden overflow-ellipsis text-nowrap">{currentUser.fullName}</span>
-                    </Link>
-
-                    { username === userProfile[0].userName && (
-                    <div>
-                      <button className=" hover:text-slate-500" title="options" onClick={() => setShowOptions((prev) => !prev)}>< BsThreeDots size={30}/></button>
-                      
-                      { showOptions && (
-                          <div className="fixed top-0 left-0 z-50 w-full h-full flex items-center justify-center bg-black bg-opacity-50 p-2">
-                            <div className="w-full border borderBg max-w-[400px] max-h-[300px] p-3 rounded shadow-md bg-black text-white">
-                              <button
-                                  className="block w-full text-left py-3 px-2 border-b borderBg text-red-500 border-t hover:bg-[#2d2929] focus:outline-none"
-                                  onClick={() => { setShowConfirmation(true); setShowOptions((prev) => !prev) }}
-                                >
-                               <div className="flex items-center gap-4">
-                                  <MdDeleteOutline size={30} className="mr-2 inline-block" />
-                                  <span>delete</span>
-                                  </div>
-                                </button>
-
-                                <button
-                                  className="block w-full text-left py-3 px-2 border-b borderBg  border-t hover:bg-[#2d2929] focus:outline-none"
-                                   onClick={() => {setShowOptions((prev) => !prev); setEditPosts((prev) => !prev)}}
-                                >
-                                <div className="flex items-center gap-4">
-                                  < BiSolidEditAlt size={30} className="mr-2 inline-block" />
-                                  <span>edit</span>
-                                  </div>
-                                </button>
-                              
-                              <button
-                                onClick={() => setShowOptions((prev) => !prev)}
-                                className="block w-full text-left hover:bg-[#2d2929] py-3 px-2 border-b borderBg focus:outline-none"
-                              >
-                                <div className="flex items-center gap-4">
-                                  <MdClose size={30}/> 
-                                  <span>back</span>
-                                </div>
-                              </button>
+              <div className="flex w-full border-t borderBg border-gray-300 "></div>
+              { posts.length !== 0 ? (
+                    <div className="grid grid-cols-3 gap-1 w-full p-1 pb-20">
+                        {posts.map((post, index) => (
+                            <div key={post.id} className="relative">
+                                {post.type === 'image' ? (
+                                    <img
+                                        onClick={() => handleImageClick(post, index)}
+                                        src={post.media}
+                                        className="object-cover aspect-square w-full h-full cursor-pointer"
+                                        alt="Posted image"
+                                    />
+                                ) : post.type === 'video' ? (
+                                    <video
+                                        className="object-cover aspect-square w-full h-full cursor-pointer"
+                                        onClick={() => handleVideoClick(post, index)}
+                                    >
+                                        <source src={post.media} type="video/mp4" />
+                                    </video>
+                                ) : null}
                             </div>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="flex justify-center items-center w-full sm:h-40 h-28">
+                        <h1 className="font-bold text-xl text-gray-400">
+                            Looks like you've not posted yet 🤔
+                        </h1>
+                    </div>
+                )}
+              </div>
+              </div>
+        
+{/* Show The Selected Post */}
+              { isPostSelected && (
+                <div className="fixed flex-col top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-90 z-50">
+                  <div className="flex lg:mt-0 bg-black w-full max-w-[700px] lg:max-w-[1200px] flex-col-reverse lg:flex-row">
+                    <div className="w-full border-b lg:border borderBg flex justify-center items-center relative">
+                      { showPauseIcon && 
+                          <div className="absolute flex items-center bg-black rounded-full bg-opacity-50 p-4">
+                            <TbPlayerPlayFilled size={60}/>
                           </div>
-                        )}
-                     
-                      {showConfirmation && (
-                          <div className="fixed top-0 left-0 z-50 w-full h-full flex items-center justify-center bg-black bg-opacity-50 p-2">
-                              <div className="bg-white p-4 rounded shadow-md">
-                                  <p className="text-lg text-black">Are you sure you want to delete this post?</p>
-                                  <div className="flex justify-end mt-4">
-                                      <button className="bg-red-500 text-white px-4 py-2 mr-2 rounded" onClick={handleDeletePost}>Confirm</button>
-                                      <button className="bg-gray-300 text-gray-800 px-4 py-2 rounded" onClick={() => setShowConfirmation(false)}>Cancel</button>
+                        }
+                        {selectedPostType === 'video' ? (
+                          <video className="w-full cursor-pointer max-w-[500px] lg:max-w-[560px] xl:max-w-[600px] 2xl:max-w-[630px] aspect-square" 
+                            autoPlay
+                            loop
+                            onClick={(e) => {
+                                if (e.target.paused) {
+                                    e.target.play();
+                                    setShowPauseIcon(false);
+                                } else {
+                                    e.target.pause();
+                                    setShowPauseIcon(true);
+                                }
+                            }}
+                          >
+                            <source className="" src={selectedPost.media} type="video/mp4" />
+                          </video>
+                          
+                        ) : selectedPostType === 'image' ? (
+                          <img className="object-cover w-full h-full  aspect-square" src={selectedPost.media} alt="Selected Post" />
+                        ) : null }
+                    </div>
+
+                    {/* Comments, Delete Button, Owner Profile Section */}
+                    <div className="flex flex-col w-full max-w-[700px] h-full max-h-[700px] lg:max-w-[500px] justify-between items-center bg-black">
+                      <div className="flex border-t lg:border lg:border-l-0 borderBg w-full max-w-[700px] max-h-24 lg:max-w-[500px] justify-between items-center p-2">
+                        <Link to={`/${userProfile[0]?.userName}`} className="flex items-center">
+                          {currentUser?.userPictureURL ? (
+                            <img className='h-10 w-12 rounded-full border-2' src={currentUser?.userPictureURL} alt='' />
+                          ) : (
+                            <div className='rounded-full bg-gray-300 flex items-center justify-center'><IoPersonCircleSharp size={40} /></div>
+                          )}
+                          <span className="ml-2 max-w-[300px] w-full overflow-hidden overflow-ellipsis text-nowrap">{currentUser.fullName}</span>
+                        </Link>
+
+                        { username === userProfile[0].userName && (
+                        <div>
+                          <button className=" hover:text-slate-500" title="options" onClick={() => setShowOptions((prev) => !prev)}>< BsThreeDots size={30}/></button>
+                          
+                          { showOptions && (
+                              <div className="fixed top-0 left-0 z-50 w-full h-full flex items-center justify-center bg-black bg-opacity-50 p-2">
+                                <div className="w-full border borderBg max-w-[400px] max-h-[300px] p-3 rounded shadow-md bg-black text-white">
+                                  <button
+                                      className="block w-full text-left py-3 px-2 border-b borderBg text-red-500 border-t hover:bg-[#2d2929] focus:outline-none"
+                                      onClick={() => { setShowConfirmation(true); setShowOptions((prev) => !prev) }}
+                                    >
+                                  <div className="flex items-center gap-4">
+                                      <MdDeleteOutline size={30} className="mr-2 inline-block" />
+                                      <span>delete</span>
+                                      </div>
+                                    </button>
+
+                                    <button
+                                      className="block w-full text-left py-3 px-2 border-b borderBg  border-t hover:bg-[#2d2929] focus:outline-none"
+                                      onClick={() => {setShowOptions((prev) => !prev); setEditPosts((prev) => !prev)}}
+                                    >
+                                    <div className="flex items-center gap-4">
+                                      < BiSolidEditAlt size={30} className="mr-2 inline-block" />
+                                      <span>edit</span>
+                                      </div>
+                                    </button>
+                                  
+                                  <button
+                                    onClick={() => setShowOptions((prev) => !prev)}
+                                    className="block w-full text-left hover:bg-[#2d2929] py-3 px-2 border-b borderBg focus:outline-none"
+                                  >
+                                    <div className="flex items-center gap-4">
+                                      <MdClose size={30}/> 
+                                      <span>back</span>
+                                    </div>
+                                  </button>
+                                </div>
+                              </div>
+                            )}
+                        
+                          {showConfirmation && (
+                              <div className="fixed top-0 left-0 z-50 w-full h-full flex items-center justify-center bg-black bg-opacity-50 p-2">
+                                  <div className="bg-white p-4 rounded shadow-md">
+                                      <p className="text-lg text-black">Are you sure you want to delete this post?</p>
+                                      <div className="flex justify-end mt-4">
+                                          <button className="bg-red-500 text-white px-4 py-2 mr-2 rounded" onClick={handleDeletePost}>Confirm</button>
+                                          <button className="bg-gray-300 text-gray-800 px-4 py-2 rounded" onClick={() => setShowConfirmation(false)}>Cancel</button>
+                                      </div>
                                   </div>
                               </div>
-                          </div>
-                      )}
-                      
+                          )}
+                          
+                        </div>
+                        )}
+                      </div>
+
+                      {/* Comments Section */}
+                      <div className="lg:flex w-full h-full lg:flex-col hidden bg-black">
+                        <div className="flex flex-col p-2">
+                          <h2>{selectedPost.caption}</h2>
+                          <p className="text-sm text-gray-500">{selectedPost.hashtag}</p>
+                        </div>
+                      </div>
                     </div>
-                    )}
-                  </div>
 
-                  {/* Comments Section */}
-                  <div className="lg:flex w-full h-full lg:flex-col hidden bg-black">
-                    <div className="p-4">
-                      {selectedPost.caption}
+                    {/* Close Icon */}
+                    <div onClick={() => setIsPostSelected(false)} className="absolute hidden top-2 right-2 lg:flex text-white cursor-pointer">
+                      <MdClose size={30} onClick={() => setShowPauseIcon(false)} />
+                    </div>
+
+                    <div onClick={() => setIsPostSelected(false)} className="flex w-full max-w-[700px] p-3 bg-black lg:hidden text-white cursor-pointer">
+                      <IoMdArrowRoundBack size={30} onClick={() => setShowPauseIcon(false)} />
                     </div>
                   </div>
-                </div>
-
-                {/* Close Icon */}
-                <div onClick={() => setIsPostSelected(false)} className="absolute hidden top-2 right-2 lg:flex text-white cursor-pointer">
-                  <MdClose size={30} onClick={() => setShowPauseIcon(false)} />
-                </div>
-
-                <div onClick={() => setIsPostSelected(false)} className="flex w-full max-w-[700px] p-3 bg-black lg:hidden text-white cursor-pointer">
-                  <IoMdArrowRoundBack size={30} onClick={() => setShowPauseIcon(false)} />
-                </div>
-              </div>
-                 <div className="flex w-full max-w-[700px] flex-col lg:hidden bg-black overflow-y-auto h-full">
-                    <div className="p-4">
-                      {selectedPost.caption} 
+                    <div className="flex w-full max-w-[700px] flex-col lg:hidden bg-black overflow-y-auto h-full">
+                      <div className="flex flex-col p-2">
+                          <h2>{selectedPost.caption}</h2>
+                          <p className="text-sm text-gray-500">{selectedPost.hashtag}</p>
+                        </div>
                     </div>
                 </div>
-            </div>
-          )}
+              )}
 
-            {editPosts && (
-              <div className="fixed top-0 left-0 z-50 w-full h-full flex items-center justify-center bg-black bg-opacity-50 p-2">
-                <div className="w-full flex flex-col justify-center max-w-[400px] h-full max-h-[300px] p-4 rounded shadow-md bg-gray-800 text-white">
-                  <div className="flex justify-end mt-[-50px] text-white cursor-pointer">
-                    <MdClose size={30} onClick={() => setEditPosts(false)} />
+
+ {/* Edit The Selected Post */}
+                { editPosts && (
+                  <div className="fixed top-0 left-0 z-50 w-full h-full flex items-center justify-center bg-black bg-opacity-50 p-2">
+                    <div className="w-full flex flex-col justify-center max-w-[425px] h-full max-h-[400px] p-4 rounded shadow-md bg-gray-800 text-white">
+                      <div className="flex justify-end mt-[-50px] text-white cursor-pointer">
+                        <MdClose size={30} onClick={() => setEditPosts(false)} />
+                      </div>
+                      <h2 className="text-2xl font-bold mb-4 text-center mt-[15px]">Edit Post</h2>
+                      <form onSubmit={handleEditPost} className="flex flex-col gap-4">
+                        <label className="text-lg">Edit The Caption:</label>
+                        <input
+                          className="bg-gray-700 text-white px-3 py-2 rounded focus:outline-none"
+                          type="text"
+                          value={updatedCaption}
+                          onChange={(e) => setUpdatedCaption(e.target.value)}
+                        />
+                        <label className="text-lg">Edit The Hashtags :</label>
+                        <input
+                          className="bg-gray-700 text-white px-3 py-2 rounded focus:outline-none"
+                          type="text"
+                          value={updatedHashtag}
+                          onChange={(e) => setUpdatedHashtag(e.target.value)}
+                        />
+
+                        <button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 rounded">
+                          Update Post
+                        </button>
+                      </form>
+                    </div>
                   </div>
-                  <h2 className="text-2xl font-bold mb-4 text-center mt-[15px]">Edit Post</h2>
-                  <form onSubmit={handleEditPost} className="flex flex-col gap-4">
-                    <label className="text-lg">Edit The Caption:</label>
-                    <input
-                      className="bg-gray-700 text-white px-3 py-2 rounded focus:outline-none"
-                      type="text"
-                      value={updatedCaption}
-                      onChange={(e) => setUpdatedCaption(e.target.value)}
-                    />
-                    <button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 rounded">
-                      Update Post
-                    </button>
-                  </form>
-                </div>
-              </div>
-            )}
-       </main>
+              )}
+        </main>
      );
   };
 }
