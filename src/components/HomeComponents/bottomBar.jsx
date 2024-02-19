@@ -21,8 +21,8 @@ const BottomBar = () => {
   }, [1000])
          
   return (
-     <main className="fixed z-10 BottomBar bottom-0 left-0 w-full border-t text-white bg-[#3a1450] borderBg">
-      <ul className='flex items-center p-3 w-full h-[75px] justify-around space-x-2'>
+    <main className="fixed z-10 BottomBar bottom-0 left-0 w-full border-t text-white bg-[#3a1450] borderBg">
+      <ul className='flex items-center p-3 w-full h-[60px] justify-around space-x-2'>
        <NavLink to="/" className='rounded-full' activeclassname="active">
             <li className="flex p-2">
               <AiFillHome size={27} className="cursor-pointer" />
