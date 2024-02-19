@@ -11,6 +11,7 @@ body, html {
   background-image: linear-gradient(to right top, #1c0c24, #1e0d28, #200e2b, #220f2f, #240f33, #250f35, #250f36, #260f38, #250f38, #251038, #241038, #241038);
 }
 
+
 .gradient-text {
   background: linear-gradient(to right, #F9008E, #F733A2, #F44CB4, #F060C6, #EB71D5, #E373DD, #DB76E4, #D179EB, #C071EF, #AD6AF2, #9664F7, #785FFB);
   background-clip: text;
@@ -27,6 +28,8 @@ body, html {
 .PostButton{
   background-image: linear-gradient(to right top, #22171d, #461a38, #691759, #8a0f81, #a800ae, #b411c5, #be1fdd, #c72df6, #c63df8, #c54af9, #c555fa, #c45ffb);
 }
+
+
 
 .active {
   background-image: linear-gradient(to right top, #d16ba5, #c777b9, #ba83ca, #aa8fd8, #9a9ae1, #8aa7ec, #79b3f4, #69bff8, #52cffe, #41dfff, #46eefa, #5ffbf1);
@@ -166,3 +169,30 @@ body, html {
 
 
 
+@keyframes moveUp {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.7));
+  }
+  50% {
+    transform: translateY(-10px) scale(1.1);
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.9));
+  }
+}
+
+@keyframes moveDown {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.7));
+  }
+  50% {
+    transform: translateY(10px) scale(1.1);
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.9));
+  }
+}
+
+
+
+.up-down-animation > svg {
+  animation: moveUp 2s infinite alternate, moveDown 2s infinite alternate;
+}
