@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useUserData } from '../../getUserData';
 import { IoPersonCircleSharp } from 'react-icons/io5';
 import { Link } from 'react-router-dom';
-import Interactify from'/src/assets/Interactify.png'
+import Trendmedia from '/src/assets/Trendmedia.png';
 
 const Explore = () => {
   const { allUsersData, userProfile } = useUserData();
@@ -17,43 +17,46 @@ const Explore = () => {
   );
 
   return (
-    <div className="flex flex-col justify-center w-full h-full ">
-      <div className='flex top-0 w-full border-b borderBg px-4 py-2'>
+    <div className="flex flex-col justify-center w-full h-full overflow-hidden">
+      <div className="flex top-0 w-full border-b borderBg px-4 py-2">
         <input
-          className="w-full  bg-transparent border max-w-[300px] p-3 px-4 rounded-full  border-purple-700  outline-none "
+          className="w-full bg-transparent border max-w-[300px] p-3 px-4 rounded-full border-purple-700 outline-none"
           type="text"
           placeholder="Search by Name"
           value={searchTerm}
           onChange={handleSearch}
         />
       </div>
-      <div>
-      <div className='flex w-full h-full max-h-[500px] md:max-h-[500px] flex-col  overflow-y-auto'>
+      <div className="flex flex-col w-full h-full max-h-[500px] md:max-h-[500px] overflow-y-auto">
         {searchTerm && filteredUsers.length > 0 ? (
-          filteredUsers.filter(user => user.userName !== userProfile[0]?.userName).map((user) => (
-           <Link to={`/${user?.userName}`}>
-            <div key={user.id} className="w-full rounded-md p-4 mb-4">
-              <div className='w-full ml-2 flex gap-2 items-center'>
-              { user?.userPictureURL?
-                <img className='h-12 w-12 rounded-full border-2' src={user?.userPictureURL} alt='' />
-                : <div className=' rounded-full bg-gray-300 flex items-center justify-center'><IoPersonCircleSharp size={50}/></div>
-              } 
-               <div className='flex flex-col'>
-              <h1 className='font-bold text-xl'>{user?.fullName}</h1>
-              <h2 className='text-gray-500 text-sm'>@{user?.userName}</h2>
-           </div>
-           </div>
-            </div>
-           </Link>
-          ))
-        ): (
-          <div className='flex flex-col w-full h-screen justify-center items-center p-2'>
-            <h1 className='font-extrabold font-serif text-3xl gradient-text'>Welcome to Trendmedia!</h1>
-            <img className='w-96 ' src={Interactify}/>
-        </div>
-        )}  
-        </div>
-       </div>
+          filteredUsers
+            .filter((user) => user.userName !== userProfile[0]?.userName)
+            .map((user) => (
+              <Link to={`/${user?.userName}`} key={user.id}>
+                <div className="w-full rounded-md p-4 mb-4">
+                  <div className="w-full ml-2 flex gap-2 items-center">
+                    {user?.userPictureURL ? (
+                      <img className="h-12 w-12 rounded-full border-2" src={user?.userPictureURL} alt="" />
+                    ) : (
+                      <div className="rounded-full bg-gray-300 flex items-center justify-center">
+                        <IoPersonCircleSharp size={50} />
+                      </div>
+                    )}
+                    <div className="flex flex-col">
+                      <h1 className="font-bold text-xl">{user?.fullName}</h1>
+                      <h2 className="text-gray-500 text-sm">@{user?.userName}</h2>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            ))
+        ) : (
+          <div className="flex flex-col w-full h-screen justify-center items-center p-2">
+            <h1 className="font-extrabold font-serif text-3xl gradient-text">Welcome to Trendmedia!</h1>
+            <img className="w-96" src={Trendmedia} alt="Trendmedia" />
+          </div>
+        )}
+      </div>
     </div>
   );
 };

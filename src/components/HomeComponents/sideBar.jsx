@@ -3,7 +3,7 @@ import { Link, NavLink } from 'react-router-dom';
 import { FaPlusSquare, FaFacebookMessenger, FaBell } from 'react-icons/fa';
 import { AiFillHome } from "react-icons/ai";
 import LogOut from '../../Auth/logout';
-import Interactify from '/src/assets/Interactify.png';
+import Trendmedia from '/src/assets/Trendmedia.png';
 import { useUserData } from '../../getUserData';
 import { IoPersonCircleSharp } from "react-icons/io5";
 
@@ -31,8 +31,8 @@ const SideBar = () => {
     <main className="md:flex flex-col w-full h-screen">
       <ul className='flex flex-col items-center p-3 w-full pt-10'>
         <li className="flex gap-5 cursor-pointer">
-          <img src={Interactify} title='Interactify' onClick={handleLogoClick} className='w-[70px] sidebarLogo' />
-          <h1 title='Interactify' onClick={handleLogoClick} className="sidebarText font-serif ml-3 font-extrabold text-3xl gradient-text">Trendmedia</h1>
+          <img src={Trendmedia} title='Trendmedia' onClick={handleLogoClick} className='w-[70px] sidebarLogo' />
+          <h1 title='Trendmedia' onClick={handleLogoClick} className="sidebarText font-serif ml-3 font-extrabold text-3xl gradient-text">Trendmedia</h1>
         </li>
         <div className='grid gap-5 mt-[30px]'>
           <NavLink to="/" className='rounded-full' activeclassname="active">
