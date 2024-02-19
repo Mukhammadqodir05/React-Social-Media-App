@@ -8,7 +8,7 @@ import { doc, updateDoc, onSnapshot } from 'firebase/firestore';
 import { deleteObject, ref } from "firebase/storage";
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { IoPersonCircleSharp } from "react-icons/io5";
-import { HashLoader, RingLoader, RiseLoader, RotateLoader } from 'react-spinners';
+import { HashLoader } from 'react-spinners';
 import { MdClose } from "react-icons/md";
 import { MdDeleteOutline } from "react-icons/md";
 import { BsThreeDots } from "react-icons/bs";
@@ -40,6 +40,11 @@ const Profile = () => {
   const [updatedHashtag, setUpdatedHashtag] = useState('');
   const [userBanner, setUserBanner] = useState(currentUser?.userBannerURL);
   const [ userName, setUserName ] = useState(currentUser?.userName);
+  const [ userFollowing, setUserFollowing ] = useState(currentUser?.following);
+  const [ showFollowing, setShowFollowing ] = useState(false);
+  const [ userFollowers, setUserFollowers ] = useState(currentUser?.followers);
+  const [ showFollowers, setShowFollowers ] = useState(false);
+
  
   // Real-Time Database 
   useEffect(() => {
@@ -51,6 +56,8 @@ const Profile = () => {
       setPosts(doc.data().posts.map(post => post).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)));
       setUserBanner(doc.data().userBannerURL);
       setUserName(doc.data().userName)
+      setUserFollowing(doc.data().following)
+      setUserFollowers(doc.data().followers)
     });
   
     return () => unsubscribe();
@@ -242,15 +249,15 @@ const Profile = () => {
                   </div>
               
                   <div className="flex p-2 gap-5 mt-2 max-w-[400px] overflow-hidden ">
-                    <div className="flex gap-1">
+                    <div onClick={() => setShowFollowing(true)} title="following" className="flex cursor-pointer gap-1">
                       <p className="font-bold">{formattedFollowing}</p>
                       <p className="text-gray-500">Following</p>
                     </div>
-                    <div className="flex gap-1">
+                    <div onClick={() => setShowFollowers(true)} title="followers" className="flex cursor-pointer gap-1">
                       <p className="font-bold">{formattedFollowers}</p>
                       <p className="text-gray-500">Followers</p>
                     </div>
-                    <div className="flex gap-1">
+                    <div title="posts" className="flex gap-1 cursor-pointer">
                       <p className="font-bold">{postCount}</p>
                       <p className="text-gray-500">Posts</p>
                     </div>
@@ -417,42 +424,138 @@ const Profile = () => {
                   </div>
                  )}
  
-             {/* Edit The Selected Post */}
-                { editPosts && (
-                  <div className="fixed top-0 left-0 z-50 w-full h-full flex items-center justify-center bg-black bg-opacity-50 p-2">
-                    <div className="w-full flex flex-col justify-center max-w-[425px] h-full max-h-[400px] p-4 rounded shadow-md bg-gray-800 text-white">
-                      <div className="flex justify-end mt-[-50px] text-white cursor-pointer">
-                        <MdClose size={30} onClick={() => setEditPosts(false)} />
-                      </div>
-                      <h2 className="text-2xl font-bold mb-4 text-center mt-[15px]">Edit Post</h2>
-                      <form onSubmit={handleEditPost} className="flex flex-col gap-4">
-                        <label className="text-lg">Edit The Caption:</label>
-                        <input
-                          className="bg-gray-700 text-white px-3 py-2 rounded focus:outline-none"
-                          type="text"
-                          value={updatedCaption}
-                          onChange={(e) => setUpdatedCaption(e.target.value)}
-                        />
-                        <label className="text-lg">Edit The Hashtags :</label>
-                        <input
-                          className="bg-gray-700 text-white px-3 py-2 rounded focus:outline-none"
-                          type="text"
-                          value={updatedHashtag}
-                          onChange={(e) => setUpdatedHashtag(e.target.value)}
-                        />
+                {/* Edit The Selected Post */}
+                    { editPosts && (
+                      <div className="fixed top-0 left-0 z-50 w-full h-full flex items-center justify-center bg-black bg-opacity-50 p-2">
+                        <div className="w-full flex flex-col justify-center max-w-[425px] h-full max-h-[400px] p-4 rounded shadow-md bg-gray-800 text-white">
+                          <div className="flex justify-end mt-[-50px] text-white cursor-pointer">
+                            <MdClose size={30} onClick={() => setEditPosts(false)} />
+                          </div>
+                          <h2 className="text-2xl font-bold mb-4 text-center mt-[15px]">Edit Post</h2>
+                          <form onSubmit={handleEditPost} className="flex flex-col gap-4">
+                            <label className="text-lg">Edit The Caption:</label>
+                            <input
+                              className="bg-gray-700 text-white px-3 py-2 rounded focus:outline-none"
+                              type="text"
+                              value={updatedCaption}
+                              onChange={(e) => setUpdatedCaption(e.target.value)}
+                            />
+                            <label className="text-lg">Edit The Hashtags :</label>
+                            <input
+                              className="bg-gray-700 text-white px-3 py-2 rounded focus:outline-none"
+                              type="text"
+                              value={updatedHashtag}
+                              onChange={(e) => setUpdatedHashtag(e.target.value)}
+                            />
 
-                        <button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 rounded">
-                          Update Post
-                        </button>
-                      </form>
+                            <button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 rounded">
+                              Update Post
+                            </button>
+                          </form>
+                        </div>
+                      </div>
+                    )}
+                  </> : (
+                <div>
+                  <HashLoader color='#F9008E' size={200} loading={true} /> 
+              </div>
+              )}
+
+        {/* Show following accounts here */} 
+            { showFollowing && 
+              <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-60 z-50 p-2">
+                <div className="flex flex-col bg-[#252525] w-full max-w-[400px] h-full max-h-[500px] rounded-lg overflow-hidden">
+                  <div className="flex flex-col justify-between items-center">
+                    <div className="flex w-full justify-between items-center p-3">
+                      <h2 className="text-white text-xl font-bold">Following</h2>
+                      <MdClose title="close" size={30} className="cursor-pointer rounded-full  hover:bg-slate-600 text-white" onClick={() => setShowFollowing(false)} />
                     </div>
+                    <div className="flex w-full border-b borderBg" />
                   </div>
-                )}
-              </> : (
-            <div>
-              <HashLoader color='#F9008E' size={200} loading={true} /> 
-          </div>
-          )}
+                  <div className="p-2 overflow-y-auto pb-5">
+                  {userFollowing.length > 0 ? (
+                    userFollowing.map((userId, index) => {
+                      const followedUser = allUsersData?.find(user => user.uid === userId);
+                      return (
+                        <div key={userId} className="flex items-center justify-between p-2 border-b border-gray-800">
+                          <div onClick={() => setShowFollowing(false)} className="flex items-center gap-4 cursor-pointer">
+                            <Link to={`/${followedUser?.userName}`}>
+                              {followedUser?.userPictureURL ? 
+                                <img
+                                  src={followedUser?.userPictureURL}
+                                  alt={followedUser?.fullName}
+                                  className="rounded-full h-10 w-10"
+                                /> 
+                                : <div className="rounded-full bg-gray-300 flex items-center justify-center h-10 w-10"><IoPersonCircleSharp size={40} /></div>
+                              }
+                            </Link>
+                            <div>
+                              <Link to={`/${followedUser?.userName}`}>
+                                <p className="text-white font-bold">{followedUser?.fullName}</p>
+                                <p className="text-gray-500 text-base">@{followedUser?.userName}</p>
+                              </Link>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })
+                  ) : (
+                    <div className="flex font-bold text-xl justify-center items-center h-[400px] w-full text-white">
+                      No following yet
+                    </div>
+                  )}
+                  </div>
+                </div>
+              </div>
+            }
+
+            {/* Show followers accounts here */} 
+            { showFollowers && 
+              <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-60 z-50 p-2">
+                <div className="flex flex-col bg-[#252525] w-full max-w-[400px] h-full max-h-[500px] rounded-lg overflow-hidden">
+                  <div className="flex flex-col justify-between items-center">
+                    <div className="flex w-full justify-between items-center p-3">
+                      <h2 className="text-white text-xl font-bold">Followers</h2>
+                      <MdClose title="close" size={30} className="cursor-pointer rounded-full  hover:bg-slate-600 text-white" onClick={() => setShowFollowers(false)} />
+                    </div>
+                    <div className="flex w-full border-b borderBg" />
+                  </div>
+                  <div className="p-2 overflow-y-auto pb-5">
+                  { userFollowers.length > 0 ? (
+                    userFollowers.map((userId, index) => {
+                      const followerUser = allUsersData?.find(user => user.uid === userId);
+                      return (
+                        <div key={userId} className="flex items-center justify-between p-2 border-b border-gray-800">
+                          <div onClick={() => setShowFollowers(false)} className="flex items-center gap-4 cursor-pointer">
+                            <Link to={`/${followerUser?.userName}`}>
+                              {followerUser?.userPictureURL ? 
+                                <img
+                                  src={followerUser?.userPictureURL}
+                                  alt={followerUser?.fullName}
+                                  className="rounded-full h-10 w-10"
+                                /> 
+                                : <div className="rounded-full bg-gray-300 flex items-center justify-center h-10 w-10"><IoPersonCircleSharp size={40} /></div>
+                              }
+                            </Link>
+                            <div>
+                              <Link to={`/${followerUser?.userName}`}>
+                                <p className="text-white font-bold">{followerUser?.fullName}</p>
+                                <p className="text-gray-500 text-base">@{followerUser?.userName}</p>
+                              </Link>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })
+                  ) : (
+                    <div className="flex font-bold text-xl justify-center items-center h-[400px] w-full text-white">
+                      No followers yet
+                    </div>
+                  )}
+                  </div>
+                </div>
+              </div>
+            }
      </main>
    );
 }

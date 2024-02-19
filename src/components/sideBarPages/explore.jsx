@@ -70,7 +70,7 @@ const Explore = () => {
       </div>
       { userCount >= 6 ?
         <div className="up-down-animation fixed bottom-20 sm:bottom-10">
-        <IoArrowDownCircle size={40} color="#750be6"/>
+        <IoArrowDownCircle size={55} color="#750be6"/>
       </div>
        :""}
     </div>
