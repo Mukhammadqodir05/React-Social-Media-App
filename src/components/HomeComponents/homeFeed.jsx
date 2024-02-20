@@ -7,22 +7,72 @@ import { Link } from 'react-router-dom';
 import { IoPersonCircleSharp } from "react-icons/io5";
 import Explore from '../sideBarPages/explore';
 import { FaCompass } from 'react-icons/fa';
-import { onSnapshot } from 'firebase/firestore';
-import { db } from '../../firebase';
+import { doc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { collection } from 'firebase/firestore';
 import { HashLoader } from 'react-spinners';
+import { useUserData } from '../../getUserData';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import{ auth, db } from '../../firebase'
 
 const ImageCard = ({ user, post }) => {
+  const [authenticatedUser] = useAuthState(auth);
   const [liked, setLiked] = useState(false);
   const videoRef = useRef(null);
+  const { userProfile, allUsersData } = useUserData();
+  const [likedUserUid, setLikedUserUid] = useState(null);
+  const [likedPostId, setLikedPostId] = useState(null);
+  const likedUser = allUsersData?.find(user => user.uid === likedUserUid);
+  const likedPost = likedUser?.posts.find(post => post.id === likedPostId);
 
+  
+  
+  
+  const handleLike = async (event, likedPost, likedUser) => {
+    if (event) {
+      event.preventDefault();
+    }
+
+    console.log(likedUser);
+    console.log(likedPost);
+
+
+    if (!likedUser || !likedPost) {
+      console.error("Liked user or liked post not found");
+      return;
+    }
+  
+    if (!likedPost.likes) {
+      likedPost.likes = []; // Initialize likes array if it's undefined
+    }
+  
+    try {
+      if (authenticatedUser && authenticatedUser?.uid) {
+        if (likedPost?.likes.includes(authenticatedUser.uid)) {
+          likedPost.likes = likedPost?.likes.filter((uid) => uid !== authenticatedUser.uid);
+        } else {
+          likedPost.likes.push(authenticatedUser.uid);
+        }
+  
+        const userRef = doc(db, "users", likedUser?.uid);
+        const updatedData = {
+          posts: likedUser.posts
+        };
+  
+        await updateDoc(userRef, updatedData);
+        console.log('Document updated successfully');
+      } else {
+        console.error("User authentication failed.");
+      }
+    } catch (error) {
+      console.error('Error updating document:', error);
+    }
+  };
+  
+  
+  
 
   
  
-  const handleLike = () => {
-    setLiked(!liked);
-  };
-
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -54,7 +104,6 @@ const ImageCard = ({ user, post }) => {
     };
   }, []);
 
-
   return (
     <div className='w-full p-4 border-t borderBg mb-2'>
       <div className='flex items-center '>
@@ -81,10 +130,10 @@ const ImageCard = ({ user, post }) => {
       <div className='flex justify-center items-center'>
       <div className='flex w-full max-w-[500px] max-h-[600px] border borderBg p-2 rounded-[10px]'>
       {post.type === 'image' ? (
+        
         <img
           src={post.media}
           className="object-cover aspect-square w-full h-full"
-          alt="Posted image"
         />
        ) : post.type === 'video' ? (
         <video
@@ -104,17 +153,26 @@ const ImageCard = ({ user, post }) => {
         <div className='flex justify-around'>
           <div className='flex items-center justify-center space-x-1'>
             <GoComment size={20} className='curtext-gray-600 cursor-pointer' />
-            <span className='text-xs text-gray-600'>{post.comments.length} Comments</span>
+            <span className='text-xs text-gray-600'> Comments</span>
           </div>
-    
-          <div className='flex items-center justify-center space-x-1' onClick={handleLike}>
-           <FaRegHeart size={20} className={liked ? 'text-red-500 cursor-pointer' : 'text-gray-600 cursor-pointer'} />
-           <span className='text-xs  text-gray-600'>{liked ? (post.likes)+1
-              : (
-              (post.likes+0)
-              )}
+
+          <div className='flex items-center justify-center space-x-1' onClick={(event) => {
+            const updatedLikedUserUid = user.uid;
+            const updatedLikedPostId = post.id;
+            setLikedUserUid(updatedLikedUserUid);
+            setLikedPostId(updatedLikedPostId);
+            handleLike(event, post, user);
+          }}>
+            <FaRegHeart
+              size={20}
+              className={post.likes.includes(authenticatedUser?.uid)? 'text-red-500 cursor-pointer' : 'text-gray-600 cursor-pointer'}
+            />
+            <span className='text-xs text-gray-600'>
+              {post.likes.length}
             </span>
-         </div>
+          </div>
+
+
 
           <div className='flex items-center justify-center space-x-1'>
             <FiBarChart2 size={20} className='cursor-pointer text-blue-500' />
@@ -130,6 +188,8 @@ const ImageCard = ({ user, post }) => {
     </div>
   );
 };
+
+
 
   
 const HomeFeed = () => {
