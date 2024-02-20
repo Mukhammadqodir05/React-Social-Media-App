@@ -1,6 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { GoComment } from "react-icons/go";
-import { FaRegHeart } from "react-icons/fa";
 import { FiBarChart2 } from "react-icons/fi";
 import { TbHeartShare } from "react-icons/tb";
 import { Link } from 'react-router-dom';
@@ -10,23 +9,15 @@ import { FaCompass } from 'react-icons/fa';
 import { doc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { collection } from 'firebase/firestore';
 import { HashLoader } from 'react-spinners';
-import { useUserData } from '../../getUserData';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import{ auth, db } from '../../firebase'
+import { ImHeart } from "react-icons/im";
+import { FiHeart } from "react-icons/fi";
 
 const ImageCard = ({ user, post }) => {
   const [authenticatedUser] = useAuthState(auth);
-  const [liked, setLiked] = useState(false);
   const videoRef = useRef(null);
-  const { userProfile, allUsersData } = useUserData();
-  const [likedUserUid, setLikedUserUid] = useState(null);
-  const [likedPostId, setLikedPostId] = useState(null);
-  const likedUser = allUsersData?.find(user => user.uid === likedUserUid);
-  const likedPost = likedUser?.posts.find(post => post.id === likedPostId);
 
-  
-  
-  
   const handleLike = async (event, likedPost, likedUser) => {
     if (event) {
       event.preventDefault();
@@ -63,10 +54,6 @@ const ImageCard = ({ user, post }) => {
       console.error('Error updating document:', error);
     }
   };
-  
-  
-  
-
   
  
   useEffect(() => {
@@ -153,22 +140,20 @@ const ImageCard = ({ user, post }) => {
           </div>
 
           <div className='flex items-center justify-center space-x-1' onClick={(event) => {
-            const updatedLikedUserUid = user.uid;
-            const updatedLikedPostId = post.id;
-            setLikedUserUid(updatedLikedUserUid);
-            setLikedPostId(updatedLikedPostId);
-            handleLike(event, post, user);
+              handleLike(event, post, user);
           }}>
-            <FaRegHeart
-              size={20}
-              className={post.likes.includes(authenticatedUser?.uid)? 'text-red-500 cursor-pointer heart-beat' : 'text-gray-600 cursor-pointer'}
-            />
-            <span className='text-xs text-gray-600'>
-              {post.likes.length}
-            </span>
+              <div className={post.likes.includes(authenticatedUser?.uid) ? 'heart-beat cursor-pointer flex text-[#ff0404] rounded-full justify-center items-center ' : 'cursor-pointer rounded-full'}>
+                  {post.likes.includes(authenticatedUser?.uid) ?
+                      <ImHeart size={20} />
+                  : (
+                    <FiHeart size={20} />
+                   )
+                  }
+              </div>
+              <span className='text-xs text-gray-600'>
+                  {post.likes.length}
+              </span>
           </div>
-
-
 
           <div className='flex items-center justify-center space-x-1'>
             <FiBarChart2 size={20} className='cursor-pointer text-blue-500' />
