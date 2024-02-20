@@ -196,3 +196,28 @@ body, html {
 .up-down-animation > svg {
   animation: moveUp 2s infinite alternate, moveDown 2s infinite alternate;
 }
+
+
+
+
+@keyframes heartBeat {
+  0% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(1.3);
+  }
+  50% {
+    transform: scale(1);
+  }
+  75% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.heart-beat {
+  animation: heartBeat 0.5s;
+}

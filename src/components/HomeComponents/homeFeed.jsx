@@ -32,17 +32,13 @@ const ImageCard = ({ user, post }) => {
       event.preventDefault();
     }
 
-    console.log(likedUser);
-    console.log(likedPost);
-
-
     if (!likedUser || !likedPost) {
       console.error("Liked user or liked post not found");
       return;
     }
   
     if (!likedPost.likes) {
-      likedPost.likes = []; // Initialize likes array if it's undefined
+      likedPost.likes = []; 
     }
   
     try {
@@ -165,7 +161,7 @@ const ImageCard = ({ user, post }) => {
           }}>
             <FaRegHeart
               size={20}
-              className={post.likes.includes(authenticatedUser?.uid)? 'text-red-500 cursor-pointer' : 'text-gray-600 cursor-pointer'}
+              className={post.likes.includes(authenticatedUser?.uid)? 'text-red-500 cursor-pointer heart-beat' : 'text-gray-600 cursor-pointer'}
             />
             <span className='text-xs text-gray-600'>
               {post.likes.length}
