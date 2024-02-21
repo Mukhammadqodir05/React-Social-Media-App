@@ -17,6 +17,7 @@ import { FiHeart } from "react-icons/fi";
 const ImageCard = ({ user, post }) => {
   const [authenticatedUser] = useAuthState(auth);
   const videoRef = useRef(null);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   const handleLike = async (event, likedPost, likedUser) => {
     if (event) {
@@ -141,18 +142,17 @@ const ImageCard = ({ user, post }) => {
 
           <div className='flex items-center justify-center space-x-1' onClick={(event) => {
               handleLike(event, post, user);
+              setIsAnimating(true);
           }}>
-              <div className={post.likes.includes(authenticatedUser?.uid) ? 'heart-beat cursor-pointer flex text-[#ff0404] rounded-full justify-center items-center ' : 'cursor-pointer rounded-full'}>
-                  {post.likes.includes(authenticatedUser?.uid) ?
-                      <ImHeart size={20} />
-                  : (
-                    <FiHeart size={20} />
-                   )
-                  }
-              </div>
-              <span className='text-xs text-gray-600'>
-                  {post.likes.length}
-              </span>
+            <div className={post.likes.includes(authenticatedUser?.uid) ? (isAnimating ? 'heart-beat cursor-pointer flex text-[#ff0404] rounded-full justify-center items-center' : 'cursor-pointer rounded-full text-[#ff0404]') : 'cursor-pointer rounded-full'}>
+                {post.likes.includes(authenticatedUser?.uid) ?
+                    <ImHeart size={20} />
+                    : <FiHeart size={20} />
+                }
+            </div>
+            <span className='text-xs text-gray-600'>
+                {post.likes.length}
+            </span>
           </div>
 
           <div className='flex items-center justify-center space-x-1'>
@@ -200,6 +200,7 @@ const HomeFeed = () => {
     return () => unsubscribe();
   }, []);
 
+  
 
   return (
     <main className='flex flex-col items-center w-full h-full'>

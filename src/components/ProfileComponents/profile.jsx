@@ -4,7 +4,7 @@ import { useUserData } from '../../getUserData';
 import { Link, useParams } from "react-router-dom";
 import { IoMdArrowRoundBack } from "react-icons/io";
 import{ auth, db, storage } from '../../firebase'
-import { doc, updateDoc, onSnapshot } from 'firebase/firestore';
+import { doc, updateDoc, onSnapshot, collection } from 'firebase/firestore';
 import { deleteObject, ref } from "firebase/storage";
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { IoPersonCircleSharp } from "react-icons/io5";
@@ -16,6 +16,8 @@ import { LiaUserEditSolid } from "react-icons/lia";
 import { BiSolidEditAlt } from "react-icons/bi";
 import { TbPlayerPlayFilled } from "react-icons/tb";
 import { SlUserFollowing } from "react-icons/sl";
+import { ImHeart } from "react-icons/im";
+import { FiHeart } from "react-icons/fi";
 
 const Profile = () => {
   const { handleFollowAction, isFollowing } = FollowFunction()
@@ -44,9 +46,26 @@ const Profile = () => {
   const [ showFollowing, setShowFollowing ] = useState(false);
   const [ userFollowers, setUserFollowers ] = useState(currentUser?.followers);
   const [ showFollowers, setShowFollowers ] = useState(false);
+  const [authenticatedUser] = useAuthState(auth);
 
- 
-  // Real-Time Database 
+  
+  // Handle Video Ckick
+  const handleVideoClick = (post, index) => {
+    setSelectedPost(post);
+    setSelectedPostType('video');
+    setIsPostSelected(true);
+    setClickedIndex(index);
+  };
+  
+  // Handle Image Ckick
+  const handleImageClick = (post, index) => {
+    setSelectedPost(post);
+    setSelectedPostType('image');
+    setIsPostSelected(true);
+    setClickedIndex(index);
+  };
+  
+  
   useEffect(() => {
     const unsubscribe = onSnapshot(doc(db, "users", currentUser?.uid), (doc) => {
       setFollowersCount(doc.data().followers.length);
@@ -58,28 +77,45 @@ const Profile = () => {
       setUserName(doc.data().userName)
       setUserFollowing(doc.data().following)
       setUserFollowers(doc.data().followers)
+
     });
   
     return () => unsubscribe();
-  }, [user.uid, currentUser?.uid]);
+}, [user.uid, currentUser?.uid]);
 
 
-// Handle Video Ckick
-  const handleVideoClick = (post, index) => {
-    setSelectedPost(post);
-    setSelectedPostType('video');
-    setIsPostSelected(true);
-    setClickedIndex(index);
-  };
-
-  // Handle Image Ckick
-  const handleImageClick = (post, index) => {
-    setSelectedPost(post);
-    setSelectedPostType('image');
-    setIsPostSelected(true);
-    setClickedIndex(index);
-  };
+    // Handle Like
+  const handleLike = async (event, likedPost, likedUser) => {
+    if (event) {
+      event.preventDefault();
+    }
   
+    if (!likedUser || !likedPost) {
+      console.error("Liked user or liked post not found");
+      return;
+    }
+  
+    if (!likedPost.likes) {
+      likedPost.likes = [];
+    }
+  
+    try {
+      if (authenticatedUser && authenticatedUser?.uid) {
+        const updatedLikes = likedPost.likes.includes(authenticatedUser.uid)
+          ? likedPost.likes.filter((uid) => uid !== authenticatedUser.uid)
+          : [...likedPost.likes, authenticatedUser.uid];
+  
+        const userRef = doc(db, "users", likedUser?.uid);
+        await updateDoc(userRef, { posts: likedUser.posts.map(post => post.id === likedPost.id ? { ...likedPost, likes: updatedLikes } : post) });
+        console.log('Document updated successfully');
+      } else {
+        console.error("User authentication failed.");
+      }
+    } catch (error) {
+      console.error('Error updating document:', error);
+    }
+  };
+
  
   // Delete The Post
   const handleDeletePost = async () => {
@@ -110,7 +146,6 @@ const Profile = () => {
         console.error('Error deleting post or media:', error);
     }
   };
-
 
 // Edit The Post
   const handleEditPost = async (e) => {
@@ -420,10 +455,26 @@ const Profile = () => {
                         <h2>{selectedPost.caption}</h2>
                         <p className="text-sm text-gray-500">{selectedPost.hashtag}</p>
                       </div>
-                    </div>
-                  </div>
-                 )}
- 
+                      
+                      {/* Like button */}
+                      {/* <div className='flex items-center justify-center space-x-1' onClick={(event) => {
+                            handleLike(event, selectedPost, currentUser);
+                          }}>
+                            <div className={selectedPost?.likes?.includes(user.uid)?  'heart-beat cursor-pointer flex text-[#ff0404] rounded-full justify-center items-center' : 'cursor-pointer rounded-full'}>
+                              {selectedPost?.likes?.includes(user.uid) ? (
+                                <ImHeart size={20} />
+                              ) : (
+                                <FiHeart size={20} />
+                              )}
+                            </div>
+                            <span className='text-xs text-gray-600'>
+                               {selectedPost.likes.length}
+                            </span>
+                      </div> */}
+                      </div>
+                   </div>
+                  )}
+
                 {/* Edit The Selected Post */}
                     { editPosts && (
                       <div className="fixed top-0 left-0 z-50 w-full h-full flex items-center justify-center bg-black bg-opacity-50 p-2">

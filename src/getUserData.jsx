@@ -11,7 +11,7 @@ const GetUserData = ({ children }) => {
   const [allUsersData, setAllUsersData] = useState(null)
   const [userProfile, setUserProfile] = useState(null);
   const [user, loading] = useAuthState(auth);
-  
+
 
   useEffect(() => {
     const fetchAllData = async () => {
@@ -56,6 +56,7 @@ const GetUserData = ({ children }) => {
     fetchUserProfile();
   }, [user, loading]);
 
+ 
   
  
 
