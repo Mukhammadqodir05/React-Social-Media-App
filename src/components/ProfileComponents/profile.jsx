@@ -47,7 +47,7 @@ const Profile = () => {
   const [ userFollowers, setUserFollowers ] = useState(currentUser?.followers);
   const [ showFollowers, setShowFollowers ] = useState(false);
   const [authenticatedUser] = useAuthState(auth);
-
+  const [isAnimating, setIsAnimating] = useState(false);
   
   // Handle Video Ckick
   const handleVideoClick = (post, index) => {
@@ -85,36 +85,36 @@ const Profile = () => {
 
 
     // Handle Like
-  const handleLike = async (event, likedPost, likedUser) => {
-    if (event) {
-      event.preventDefault();
-    }
+  // const handleLike = async (event, likedPost, likedUser) => {
+  //   if (event) {
+  //     event.preventDefault();
+  //   }
   
-    if (!likedUser || !likedPost) {
-      console.error("Liked user or liked post not found");
-      return;
-    }
+  //   if (!likedUser || !likedPost) {
+  //     console.error("Liked user or liked post not found");
+  //     return;
+  //   }
   
-    if (!likedPost.likes) {
-      likedPost.likes = [];
-    }
+  //   if (!likedPost.likes) {
+  //     likedPost.likes = [];
+  //   }
   
-    try {
-      if (authenticatedUser && authenticatedUser?.uid) {
-        const updatedLikes = likedPost.likes.includes(authenticatedUser.uid)
-          ? likedPost.likes.filter((uid) => uid !== authenticatedUser.uid)
-          : [...likedPost.likes, authenticatedUser.uid];
+  //   try {
+  //     if (authenticatedUser && authenticatedUser?.uid) {
+  //       const updatedLikes = likedPost.likes.includes(authenticatedUser.uid)
+  //         ? likedPost.likes.filter((uid) => uid !== authenticatedUser.uid)
+  //         : [...likedPost.likes, authenticatedUser.uid];
   
-        const userRef = doc(db, "users", likedUser?.uid);
-        await updateDoc(userRef, { posts: likedUser.posts.map(post => post.id === likedPost.id ? { ...likedPost, likes: updatedLikes } : post) });
-        console.log('Document updated successfully');
-      } else {
-        console.error("User authentication failed.");
-      }
-    } catch (error) {
-      console.error('Error updating document:', error);
-    }
-  };
+  //       const userRef = doc(db, "users", likedUser?.uid);
+  //       await updateDoc(userRef, { posts: likedUser.posts.map(post => post.id === likedPost.id ? { ...likedPost, likes: updatedLikes } : post) });
+  //       console.log('Document updated successfully');
+  //     } else {
+  //       console.error("User authentication failed.");
+  //     }
+  //   } catch (error) {
+  //     console.error('Error updating document:', error);
+  //   }
+  // };
 
  
   // Delete The Post
@@ -459,18 +459,18 @@ const Profile = () => {
                       {/* Like button */}
                       {/* <div className='flex items-center justify-center space-x-1' onClick={(event) => {
                             handleLike(event, selectedPost, currentUser);
-                          }}>
-                            <div className={selectedPost?.likes?.includes(user.uid)?  'heart-beat cursor-pointer flex text-[#ff0404] rounded-full justify-center items-center' : 'cursor-pointer rounded-full'}>
-                              {selectedPost?.likes?.includes(user.uid) ? (
-                                <ImHeart size={20} />
-                              ) : (
-                                <FiHeart size={20} />
-                              )}
-                            </div>
-                            <span className='text-xs text-gray-600'>
-                               {selectedPost.likes.length}
-                            </span>
-                      </div> */}
+                            setIsAnimating(true);
+                        }}>
+                          <div className={selectedPost.likes.includes(authenticatedUser?.uid) ? (isAnimating ? 'heart-beat cursor-pointer flex text-[#ff0404] rounded-full justify-center items-center' : 'cursor-pointer rounded-full text-[#ff0404]') : 'cursor-pointer rounded-full'}>
+                              {selectedPost.likes.includes(authenticatedUser?.uid) ?
+                                  <ImHeart size={20} />
+                                  : <FiHeart size={20} />
+                              }
+                          </div>
+                          <span className='text-xs text-gray-600'>
+                              {selectedPost.likes.length}
+                          </span>
+                        </div> */}
                       </div>
                    </div>
                   )}

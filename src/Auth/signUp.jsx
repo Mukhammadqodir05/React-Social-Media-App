@@ -69,6 +69,7 @@ const SignUp = (props) => {
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
             placeholder="Full Name"
+            autoComplete='off'
           />
           <input
             className="input outline-none py-1 p-1 bg-transparent border-b w-full max-w-[240px]"
@@ -77,6 +78,7 @@ const SignUp = (props) => {
             onChange={(e) => setEmail(e.target.value)}
             value={email}
             placeholder="Email"
+            autoComplete='off'
           />
          <div className='relative'>
             <input
@@ -85,6 +87,7 @@ const SignUp = (props) => {
               onChange={(e) => setPassword(e.target.value)}
               value={password}
               placeholder='Password'
+              autoComplete='off'
             />
             <span
               className='absolute right-7 top-1/2 transform -translate-y-1/2 cursor-pointer text-black'

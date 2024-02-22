@@ -45,6 +45,7 @@ const SignIn = (props) => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Email"
+            autoComplete='off'
           />
           <div className='relative'>
             <input
@@ -53,6 +54,7 @@ const SignIn = (props) => {
               onChange={(e) => setPassword(e.target.value)}
               value={password}
               placeholder='Password'
+              autoComplete='off'
             />
             <span
               className='absolute right-7 top-1/2 transform -translate-y-1/2 cursor-pointer text-black'

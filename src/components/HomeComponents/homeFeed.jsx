@@ -8,17 +8,26 @@ import Explore from '../sideBarPages/explore';
 import { FaCompass } from 'react-icons/fa';
 import { doc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { collection } from 'firebase/firestore';
-import { HashLoader } from 'react-spinners';
+import { HashLoader, PulseLoader } from 'react-spinners';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import{ auth, db } from '../../firebase'
 import { ImHeart } from "react-icons/im";
 import { FiHeart } from "react-icons/fi";
+import { useUserData } from '../../getUserData';
+import { BsThreeDots } from "react-icons/bs";
 
 const ImageCard = ({ user, post }) => {
   const [authenticatedUser] = useAuthState(auth);
   const videoRef = useRef(null);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [isCommenting, setIsCommenting] = useState(false);
+  const [showCommentForm, setShowCommentForm] = useState(false);
+  const [commentText, setCommentText] = useState('');
+  const { allUsersData } = useUserData();
+  const commentsEndRef = useRef(null);
+  const isPostDisabled = commentText.trim().length === 0;
 
+  // Handle Like
   const handleLike = async (event, likedPost, likedUser) => {
     if (event) {
       event.preventDefault();
@@ -55,6 +64,62 @@ const ImageCard = ({ user, post }) => {
       console.error('Error updating document:', error);
     }
   };
+
+
+  //  Handle Comment
+  const handleComment = async (event, likedPost, likedUser) => {
+    if (event) {
+      event.preventDefault();
+    }
+    setIsCommenting(true)
+
+    try {
+      if (authenticatedUser && authenticatedUser.uid) {
+        const newComment = {
+            userId: authenticatedUser.uid,
+            text: event.target.comment.value,
+            timestamp: new Date().toISOString()
+        };
+        likedPost.comments.push(newComment);
+        const userRef = doc(db, "users", likedUser?.uid);
+        const updatedData = {
+          posts: likedUser.posts
+        };
+        await updateDoc(userRef, updatedData);
+        setIsCommenting(false)
+        setCommentText('')
+        commentsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+
+    } else {
+        console.error("User authentication failed.");
+    }
+    }catch (error) {
+      console.error('Error adding comment:', error);
+    } 
+  };
+
+  // Scroll to the bottom when comments load or change
+  useEffect(() => {
+    commentsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [post.comments]);
+
+  const formatTimestamp = (timestamp) => {
+    const timeDiff = new Date() - new Date(timestamp);
+    const seconds = Math.floor(timeDiff / 1000);
+    if (seconds < 60) {
+      return `${seconds} seconds ago`;
+    }
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) {
+      return `${minutes} minutes ago`;
+    }
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) {
+      return `${hours} hours ago`;
+    }
+    const days = Math.floor(hours / 24);
+    return `${days} days ago`;
+  };
   
  
   useEffect(() => {
@@ -88,8 +153,9 @@ const ImageCard = ({ user, post }) => {
     };
   }, []);
 
+
   return (
-    <div className='w-full p-4 border-t borderBg mb-2'>
+    <div className='w-full  p-4 border-t borderBg mb-2'>
       <div className='flex items-center '>
         <Link to={`/${user?.userName}`}>
         { user?.userPictureURL?
@@ -110,9 +176,9 @@ const ImageCard = ({ user, post }) => {
             <p className="text-sm text-gray-500">{post.hashtag}</p>
          </div>
       </div>
-      <div className='flex flex-col p-2 gap-7'>
+      <div className='flex flex-col p-2 gap-5'>
       <div className='flex justify-center items-center'>
-      <div className='flex w-full max-w-[500px] max-h-[600px] border borderBg p-2 rounded-[10px]'>
+      <div className='flex w-full max-w-[500px] max-h-[600px] border borderBg px-2 rounded-md'>
       {post.type === 'image' ? (
         
         <img
@@ -135,10 +201,10 @@ const ImageCard = ({ user, post }) => {
     </div>
         </div>
         <div className='flex justify-around'>
-          <div className='flex items-center justify-center space-x-1'>
-            <GoComment size={20} className='curtext-gray-600 cursor-pointer' />
-            <span className='text-xs text-gray-600'> Comments</span>
-          </div>
+          <div className='flex items-center justify-center space-x-1' onClick={() => setShowCommentForm(prev => !prev)}>
+            <GoComment size={20} className='text-[#0b17ff] cursor-pointer' />
+            <span className='text-xs text-gray-600'>{post?.comments?.length}</span>
+         </div>
 
           <div className='flex items-center justify-center space-x-1' onClick={(event) => {
               handleLike(event, post, user);
@@ -166,6 +232,67 @@ const ImageCard = ({ user, post }) => {
           </div>
         </div>
       </div>
+
+      {/* Add Comment */}
+       <div className='flex flex-col w-full h-full justify-center items-center mt-2 overflow-hidden'>
+         {showCommentForm && (
+            <div className="flex justify-center items-center w-full h-full max-h-[400px] flex-col max-w-[500px] p-4 bg-black">
+              <div className="h-full w-full justify-start items-start max-h-[350px] overflow-y-auto">
+                <div className='flex flex-col w-full'>
+                  {post.comments.map((comment) => {
+                    const commenter = allUsersData?.find((u) => u.uid === comment.userId);
+                    
+                    return (
+                      <div key={comment.timestamp} className="flex w-full  items-start py-3 gap-3">
+                        {commenter?.userPictureURL?
+                          <img className='h-12 w-12 rounded-full border-2' src={commenter?.userPictureURL} alt='' />
+                        : <div className='rounded-full bg-gray-300 flex items-center justify-center'><IoPersonCircleSharp size={50}/></div>
+                        } 
+                       
+                        <div className='flex justify-start flex-col'>
+                          <div className='flex items-center gap-2'>
+                            <p className="text-white font-bold">{commenter?.fullName}</p>
+                            <p className="text-gray-400 text-xs">{formatTimestamp(comment.timestamp)}</p>
+                          { comment.userId === commenter.uid && <p className="text-gray-400 text-xs"><BsThreeDots /></p>}
+                          </div>
+                          <p className="text-gray-100 mt-1">{comment.text}</p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                 <div ref={commentsEndRef} /> 
+              </div>
+            </div>
+           )}
+
+         { showCommentForm && <form
+          className='flex border-b bg-black borderBg w-full max-w-[500px] h-full max-h-[60px] items-center'
+          onSubmit={(event) => handleComment(event, post, user)}
+        >
+          <input
+            name="comment"
+            value={commentText}
+            onChange={(e) => setCommentText(e.target.value)}
+            className="w-full bg-transparent h-10 px-2 outline-none"
+            placeholder="Add a comment..."
+            autoComplete='off'
+          />
+          <button
+            type="submit"
+            className={`px-4 py-2 w-[80px] h-[40px] ${isPostDisabled ? 'text-gray-500' : 'text-green-500'}`}
+            disabled={isPostDisabled}
+          >
+            {isCommenting ? (
+              <div className="flex items-center justify-center">
+                <PulseLoader color='#F9008E' size={15} loading={true} />
+              </div>
+            ) : (
+              "Post"
+            )}
+          </button>
+        </form> }
+       </div>
     </div>
   );
 };
