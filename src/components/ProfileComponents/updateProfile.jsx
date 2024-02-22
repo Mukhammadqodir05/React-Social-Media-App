@@ -28,7 +28,7 @@ const UpdateProfile = () => {
  
 
   // FULLNAME limitation
-  const MAX_FULLNAME_LENGTH = 35;
+  const MAX_FULLNAME_LENGTH = 30;
   const handleFullNameChange = (e) => {
     const inputFullNmae = e.target.value;
     const limitedFullName = inputFullNmae.substring(0, MAX_FULLNAME_LENGTH); 

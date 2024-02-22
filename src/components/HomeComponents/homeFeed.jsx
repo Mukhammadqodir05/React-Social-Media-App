@@ -14,7 +14,7 @@ import{ auth, db } from '../../firebase'
 import { ImHeart } from "react-icons/im";
 import { FiHeart } from "react-icons/fi";
 import { useUserData } from '../../getUserData';
-import { BsThreeDots } from "react-icons/bs";
+import { MdDeleteOutline, MdClose } from "react-icons/md";
 
 const ImageCard = ({ user, post }) => {
   const [authenticatedUser] = useAuthState(auth);
@@ -65,9 +65,8 @@ const ImageCard = ({ user, post }) => {
     }
   };
 
-
   //  Handle Comment
-  const handleComment = async (event, likedPost, likedUser) => {
+  const handleComment = async (event, commentedPost, commentedUser) => {
     if (event) {
       event.preventDefault();
     }
@@ -76,20 +75,21 @@ const ImageCard = ({ user, post }) => {
     try {
       if (authenticatedUser && authenticatedUser.uid) {
         const newComment = {
-            userId: authenticatedUser.uid,
-            text: event.target.comment.value,
-            timestamp: new Date().toISOString()
-        };
-        likedPost.comments.push(newComment);
-        const userRef = doc(db, "users", likedUser?.uid);
+          userId: authenticatedUser.uid,
+          commentId: `${authenticatedUser.uid}-${Date.now()}`, 
+          text: event.target.comment.value,
+          timestamp: new Date().toISOString()
+      };
+      
+        commentedPost.comments.push(newComment);
+        const userRef = doc(db, "users", commentedUser?.uid);
         const updatedData = {
-          posts: likedUser.posts
+          posts: commentedUser.posts
         };
         await updateDoc(userRef, updatedData);
         setIsCommenting(false)
         setCommentText('')
         commentsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-
     } else {
         console.error("User authentication failed.");
     }
@@ -98,30 +98,7 @@ const ImageCard = ({ user, post }) => {
     } 
   };
 
-  // Scroll to the bottom when comments load or change
-  useEffect(() => {
-    commentsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [post.comments]);
-
-  const formatTimestamp = (timestamp) => {
-    const timeDiff = new Date() - new Date(timestamp);
-    const seconds = Math.floor(timeDiff / 1000);
-    if (seconds < 60) {
-      return `${seconds} seconds ago`;
-    }
-    const minutes = Math.floor(seconds / 60);
-    if (minutes < 60) {
-      return `${minutes} minutes ago`;
-    }
-    const hours = Math.floor(minutes / 60);
-    if (hours < 24) {
-      return `${hours} hours ago`;
-    }
-    const days = Math.floor(hours / 24);
-    return `${days} days ago`;
-  };
-  
- 
+  // Show video
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -152,7 +129,61 @@ const ImageCard = ({ user, post }) => {
       }
     };
   }, []);
+  
+// Logic for scrolling to the latest comment
+  useEffect(() => {
+    if (commentsEndRef.current) {
+      commentsEndRef.current.scrollTop = commentsEndRef.current.scrollHeight;
+    }
+  }, [post.comments]);
 
+  const formatTimestamp = (timestamp) => {
+    const timeDiff = new Date() - new Date(timestamp);
+    const seconds = Math.floor(timeDiff / 1000);
+    if (seconds < 60) {
+      return `${seconds} seconds ago`;
+    }
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) {
+      return `${minutes} minutes ago`;
+    }
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) {
+      return `${hours} hours ago`;
+    }
+    const days = Math.floor(hours / 24);
+    return `${days} days ago`;
+  };
+  
+
+  // Handle Comment Delete
+  const handleDeleteComment = async (event, commentId, postOwner) => {
+    if (event) {
+      event.preventDefault();
+    }
+     try {
+       postOwner.posts.forEach(post => {
+         post.comments = post.comments.filter(comment => comment?.commentId !== commentId);
+       });
+   
+       const userRef = doc(db, "users", postOwner.uid);
+       const updatedData = {
+         posts: postOwner.posts
+       };
+       await updateDoc(userRef, updatedData);
+       console.log("Comment deleted successfully.");
+   
+
+   }
+    
+      catch (error) {
+       console.error('Error deleting comment:', error);
+     }
+
+    
+  };
+
+  
 
   return (
     <div className='w-full  p-4 border-t borderBg mb-2'>
@@ -178,7 +209,7 @@ const ImageCard = ({ user, post }) => {
       </div>
       <div className='flex flex-col p-2 gap-5'>
       <div className='flex justify-center items-center'>
-      <div className='flex w-full max-w-[500px] max-h-[600px] border borderBg px-2 rounded-md'>
+      <div className='flex w-full max-w-[500px] max-h-[600px] border borderBg rounded-md'>
       {post.type === 'image' ? (
         
         <img
@@ -237,62 +268,80 @@ const ImageCard = ({ user, post }) => {
        <div className='flex flex-col w-full h-full justify-center items-center mt-2 overflow-hidden'>
          {showCommentForm && (
             <div className="flex justify-center items-center w-full h-full max-h-[400px] flex-col max-w-[500px] p-4 bg-black">
-              <div className="h-full w-full justify-start items-start max-h-[350px] overflow-y-auto">
+              <div onClick={() => setShowCommentForm(prev => ! prev)} className='flex w-full justify-end cursor-pointer items-center hover:text-cyan-300'>
+                <MdClose size={25} title='close' />
+              </div>
+              <div ref={commentsEndRef} className="h-full w-full justify-start items-start max-h-[350px] overflow-y-auto">
                 <div className='flex flex-col w-full'>
-                  {post.comments.map((comment) => {
+                  {post?.comments?.map((comment) => {
                     const commenter = allUsersData?.find((u) => u.uid === comment.userId);
                     
                     return (
-                      <div key={comment.timestamp} className="flex w-full  items-start py-3 gap-3">
-                        {commenter?.userPictureURL?
-                          <img className='h-12 w-12 rounded-full border-2' src={commenter?.userPictureURL} alt='' />
-                        : <div className='rounded-full bg-gray-300 flex items-center justify-center'><IoPersonCircleSharp size={50}/></div>
-                        } 
-                       
-                        <div className='flex justify-start flex-col'>
-                          <div className='flex items-center gap-2'>
-                            <p className="text-white font-bold">{commenter?.fullName}</p>
-                            <p className="text-gray-400 text-xs">{formatTimestamp(comment.timestamp)}</p>
-                          { comment.userId === commenter.uid && <p className="text-gray-400 text-xs"><BsThreeDots /></p>}
+                      <div key={comment.timestamp} className="flex w-full items-start py-3 gap-3">
+                        <Link to={`/${commenter?.userName}`} className='flex'>
+                          <div className='relative w-12 h-12'>
+                            {commenter?.userPictureURL ? (
+                              <img className='h-full w-full object-cover rounded-full border-2' src={commenter?.userPictureURL} alt='' />
+                            ) : (
+                              <div className='rounded-full bg-gray-300 flex items-center justify-center h-full'>
+                                <IoPersonCircleSharp size={50}/>
+                              </div>
+                            )}
                           </div>
-                          <p className="text-gray-100 mt-1">{comment.text}</p>
+                        </Link>
+                        <div className='flex justify-start flex-col w-full'>
+                          <div className='flex items-center w-full gap-2'>
+                           <Link to={`/${commenter?.userName}`} className="font-medium overflow-hidden text-nowrap text-ellipsis">
+                             <p className='text-nowrap  text-ellipsis' >{commenter?.fullName}</p>
+                            </Link>
+                            {comment.userId === authenticatedUser?.uid && (
+                              <p onClick={(event) => handleDeleteComment(event, comment.commentId, user)} className="text-[#c803fff0] max-w-[70px] w-full cursor-pointer mr-3 hover:text-red-500">
+                                <MdDeleteOutline title='delete this comment' size={20}/>
+                              </p>
+                            )}
+                          </div>
+                          <div className='flex flex-col gap-2'>
+                            <p className="text-gray-100 mt-1">{comment.text}</p>
+                            <p className="flex mr-4 text-gray-400 text-xs">{formatTimestamp(comment.timestamp)}</p>
+                          </div>
                         </div>
                       </div>
                     );
+                    
                   })}
                 </div>
-                 <div ref={commentsEndRef} /> 
               </div>
             </div>
            )}
 
-         { showCommentForm && <form
-          className='flex border-b bg-black borderBg w-full max-w-[500px] h-full max-h-[60px] items-center'
-          onSubmit={(event) => handleComment(event, post, user)}
-        >
-          <input
-            name="comment"
-            value={commentText}
-            onChange={(e) => setCommentText(e.target.value)}
-            className="w-full bg-transparent h-10 px-2 outline-none"
-            placeholder="Add a comment..."
-            autoComplete='off'
-          />
-          <button
-            type="submit"
-            className={`px-4 py-2 w-[80px] h-[40px] ${isPostDisabled ? 'text-gray-500' : 'text-green-500'}`}
-            disabled={isPostDisabled}
-          >
-            {isCommenting ? (
-              <div className="flex items-center justify-center">
-                <PulseLoader color='#F9008E' size={15} loading={true} />
-              </div>
-            ) : (
-              "Post"
-            )}
-          </button>
-        </form> }
-       </div>
+          { showCommentForm && <form
+                className='flex border-b bg-black borderBg w-full max-w-[500px] h-full max-h-[60px] items-center'
+                onSubmit={(event) => handleComment(event, post, user)}
+              >
+                <input
+                  name="comment"
+                  value={commentText}
+                  onChange={(e) => setCommentText(e.target.value)}
+                  className="w-full bg-transparent h-10 px-2 outline-none"
+                  placeholder="Add a comment..."
+                  autoComplete='off'
+                />
+                <button
+                  type="submit"
+                  className={`px-4 py-2 w-[80px] h-[40px] cursor-pointer ${isPostDisabled ? 'text-gray-500' : 'text-green-500'}`}
+                  disabled={isPostDisabled}
+                  title='post a comment'
+                >
+                  {isCommenting ? (
+                    <div className="flex items-center justify-center cursor-pointer">
+                      <PulseLoader color='#F9008E' size={15} loading={true} />
+                    </div>
+                  ) : (
+                    "Post"
+                  )}
+                </button>
+            </form> }
+        </div>
     </div>
   );
 };
@@ -320,7 +369,7 @@ const HomeFeed = () => {
           });
         }
       });
-      updatedPosts.sort((a, b) => new Date(b.post.timestamp) - new Date(a.post.timestamp));
+      // updatedPosts.sort((a, b) => new Date(b.post.timestamp) - new Date(a.post.timestamp));
       setAllPosts(updatedPosts);
     });
   

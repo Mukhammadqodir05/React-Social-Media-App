@@ -29,8 +29,6 @@ body, html {
   background-image: linear-gradient(to right top, #22171d, #461a38, #691759, #8a0f81, #a800ae, #b411c5, #be1fdd, #c72df6, #c63df8, #c54af9, #c555fa, #c45ffb);
 }
 
-
-
 .active {
   background-image: linear-gradient(to right top, #d16ba5, #c777b9, #ba83ca, #aa8fd8, #9a9ae1, #8aa7ec, #79b3f4, #69bff8, #52cffe, #41dfff, #46eefa, #5ffbf1);
 }
