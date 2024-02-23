@@ -8,7 +8,7 @@ import { doc, updateDoc, onSnapshot, collection } from 'firebase/firestore';
 import { deleteObject, ref } from "firebase/storage";
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { IoPersonCircleSharp } from "react-icons/io5";
-import { HashLoader, PulseLoader } from 'react-spinners';
+import { FadeLoader, HashLoader, PulseLoader } from 'react-spinners';
 import { MdDeleteOutline, MdClose } from "react-icons/md";
 import { BsThreeDots } from "react-icons/bs";
 import { LiaUserEditSolid } from "react-icons/lia";
@@ -48,10 +48,10 @@ const Profile = () => {
   const [ userFollowers, setUserFollowers ] = useState(currentUser?.followers);
   const [ showFollowers, setShowFollowers ] = useState(false);
   const [authenticatedUser] = useAuthState(auth);
-
   const [isAnimating, setIsAnimating] = useState(false);
   const [isCommenting, setIsCommenting] = useState(false);
   const [showCommentForm, setShowCommentForm] = useState(false);
+  const [isDeletingComment, setIsDeletingComment] = useState(false);
   const [commentText, setCommentText] = useState('');
   const commentsEndRef = useRef(null);
   const isPostDisabled = commentText.trim().length === 0;
@@ -71,6 +71,11 @@ const Profile = () => {
     const hours = Math.floor(minutes / 60);
     if (hours < 24) {
       return `${hours} hours ago`;
+    }
+
+    const day = Math.floor(hours / 24);
+    if (day === 1) {
+      return `${day} day ago`;
     }
     const days = Math.floor(hours / 24);
     return `${days} days ago`;
@@ -135,6 +140,7 @@ const Profile = () => {
     if (event) {
         event.preventDefault();
     }
+    setIsDeletingComment(true)
 
     const userRef = doc(db, "users", currentUser.uid);
     let updatedData = {};
@@ -158,6 +164,8 @@ const Profile = () => {
         console.log("Comment deleted successfully.");
     } catch (error) {
         console.error('Error deleting comment:', error);
+    } finally{
+      setIsDeletingComment(false)
     }
 };
 
@@ -265,14 +273,14 @@ const Profile = () => {
       const userRef = doc(db, "users", user.uid);
 
       if (clickedIndex !== -1) {
-        const postToEdit = userProfile[0].posts[clickedIndex];
+        const postToEdit = posts[clickedIndex];
 
         if (postToEdit) {
           postToEdit.caption = updatedCaption;
           postToEdit.hashtag = updatedHashtag;
 
           const updatedData = {
-            posts: userProfile[0].posts,
+            posts: posts,
           };
 
           await updateDoc(userRef, updatedData);
@@ -444,11 +452,12 @@ const Profile = () => {
       
             {/* Show The Selected Post */}
                 
-           {isPostSelected && (
+           { isPostSelected && (
               <div className="fixed flex-col top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-90 z-50">
                {/* Close Icon */}
-                <div onClick={() => setIsPostSelected(false)} className="flex w-full max-w-[600px] p-3 bg-black lg:hidden text-white cursor-pointer overflow-hidden ">
+                <div onClick={() => setIsPostSelected(false)} className="flex gap-5 w-full max-w-[600px] p-3 bg-black lg:hidden text-white cursor-pointer overflow-hidden ">
                   <IoMdArrowRoundBack size={30} onClick={() => setShowPauseIcon(false)} />
+                  <h2 className="text-white text-xl font-bold">Post</h2>
                 </div>
                  <div className='flex flex-col items-center lg:justify-center h-full w-full overflow-y-auto overflow-x-hidden'>
                   <div className="flex lg:mt-0 bg-black w-full max-w-[600px] lg:max-w-[1140px] flex-col-reverse lg:flex-row  overflow-y-auo lg:overflow-hidden">
@@ -477,7 +486,8 @@ const Profile = () => {
                       ) : selectedPostType === 'image' ? (
                           <img className="object-cover w-full h-full aspect-square" src={selectedPost.media} alt="Selected Post" />
                       ) : null }
-                      </div>
+                  </div>
+
                     {/* Comments, Delete Button, Owner Profile Section */}
                     <div className="flex flex-col w-full max-w-[700px] h-full lg:border-r borderBg lg:max-w-[500px] justify-between items-center bg-black">
                       <div className="flex border-t lg:border lg:border-r-0 lg:border-l-0 borderBg w-full max-w-[700px] max-h-24 lg:max-w-[500px] justify-between items-center p-2">
@@ -554,7 +564,6 @@ const Profile = () => {
                     <div className="lg:flex w-full h-full lg:flex-col hidden bg-black">
                      <div className="flex flex-col p-5 mt-[-20px] mb-[-20px] gap-2 ">
                      <div className='lg:flex hidden flex-col w-full h-full justify-center items-center overflow-hidden'>
-                     {!showCommentForm && (
                       <div className="flex justify-center items-center w-full flex-col h-[455px]">
                         <div ref={commentsEndRef} className="h-full w-full justify-start items-start max-h-[455px] overflow-y-auto overflow-x-hidden">
                           <div className=''>
@@ -581,7 +590,7 @@ const Profile = () => {
                                     <div className='flex h-full justify-start flex-col w-full'>
                                       <div className='flex items-center w-full gap-2'>
                                         <p className='text-nowrap font-medium overflow-hidden text-ellipsis'>{commenter?.userName}</p>
-                                        {(comment.userId === authenticatedUser?.uid || username === userProfile[0]?.userName) && (
+                                        {(comment.userId === authenticatedUser?.uid || username === currentUser?.userName) && (
                                             <p onClick={(event) => handleDeleteComment(event, comment.commentId, currentUser)} className="text-[#c803fff0] max-w-[70px] w-full cursor-pointer mr-3 hover:text-red-500">
                                               <MdDeleteOutline title='delete this comment' size={25}/>
                                             </p>
@@ -604,14 +613,13 @@ const Profile = () => {
                           </div>
                         </div>
                        </div>
-                       )}
                       </div>
-                      <div className='lg:flex hidden items-center pl-5 gap-4 w-full h-[60px]'>
+                      <div className='lg:flex hidden items-center pl-5 gap-10 w-full h-[60px]'>
+                      {/* Comment Button*/}
                         <div className='hidden lg:flex items-center justify-center space-x-1'>
                           <FaCommentAlt  size={20} className='text-[#0b17ff] cursor-pointer' />
                           <span className='text-gray-600'>{selectedPost?.comments?.length} comments</span>
                        </div>
-
                 {/* Like Button */}
                           <div className='flex items-center justify-center space-x-1' onClick={(event) => {
                                 handleLike(event, selectedPost, currentUser);
@@ -627,12 +635,9 @@ const Profile = () => {
                               {selectedPost.likes.length} likes
                           </span>
                         </div>
+                       <p className='text-sm text-gray-500'>{formatTimestamp(selectedPost?.timestamp)}</p>
                       </div>
                      </div>
-      
-               {/* Comment Button*/}
-
-
                       </div>
                        <form
                         className='border-t border-b lg:flex hidden bg-black borderBg w-full h-[60px] items-center'
@@ -663,54 +668,183 @@ const Profile = () => {
                       </form> 
                     </div>
                     </div>
+
+              {/*Mobile Design   */}
                     <div className="flex w-full max-w-[600px] flex-col lg:hidden bg-black h-full pb-11">
-                    <div className="flex flex-col p-2">
-                      <h2>{selectedPost.caption}</h2>
+                    <div className="flex flex-col w-full h-full p-2">
+                      <h2 className=''>{selectedPost.caption}</h2>
                       <p className="text-sm text-gray-500">{selectedPost.hashtag}</p>
-                    </div>
-                    </div>
+                   {/* Mobile Responsive Like and Comment */}
+                        <div className='flex items-center gap-10 p-4'>
+                    {/* Like Button */}
+                            <div className='flex items-center justify-center space-x-1' onClick={(event) => {
+                              handleLike(event, selectedPost, currentUser);
+                              setIsAnimating(true);
+                              }}>
+                              <div className={selectedPost.likes.includes(authenticatedUser?.uid) ? (isAnimating ? 'heart-beat cursor-pointer flex text-[#ff0404] rounded-full justify-center items-center' : 'cursor-pointer rounded-full text-[#ff0404]') : 'cursor-pointer rounded-full'}>
+                                {selectedPost.likes.includes(authenticatedUser?.uid) ?
+                                    <ImHeart size={20} />
+                                    : <FiHeart size={20} />
+                                }
+                              </div>
+                            <span className='text-gray-600'>
+                                {selectedPost.likes.length} likes
+                            </span>
+                          </div>
+                    {/* Comment icon */}
+                            <div className='flex items-center justify-center space-x-1'>
+                                <FaCommentAlt onClick={() => setShowCommentForm(prev =>! prev)} title='open comments'  size={20} className='text-[#0b17ff] cursor-pointer' />
+                                <span className='text-gray-600'>{selectedPost?.comments?.length} comments</span>
+                            </div>
+                            <p className='text-sm text-gray-500'>{formatTimestamp(selectedPost?.timestamp)}</p>
+                         </div>
+                        </div>
+                     </div>
                   </div>
                 </div>
-                  )}
-
-                {/* Edit The Selected Post */}
-                    { editPosts && (
-                      <div className="fixed top-0 left-0 z-50 w-full h-full flex items-center justify-center bg-black bg-opacity-50 p-2">
-                        <div className="w-full flex flex-col justify-center max-w-[425px] h-full max-h-[400px] p-4 rounded shadow-md bg-gray-800 text-white">
-                          <div className="flex justify-end mt-[-50px] text-white cursor-pointer">
-                            <MdClose size={30} onClick={() => setEditPosts(false)} />
-                          </div>
-                          <h2 className="text-2xl font-bold mb-4 text-center mt-[15px]">Edit Post</h2>
-                          <form onSubmit={handleEditPost} className="flex flex-col gap-4">
-                            <label className="text-lg">Edit The Caption:</label>
-                            <input
-                              className="bg-gray-700 text-white px-3 py-2 rounded focus:outline-none"
-                              type="text"
-                              value={updatedCaption}
-                              onChange={(e) => setUpdatedCaption(e.target.value)}
-                            />
-                            <label className="text-lg">Edit The Hashtags :</label>
-                            <input
-                              className="bg-gray-700 text-white px-3 py-2 rounded focus:outline-none"
-                              type="text"
-                              value={updatedHashtag}
-                              onChange={(e) => setUpdatedHashtag(e.target.value)}
-                            />
-
-                            <button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 rounded">
-                              Update Post
-                            </button>
-                          </form>
-                        </div>
+               )}
+                
+            {/* Mobile Responsive Comment section */}
+          { showCommentForm &&
+            <div className="fixed top-0 left-0 z-50 lg:hidden w-full h-screen flex flex-col items-center justify-center bg-opacity-50 bg-black">
+             <div className="flex w-full h-screen max-w-[600px] lg:max-w-[1140px] flex-col bg-black">
+               <div className="flex gap-5 w-full border-b borderBg max-w-[600px] p-4 bg-black text-white cursor-pointer overflow-hidden ">
+                 <IoMdArrowRoundBack 
+                    onClick={() => setShowCommentForm(prev =>! prev)}
+                    className='hover:bg-slate-800 rounded-full' 
+                    title='back' size={30}
+                  />
+                    <h2 className="text-white text-xl font-bold ml-[100px] ">Comments</h2>
+                  </div>
+                { showCommentForm &&  
+                  <div className="flex justify-center items-center w-full flex-col">
+                    <div ref={commentsEndRef} className="h-full p-5 w-full justify-start items-start max-h-[600px] overflow-y-auto overflow-x-hidden">
+                      <div>
+                        <h2>{selectedPost.caption}</h2> 
+                        <p className="text-sm text-gray-500">{selectedPost.hashtag}</p>
                       </div>
-                    )}
-                  </> : (
-                <div>
-                  <HashLoader color='#F9008E' size={200} loading={true} /> 
-              </div>
-              )}
+                      <div className='flex flex-col w-full'>
+                        {selectedPost?.comments?.length !== 0 ? (
+                          selectedPost?.comments?.map((comment, index) => {
+                            const commenter = allUsersData?.find((u) => u.uid === comment.userId);
+                            return (
+                              <div key={comment.timestamp} className={`flex w-full h-full items-start py-3 gap-3 ${index > 1 ? 'mt-2' : ''}`}>
+                                <Link to={`/${commenter?.userName}`} className='flex'>
+                                  <div className='relative w-10 h-10'>
+                                    {commenter?.userPictureURL ? (
+                                      <img className='h-full w-full object-cover rounded-full border-2' src={commenter?.userPictureURL} alt='' />
+                                    ) : (
+                                      <div className='rounded-full bg-gray-300 flex items-center justify-center h-full'>
+                                        <IoPersonCircleSharp size={50}/>
+                                      </div>
+                                    )}
+                                  </div>
+                                </Link>
+                                <div className='flex h-full justify-start flex-col w-full'>
+                                  <div className='flex items-center w-full gap-2'>
+                                    <p className='text-nowrap font-medium overflow-hidden text-ellipsis'>{commenter?.userName}</p>
+                                    {(comment.userId === authenticatedUser?.uid || username === currentUser?.userName) && (
+                                        <p onClick={(event) => handleDeleteComment(event, comment.commentId, currentUser)} className="text-[#c803fff0] max-w-[70px] w-full cursor-pointer mr-3 hover:text-red-500">
+                                          <MdDeleteOutline title='delete this comment' size={25}/>
+                                        </p>
+                                      )}
 
-         
+                                  </div>
+                                  <div className='flex w-full h-full flex-col gap-2 overflow-x-hidden'>
+                                    <p className="text-gray-100 mt-1" style={{ wordWrap: 'break-word' }}>{comment.text}</p>
+                                    <p className="flex mr-4 text-gray-400 text-xs">{formatTimestamp(comment.timestamp)}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })
+                        ) : (
+                          <div className='flex w-full justify-center items-center h-[100px]'>
+                            Be the first to share your thoughts.
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+
+              <form
+                className='flex border-t bg-black borderBg w-full max-w-[600px] h-[60px] items-center'
+                onSubmit={(event) => handleComment(event, selectedPost, currentUser)}
+              >
+                <input
+                  name="comment"
+                  value={commentText}
+                  onChange={(e) => setCommentText(e.target.value)}
+                  className="w-full bg-transparent h-20 px-2 outline-none"
+                  placeholder="Add a comment..."
+                  autoComplete='off'
+                />
+                <button
+                  type="submit"
+                  className={`px-4 py-2 w-[80px] h-[40px] cursor-pointer ${isPostDisabled ? 'text-gray-500' : 'text-green-500'}`}
+                  disabled={isPostDisabled}
+                  title='post a comment'
+                >
+                  {isCommenting ? (
+                    <div className="flex items-center justify-center cursor-pointer">
+                      <PulseLoader color='#F9008E' size={15} loading={true} />
+                    </div>
+                  ) : (
+                    "Post"
+                  )}
+                </button>
+              </form> 
+             </div>
+             }
+             
+              {isDeletingComment ? (
+               <div className="fixed top-0 left-0 z-50 w-full h-full flex items-center justify-center bg-black bg-opacity-50 p-2">
+                  <FadeLoader color='#F9008E' size={200} loading={true} /> 
+                </div>
+              ) : (
+                ''
+              )
+            }
+            
+            {/* Edit The Selected Post */}
+                { editPosts && (
+                  <div className="fixed top-0 left-0 z-50 w-full h-full flex items-center justify-center bg-black bg-opacity-50 p-2">
+                    <div className="w-full flex flex-col justify-center max-w-[425px] h-full max-h-[400px] p-4 rounded shadow-md bg-gray-800 text-white">
+                      <div className="flex justify-end mt-[-50px] text-white cursor-pointer">
+                        <MdClose size={30} onClick={() => setEditPosts(false)} />
+                      </div>
+                      <h2 className="text-2xl font-bold mb-4 text-center mt-[15px]">Edit Post</h2>
+                      <form onSubmit={handleEditPost} className="flex flex-col gap-4">
+                        <label className="text-lg">Edit The Caption:</label>
+                        <input
+                          className="bg-gray-700 text-white px-3 py-2 rounded focus:outline-none"
+                          type="text"
+                          value={updatedCaption}
+                          onChange={(e) => setUpdatedCaption(e.target.value)}
+                        />
+                        <label className="text-lg">Edit The Hashtags :</label>
+                        <input
+                          className="bg-gray-700 text-white px-3 py-2 rounded focus:outline-none"
+                          type="text"
+                          value={updatedHashtag}
+                          onChange={(e) => setUpdatedHashtag(e.target.value)}
+                        />
+
+                        <button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 rounded">
+                          Update Post
+                        </button>
+                      </form>
+                    </div>
+                  </div>
+                )}
+              </> : (
+            <div>
+              <HashLoader color='#F9008E' size={200} loading={true} /> 
+          </div>
+          )}
+
 
         {/* Show following accounts here */} 
             { showFollowing && 

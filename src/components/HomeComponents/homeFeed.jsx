@@ -7,7 +7,7 @@ import Explore from '../sideBarPages/explore';
 import { FaCompass } from 'react-icons/fa';
 import { doc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { collection } from 'firebase/firestore';
-import { HashLoader, PulseLoader } from 'react-spinners';
+import { HashLoader, PulseLoader, FadeLoader } from 'react-spinners';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import{ auth, db } from '../../firebase'
 import { ImHeart } from "react-icons/im";
@@ -28,7 +28,7 @@ const ImageCard = ({ user, post }) => {
   const commentsEndRef = useRef(null);
   const isPostDisabled = commentText.trim().length === 0;
   const [previousCommentsLength, setPreviousCommentsLength] = useState(post?.comments.length);
-  
+  const [isDeletingComment, setIsDeletingComment] = useState(false);
 
   // Handle Like
   const handleLike = async (event, likedPost, likedUser) => {
@@ -108,6 +108,7 @@ const ImageCard = ({ user, post }) => {
       if (event) {
         event.preventDefault();
       }
+      setIsDeletingComment(true)
      
        try {
          postOwner.posts.forEach(post => {
@@ -123,6 +124,8 @@ const ImageCard = ({ user, post }) => {
      }
         catch (error) {
          console.error('Error deleting comment:', error);
+       } finally{
+        setIsDeletingComment(false)
        }
     };
   
@@ -184,6 +187,11 @@ const ImageCard = ({ user, post }) => {
     if (hours < 24) {
       return `${hours} hours ago`;
     }
+
+    const day = Math.floor(hours / 24);
+    if (day === 1) {
+      return `${day} day ago`;
+    }
     const days = Math.floor(hours / 24);
     return `${days} days ago`;
   };
@@ -194,14 +202,17 @@ const ImageCard = ({ user, post }) => {
       <div className='flex items-center '>
         <Link to={`/${user?.userName}`}>
         { user?.userPictureURL?
-          <img className='h-12 w-12 rounded-full border-2' src={user?.userPictureURL} alt='' />
-        : <div className='rounded-full bg-gray-300 flex items-center justify-center'><IoPersonCircleSharp size={50}/></div>
+          <img className='object-cover aspect-square h-full max-h-16 max-w-16 rounded-full border-2 border-white' src={user?.userPictureURL} alt='' />
+        : <div className='rounded-full bg-gray-300 flex items-center justify-center'><IoPersonCircleSharp size={60}/></div>
         } 
         </Link>
         <div className='ml-2 flex gap-2 items-center'>
             <Link to={`/${user?.userName}`}>
               <h1 className='font-bold text-xl'>{user?.fullName}</h1>
-              <h2 className='text-gray-500 text-sm'>@{user?.userName}</h2>
+              <div className='flex gap-2 items-center'>
+                <h2 className='text-gray-500 text-sm'>@{user?.userName}</h2>
+                <p className="flex mr-4 text-gray-400">{formatTimestamp(post.timestamp)}</p>
+              </div>
             </Link>
         </div>
       </div>
@@ -349,14 +360,24 @@ const ImageCard = ({ user, post }) => {
                 </button>
             </form> }
         </div>
+
+              
+        {isDeletingComment ? (
+               <div className="fixed top-0 left-0 z-50 w-full h-full flex items-center justify-center bg-black bg-opacity-50 p-2">
+                  <FadeLoader color='#F9008E' size={200} loading={true} /> 
+                </div>
+              ) : (
+                ''
+              )
+            }
+
     </div>
   );
 };
 
 
 
-  
-const HomeFeed = () => {
+ const HomeFeed = () => {
   const [display, setDisplay] = useState(false);
   const [activeTab, setActiveTab] = useState('ForYou');
   const [allPosts, setAllPosts] = useState([]);
