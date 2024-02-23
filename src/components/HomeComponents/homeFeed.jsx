@@ -1,5 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
-import { GoComment } from "react-icons/go";
+import React, { useState, useEffect, useRef} from 'react';
 import { FiBarChart2 } from "react-icons/fi";
 import { TbHeartShare } from "react-icons/tb";
 import { Link } from 'react-router-dom';
@@ -15,17 +14,21 @@ import { ImHeart } from "react-icons/im";
 import { FiHeart } from "react-icons/fi";
 import { useUserData } from '../../getUserData';
 import { MdDeleteOutline, MdClose } from "react-icons/md";
+import { FaCommentAlt } from "react-icons/fa";
+
 
 const ImageCard = ({ user, post }) => {
   const [authenticatedUser] = useAuthState(auth);
   const videoRef = useRef(null);
   const [isAnimating, setIsAnimating] = useState(false);
+  const { allUsersData } = useUserData();
   const [isCommenting, setIsCommenting] = useState(false);
   const [showCommentForm, setShowCommentForm] = useState(false);
   const [commentText, setCommentText] = useState('');
-  const { allUsersData } = useUserData();
   const commentsEndRef = useRef(null);
   const isPostDisabled = commentText.trim().length === 0;
+  const [previousCommentsLength, setPreviousCommentsLength] = useState(post?.comments.length);
+  
 
   // Handle Like
   const handleLike = async (event, likedPost, likedUser) => {
@@ -82,6 +85,8 @@ const ImageCard = ({ user, post }) => {
       };
       
         commentedPost.comments.push(newComment);
+        setPreviousCommentsLength(commentedPost.comments.length); 
+        console.log( previousCommentsLength)
         const userRef = doc(db, "users", commentedUser?.uid);
         const updatedData = {
           posts: commentedUser.posts
@@ -97,6 +102,30 @@ const ImageCard = ({ user, post }) => {
       console.error('Error adding comment:', error);
     } 
   };
+
+    // Handle Comment Delete
+  const handleDeleteComment = async (event, commentId, postOwner) => {
+      if (event) {
+        event.preventDefault();
+      }
+     
+       try {
+         postOwner.posts.forEach(post => {
+           post.comments = post.comments.filter(comment => comment?.commentId !== commentId);
+         });
+     
+         const userRef = doc(db, "users", postOwner.uid);
+         const updatedData = {
+           posts: postOwner.posts
+         };
+         await updateDoc(userRef, updatedData);
+         console.log("Comment deleted successfully.");
+     }
+        catch (error) {
+         console.error('Error deleting comment:', error);
+       }
+    };
+  
 
   // Show video
   useEffect(() => {
@@ -122,6 +151,7 @@ const ImageCard = ({ user, post }) => {
     if (videoRef.current) {
       observer.observe(videoRef.current);
     }
+    
 
     return () => {
       if (videoRef.current) {
@@ -133,10 +163,13 @@ const ImageCard = ({ user, post }) => {
 // Logic for scrolling to the latest comment
   useEffect(() => {
     if (commentsEndRef.current) {
-      commentsEndRef.current.scrollTop = commentsEndRef.current.scrollHeight;
-    }
-  }, [post.comments]);
-
+        if (post.comments.length >= previousCommentsLength) {
+          commentsEndRef.current.scrollTop = commentsEndRef.current.scrollHeight;
+        }
+      }
+    }, [post.comments, previousCommentsLength]);
+    
+  //  Format time
   const formatTimestamp = (timestamp) => {
     const timeDiff = new Date() - new Date(timestamp);
     const seconds = Math.floor(timeDiff / 1000);
@@ -154,35 +187,6 @@ const ImageCard = ({ user, post }) => {
     const days = Math.floor(hours / 24);
     return `${days} days ago`;
   };
-  
-
-  // Handle Comment Delete
-  const handleDeleteComment = async (event, commentId, postOwner) => {
-    if (event) {
-      event.preventDefault();
-    }
-     try {
-       postOwner.posts.forEach(post => {
-         post.comments = post.comments.filter(comment => comment?.commentId !== commentId);
-       });
-   
-       const userRef = doc(db, "users", postOwner.uid);
-       const updatedData = {
-         posts: postOwner.posts
-       };
-       await updateDoc(userRef, updatedData);
-       console.log("Comment deleted successfully.");
-   
-
-   }
-    
-      catch (error) {
-       console.error('Error deleting comment:', error);
-     }
-
-    
-  };
-
   
 
   return (
@@ -233,7 +237,7 @@ const ImageCard = ({ user, post }) => {
         </div>
         <div className='flex justify-around'>
           <div className='flex items-center justify-center space-x-1' onClick={() => setShowCommentForm(prev => !prev)}>
-            <GoComment size={20} className='text-[#0b17ff] cursor-pointer' />
+            <FaCommentAlt  size={20} className='text-[#0b17ff] cursor-pointer' />
             <span className='text-xs text-gray-600'>{post?.comments?.length}</span>
          </div>
 
@@ -268,47 +272,50 @@ const ImageCard = ({ user, post }) => {
        <div className='flex flex-col w-full h-full justify-center items-center mt-2 overflow-hidden'>
          {showCommentForm && (
             <div className="flex justify-center items-center w-full h-full max-h-[400px] flex-col max-w-[500px] p-4 bg-black">
-              <div onClick={() => setShowCommentForm(prev => ! prev)} className='flex w-full justify-end cursor-pointer items-center hover:text-cyan-300'>
-                <MdClose size={25} title='close' />
+              <div className='flex w-full justify-between cursor-pointer items-center'>
+                <h2 className="text-white text-xl font-bold">Comments</h2>
+                <MdClose className='hover:text-cyan-300' onClick={() => setShowCommentForm(prev => ! prev)} size={25} title='close' />
               </div>
-              <div ref={commentsEndRef} className="h-full w-full justify-start items-start max-h-[350px] overflow-y-auto">
-                <div className='flex flex-col w-full'>
-                  {post?.comments?.map((comment) => {
-                    const commenter = allUsersData?.find((u) => u.uid === comment.userId);
-                    
-                    return (
-                      <div key={comment.timestamp} className="flex w-full items-start py-3 gap-3">
-                        <Link to={`/${commenter?.userName}`} className='flex'>
-                          <div className='relative w-12 h-12'>
-                            {commenter?.userPictureURL ? (
-                              <img className='h-full w-full object-cover rounded-full border-2' src={commenter?.userPictureURL} alt='' />
-                            ) : (
-                              <div className='rounded-full bg-gray-300 flex items-center justify-center h-full'>
-                                <IoPersonCircleSharp size={50}/>
-                              </div>
-                            )}
-                          </div>
-                        </Link>
-                        <div className='flex justify-start flex-col w-full'>
-                          <div className='flex items-center w-full gap-2'>
-                           <Link to={`/${commenter?.userName}`} className="font-medium overflow-hidden text-nowrap text-ellipsis">
-                             <p className='text-nowrap  text-ellipsis' >{commenter?.fullName}</p>
-                            </Link>
-                            {comment.userId === authenticatedUser?.uid && (
-                              <p onClick={(event) => handleDeleteComment(event, comment.commentId, user)} className="text-[#c803fff0] max-w-[70px] w-full cursor-pointer mr-3 hover:text-red-500">
-                                <MdDeleteOutline title='delete this comment' size={20}/>
-                              </p>
-                            )}
-                          </div>
-                          <div className='flex flex-col gap-2'>
-                            <p className="text-gray-100 mt-1">{comment.text}</p>
-                            <p className="flex mr-4 text-gray-400 text-xs">{formatTimestamp(comment.timestamp)}</p>
+              <div ref={commentsEndRef} className="h-full w-full justify-start items-start max-h-[350px] overflow-y-auto overflow-x-hidden">
+                <div className='flex h-full flex-col w-full'>
+                  {post.comments.length !== 0 ? (
+                    post?.comments?.map((comment) => {
+                     const commenter = allUsersData?.find((u) => u.uid === comment.userId);
+                       return (
+                        <div key={comment.timestamp} className="flex w-full h-full items-start py-3 gap-3">
+                          <Link to={`/${commenter?.userName}`} className='flex'>
+                            <div className='relative w-12 h-12'>
+                              {commenter?.userPictureURL ? (
+                                <img className='h-full w-full object-cover rounded-full border-2' src={commenter?.userPictureURL} alt='' />
+                              ) : (
+                                <div className='rounded-full bg-gray-300 flex items-center justify-center h-full'>
+                                  <IoPersonCircleSharp size={50}/>
+                                </div>
+                              )}
+                            </div>
+                          </Link>
+                          <div className='flex h-full justify-start flex-col w-full'>
+                            <div className='flex items-center w-full gap-2'>
+                              <p className='text-nowrap font-medium overflow-hidden text-ellipsis'>{commenter?.userName}</p>
+                              {comment.userId === authenticatedUser?.uid && (
+                                <p onClick={(event) => handleDeleteComment(event, comment.commentId, user)} className="text-[#c803fff0] max-w-[70px] w-full cursor-pointer mr-3 hover:text-red-500">
+                                  <MdDeleteOutline title='delete this comment' size={25}/>
+                                </p>
+                              )}
+                            </div>
+                            <div className='flex w-full h-full flex-col gap-2 overflow-x-hidden'>
+                              <p className="text-gray-100 mt-1" style={{ wordWrap: 'break-word' }}>{comment.text}</p>
+                              <p className="flex mr-4 text-gray-400 text-xs">{formatTimestamp(comment.timestamp)}</p>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    );
-                    
-                  })}
+                      );
+                    })
+                  ) : (
+                    <div className='flex w-full justify-center items-center h-[100px]'>
+                       Be the first to share your thoughts.
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -369,7 +376,7 @@ const HomeFeed = () => {
           });
         }
       });
-      // updatedPosts.sort((a, b) => new Date(b.post.timestamp) - new Date(a.post.timestamp));
+      updatedPosts.sort((a, b) => new Date(b.post.timestamp) - new Date(a.post.timestamp));
       setAllPosts(updatedPosts);
     });
   
