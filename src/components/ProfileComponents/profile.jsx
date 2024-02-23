@@ -576,7 +576,7 @@ const Profile = () => {
                                 const commenter = allUsersData?.find((u) => u.uid === comment.userId);
                                 return (
                                   <div key={comment.timestamp} className={`flex w-full h-full items-start py-3 gap-3 ${index > 1 ? 'mt-2' : ''}`}>
-                                    <Link to={`/${commenter?.userName}`} className='flex'>
+                                    <Link onClick={() => setIsPostSelected(false)} to={`/${commenter?.userName}`} className='flex'>
                                       <div className='relative w-10 h-10'>
                                         {commenter?.userPictureURL ? (
                                           <img className='object-cover aspect-square h-full max-h-16 max-w-16 rounded-full border-2 border-white' src={commenter?.userPictureURL}/>
@@ -614,7 +614,8 @@ const Profile = () => {
                         </div>
                        </div>
                       </div>
-                      <div className='lg:flex hidden items-center pl-5 gap-10 w-full h-[60px]'>
+
+                    <div className='lg:flex hidden items-center pl-5 gap-10 w-full h-[60px]'>
                       {/* Comment Button*/}
                         <div className='hidden lg:flex items-center justify-center space-x-1'>
                           <FaCommentAlt  size={20} className='text-[#0b17ff] cursor-pointer' />
@@ -729,17 +730,17 @@ const Profile = () => {
                             const commenter = allUsersData?.find((u) => u.uid === comment.userId);
                             return (
                               <div key={comment.timestamp} className={`flex w-full h-full items-start py-3 gap-3 ${index > 1 ? 'mt-2' : ''}`}>
-                                <Link to={`/${commenter?.userName}`} className='flex'>
-                                  <div className='relative w-10 h-10'>
+                                   <Link to={`/${commenter?.userName}`} className='flex'>
+                                  <div onClick={() => {setShowCommentForm(prev =>! prev); setIsPostSelected(false)}} className='relative w-10 h-10'>
                                     {commenter?.userPictureURL ? (
-                                      <img className='h-full w-full object-cover rounded-full border-2' src={commenter?.userPictureURL} alt='' />
+                                      <img  className='h-full w-full object-cover aspect-square rounded-full border-2' src={commenter?.userPictureURL} alt='' />
                                     ) : (
                                       <div className='rounded-full bg-gray-300 flex items-center justify-center h-full'>
                                         <IoPersonCircleSharp size={50}/>
                                       </div>
                                     )}
                                   </div>
-                                </Link>
+                                   </Link>
                                 <div className='flex h-full justify-start flex-col w-full'>
                                   <div className='flex items-center w-full gap-2'>
                                     <p className='text-nowrap font-medium overflow-hidden text-ellipsis'>{commenter?.userName}</p>
