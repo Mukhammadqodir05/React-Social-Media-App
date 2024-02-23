@@ -202,7 +202,7 @@ const ImageCard = ({ user, post }) => {
       <div className='flex items-center '>
         <Link to={`/${user?.userName}`}>
         { user?.userPictureURL?
-          <img className='object-cover aspect-square h-full max-h-16 max-w-16 rounded-full border-2 border-white' src={user?.userPictureURL} alt='' />
+          <img className='object-cover aspect-square h-full max-h-16 max-w-16 rounded-full border-2 border-white' src={user?.userPictureURL} />
         : <div className='rounded-full bg-gray-300 flex items-center justify-center'><IoPersonCircleSharp size={60}/></div>
         } 
         </Link>

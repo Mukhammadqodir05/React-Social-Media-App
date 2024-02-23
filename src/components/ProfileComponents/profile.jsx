@@ -455,7 +455,7 @@ const Profile = () => {
            { isPostSelected && (
               <div className="fixed flex-col top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-90 z-50">
                {/* Close Icon */}
-                <div onClick={() => setIsPostSelected(false)} className="flex gap-5 w-full max-w-[600px] p-3 bg-black lg:hidden text-white cursor-pointer overflow-hidden ">
+                <div onClick={() => setIsPostSelected(false)} className="flex gap-5 w-full max-w-[600px] p-4 border-b borderBg bg-black lg:hidden text-white cursor-pointer overflow-hidden ">
                   <IoMdArrowRoundBack size={30} onClick={() => setShowPauseIcon(false)} />
                   <h2 className="text-white text-xl font-bold">Post</h2>
                 </div>
@@ -490,11 +490,11 @@ const Profile = () => {
 
                     {/* Comments, Delete Button, Owner Profile Section */}
                     <div className="flex flex-col w-full max-w-[700px] h-full lg:border-r borderBg lg:max-w-[500px] justify-between items-center bg-black">
-                      <div className="flex border-t lg:border lg:border-r-0 lg:border-l-0 borderBg w-full max-w-[700px] max-h-24 lg:max-w-[500px] justify-between items-center p-2">
-                       <div className='flex items-center'>
+                      <div className="flex lg:border lg:border-r-0 lg:border-l-0 borderBg w-full max-w-[700px] max-h-24 lg:max-w-[500px] justify-between items-center p-2">
+                       <div className='flex gap-2 items-center'>
                         <Link to={`/${userProfile[0]?.userName}`} className="flex items-center">
                           {currentUser?.userPictureURL ? (
-                            <img className='h-10 w-12 rounded-full border-2' src={currentUser?.userPictureURL} alt='' />
+                            <img className='object-cover aspect-square h-full max-h-14 max-w-14 rounded-full border-2' src={currentUser?.userPictureURL} alt='' />
                           ) : (
                             <div className='rounded-full bg-gray-300 flex items-center justify-center'><IoPersonCircleSharp size={40} /></div>
                           )}
@@ -579,7 +579,7 @@ const Profile = () => {
                                     <Link to={`/${commenter?.userName}`} className='flex'>
                                       <div className='relative w-10 h-10'>
                                         {commenter?.userPictureURL ? (
-                                          <img className='h-full w-full object-cover rounded-full border-2' src={commenter?.userPictureURL} alt='' />
+                                          <img className='object-cover aspect-square h-full max-h-16 max-w-16 rounded-full border-2 border-white' src={commenter?.userPictureURL}/>
                                         ) : (
                                           <div className='rounded-full bg-gray-300 flex items-center justify-center h-full'>
                                             <IoPersonCircleSharp size={50}/>
