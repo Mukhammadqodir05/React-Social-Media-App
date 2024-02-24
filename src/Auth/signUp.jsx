@@ -4,6 +4,7 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { BsPersonCircle } from 'react-icons/bs';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { setDoc,doc} from 'firebase/firestore';
+import Refresh from '../components/HomeComponents/Refresh';
 
 
 const SignUp = (props) => {
@@ -38,17 +39,21 @@ const SignUp = (props) => {
           timestamp:Date.now()
         }
         await setDoc(doc(db, 'users', newUser.user.uid), userDoc);
-        console.log(userDoc);
         window.location.reload();
       }
     } catch (error) {
       console.error(error);
       setError('Something went wrong. Please try again.');
-    } finally {
-      setLoading(false);
-    }
+    } 
+    
   };
- 
+
+
+  if (loading){
+    return (
+      <Refresh />
+    )
+  }
      
   return (
     <div className="AuthenticationPageBg flex w-full items-center justify-center h-screen p-3">
@@ -59,7 +64,7 @@ const SignUp = (props) => {
         </div>
         <div className='absolute mt-[540px]'>
           {error && <p className="text-xl">{error}</p>}
-          {loading && <p className="text-xl">Loading...</p>}
+        
         </div>
         <form onSubmit={handleSignUp} className="mt-[15px] text-white space-y-7 text-center">
           <input
@@ -90,7 +95,7 @@ const SignUp = (props) => {
               autoComplete='off'
             />
             <span
-              className='absolute right-7 top-1/2 transform -translate-y-1/2 cursor-pointer text-black'
+              className='absolute right-7 top-1/2 transform -translate-y-1/2 cursor-pointer'
               onClick={() => setShowPassword(prevShow => !prevShow)}
             >
               {showPassword ? <FaEyeSlash /> : <FaEye />}

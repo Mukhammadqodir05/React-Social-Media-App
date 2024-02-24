@@ -4,7 +4,7 @@ import { useUserData } from '../../getUserData';
 import { Link, useParams } from "react-router-dom";
 import { IoMdArrowRoundBack } from "react-icons/io";
 import{ auth, db, storage } from '../../firebase'
-import { doc, updateDoc, onSnapshot, collection } from 'firebase/firestore';
+import { doc, updateDoc, onSnapshot } from 'firebase/firestore';
 import { deleteObject, ref } from "firebase/storage";
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { IoPersonCircleSharp } from "react-icons/io5";
@@ -18,7 +18,8 @@ import { SlUserFollowing } from "react-icons/sl";
 import { ImHeart } from "react-icons/im";
 import { FiHeart } from "react-icons/fi";
 import { FaCommentAlt } from "react-icons/fa";
-
+import LogOut from '../../Auth/logout';
+import { IoSettingsSharp } from "react-icons/io5";
 
 const Profile = () => {
   const { handleFollowAction, isFollowing } = FollowFunction()
@@ -51,6 +52,7 @@ const Profile = () => {
   const [isAnimating, setIsAnimating] = useState(false);
   const [isCommenting, setIsCommenting] = useState(false);
   const [showCommentForm, setShowCommentForm] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   const [isDeletingComment, setIsDeletingComment] = useState(false);
   const [commentText, setCommentText] = useState('');
   const commentsEndRef = useRef(null);
@@ -168,6 +170,7 @@ const Profile = () => {
       setIsDeletingComment(false)
     }
 };
+
 
  useEffect(() => {
     if (commentsEndRef.current) {
@@ -366,18 +369,52 @@ const Profile = () => {
                               </div>
                              )}
                             </button>
-                          )}               
-                          {username === userProfile[0].userName && (
-                            <Link to={`/${currentUser?.userName}/edit`} className=" text-[#e600ff] mr-10">
-                              <LiaUserEditSolid title="edit" size={35} />
-                            </Link>
-                          )}
+                          )} 
+                        { username === userProfile[0].userName && (              
+                          <div title='options' onClick={() => setShowSettings(prev =>! prev)} className='text-white text-4xl cursor-pointer m2-5'>
+                            <IoSettingsSharp />
+                          </div>
+                        )}
                         </div>
                       )}
                      </div>
                     </div>
+                     
+                    { showSettings && (
+                      <div className="fixed top-0 left-0 z-50 w-full h-full flex items-center justify-center bg-black bg-opacity-50 p-2">
+                        <div className="w-full border borderBg max-w-[400px] max-h-[300px] p-3 rounded shadow-md bg-[#000000] text-white">
+                          <button
+                            className="block w-full text-left py-3 px-2 border-b borderBg text-red-500 border-t hover:bg-gray-800 focus:outline-none"
+                            onClick={() => { setShowConfirmation(true); setShowOptions((prev) => !prev) }}
+                          >
+                            <div className="flex items-center gap-4">
+                              <LogOut />
+                              <span className='flex xl:hidden'>Log Out</span>
+                            </div>
+                          </button>
+                          
+                          <button className="w-full text-left py-3 px-2 border-b borderBg hover:bg-gray-800 focus:outline-none">
+                            <Link to={`/${currentUser?.userName}/edit`} className='flex gap-4'>
+                              <LiaUserEditSolid title="Edit" size={30} />
+                              <span>Edit</span>
+                            </Link>
+                          </button>
 
-                  <div className="p-2 mt-[80px] w-full">
+                          <button
+                            onClick={() => setShowSettings((prev) => !prev)}
+                            className="block w-full text-left hover:bg-gray-800 py-3 px-2 border-b borderBg focus:outline-none"
+                          >
+                            <div className="flex items-center gap-4">
+                              <MdClose size={30}/> 
+                              <span>Back</span>
+                            </div>
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+
+                   <div className="p-2 mt-[80px] w-full">
                     <h1 className="text-xl font-medium">{currentUser.fullName}</h1>
                     <p className="text-xl text-gray-500">@{currentUser.userName}</p>
                     { currentUser.bio?
@@ -401,6 +438,7 @@ const Profile = () => {
                     </div>
                   </div>
               
+
                   <div className="flex p-2 gap-5 mt-2 max-w-[400px] overflow-hidden ">
                     <div onClick={() => setShowFollowing(true)} title="following" className="flex cursor-pointer gap-1">
                       <p className="font-bold">{formattedFollowing}</p>
@@ -415,6 +453,7 @@ const Profile = () => {
                       <p className="text-gray-500">Posts</p>
                     </div>
                   </div>
+
 
                 {/* Posts here */}
                   <div className="flex w-full border-t borderBg border-gray-300 "></div>

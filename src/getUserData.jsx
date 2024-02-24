@@ -56,9 +56,6 @@ const GetUserData = ({ children }) => {
     fetchUserProfile();
   }, [user, loading]);
 
- 
-  
- 
 
 
   return (

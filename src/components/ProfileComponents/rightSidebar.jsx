@@ -19,8 +19,8 @@ const RightSideBar = () => {
     <main className='flex flex-col items-center w-full h-full p-1'>
       {sortedUsers.length > 0 && (
         <div className='w-full mt-4'>
-          <div className='bg-black bg-opacity-30 p-4 rounded-md shadow'>
-            <h2 className='text-lg font-bold mb-4'>Active creators with most posts</h2>
+          <div className='bg-black p-4 rounded-md shadow'>
+            <h2 className='text-lg font-bold mb-4'>Active creators with the most posts</h2>
             {sortedUsers.map((user) => (
               <div key={user.id} className='flex w-full items-center justify-between p-2 border-b borderBg'>
                 <div className='flex items-center'>
@@ -29,7 +29,7 @@ const RightSideBar = () => {
                       <img
                         src={user.userPictureURL}
                         alt='User profile'
-                        className='w-8 h-8 rounded-full mr-2'
+                        className='w-8 h-8 rounded-full mr-2 border-2'
                       />
                     ) : (
                       <div className='rounded-full bg-gray-300 flex items-center justify-center mr-2'><IoPersonCircleSharp size={30}/></div>

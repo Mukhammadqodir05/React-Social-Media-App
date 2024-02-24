@@ -57,7 +57,7 @@ const SignIn = (props) => {
               autoComplete='off'
             />
             <span
-              className='absolute right-7 top-1/2 transform -translate-y-1/2 cursor-pointer text-black'
+              className='absolute right-7 top-1/2 transform -translate-y-1/2 cursor-pointer'
               onClick={() => setShowPassword(prevShow => !prevShow)}
             >
               {showPassword ? <FaEyeSlash /> : <FaEye />}
