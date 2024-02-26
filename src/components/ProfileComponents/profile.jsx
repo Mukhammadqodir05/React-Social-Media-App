@@ -466,13 +466,13 @@ const Profile = () => {
                                   onClick={() => handleImageClick(post, index)}
                                   src={post.media}
                                   className="object-cover aspect-square w-full h-full cursor-pointer"
-                                  loading ='lazy'
+                                  loading = 'lazy'
                               />
                             ) : post.type === 'video' ? (
                                 <video
                                   className="object-cover aspect-square w-full h-full cursor-pointer"
                                   onClick={() => handleVideoClick(post, index)}
-                                  loading='lazy'
+                                  loading = 'lazy'
                                 >
                                   <source src={post.media} type="video/mp4" />
                               </video>
