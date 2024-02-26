@@ -34,6 +34,3 @@ Trendmedia is a cutting-edge social media platform that connects users from arou
 
 ## Contributing
 We welcome contributions from the community to help improve Trendmedia. If you have any suggestions, bug reports, or feature requests, please open an issue or submit a pull request.
-
-## License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
