@@ -230,6 +230,7 @@ const ImageCard = ({ user, post }) => {
         <img
           src={post.media}
           className="object-cover aspect-square w-full h-full"
+          loading='lazy'
         />
        ) : post.type === 'video' ? (
         <video
@@ -239,6 +240,7 @@ const ImageCard = ({ user, post }) => {
           loop
           muted
           controls
+          loading = "lazy"
         >
           <source src={post.media} type="video/mp4" />
           Your browser does not support the video tag.
@@ -404,7 +406,7 @@ const ImageCard = ({ user, post }) => {
     return () => unsubscribe();
   }, []);
 
-  
+
 
   return (
     <main className='flex flex-col items-center w-full h-full'>
