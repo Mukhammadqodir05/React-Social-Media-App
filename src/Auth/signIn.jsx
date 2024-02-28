@@ -3,6 +3,7 @@ import { BsPersonCircle } from 'react-icons/bs';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { auth } from '../firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
+import { BeatLoader } from 'react-spinners';
 
 const SignIn = (props) => {
   const [email, setEmail] = useState('');
@@ -36,7 +37,6 @@ const SignIn = (props) => {
         </div>
         <div className='absolute mt-[510px] sm:mt-[520px]'>
           {error && <p className="text-xl">{error}</p>}
-          {loading && <p className="text-xl">Loading...</p>}
         </div>
         <form onSubmit={handleLogin} className="mt-[50px] space-y-7 text-center w-full">
           <input
@@ -63,8 +63,8 @@ const SignIn = (props) => {
               {showPassword ? <FaEyeSlash /> : <FaEye />}
             </span>
           </div>
-          <button type="submit" className="w-full max-w-[240px] rounded-full py-2 text-white bg-[#2432cf]">
-            Log in
+          <button onClick={handleLogin}  type="submit" className="w-full max-w-[240px] rounded-full py-2 text-white bg-[#9101ff]">
+           { loading? <BeatLoader color='#8ff' loading={true} /> :  "Sign in"} 
           </button>
         </form>
         <div className='absolute flex gap-2 mt-[440px]'>

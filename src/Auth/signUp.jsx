@@ -4,8 +4,7 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { BsPersonCircle } from 'react-icons/bs';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { setDoc,doc} from 'firebase/firestore';
-import Refresh from '../components/HomeComponents/Refresh';
-
+import { BeatLoader, FadeLoader, PulseLoader } from 'react-spinners';
 
 const SignUp = (props) => {
   const [fullName, setFullName] = useState('');
@@ -49,12 +48,6 @@ const SignUp = (props) => {
   };
 
 
-  if (loading){
-    return (
-      <Refresh />
-    )
-  }
-     
   return (
     <div className="AuthenticationPageBg flex w-full items-center justify-center h-screen p-3">
       <div className="md:w-80 container bg-transparent w-full h-full max-w-80 max-h-[500px] flex items-center flex-col rounded-3xl p-4">
@@ -64,7 +57,6 @@ const SignUp = (props) => {
         </div>
         <div className='absolute mt-[540px]'>
           {error && <p className="text-xl">{error}</p>}
-        
         </div>
         <form onSubmit={handleSignUp} className="mt-[15px] text-white space-y-7 text-center">
           <input
@@ -101,8 +93,8 @@ const SignUp = (props) => {
               {showPassword ? <FaEyeSlash /> : <FaEye />}
             </span>
           </div>
-          <button onClick={handleSignUp}  type="submit" className="w-full max-w-[240px] rounded-full py-2 text-white bg-[#2432cf]">
-            Sign up
+          <button onClick={handleSignUp}  type="submit" className="w-full max-w-[240px] rounded-full py-2 text-white bg-[#9101ff]">
+           { loading? <BeatLoader color='#8ff' loading={true} /> :  "Sign up"} 
           </button>
         </form>
         <div className='absolute flex gap-2 mt-[440px]'>

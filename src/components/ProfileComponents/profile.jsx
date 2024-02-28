@@ -58,7 +58,7 @@ const Profile = () => {
   const isPostDisabled = commentText.trim().length === 0;
   const [previousCommentsLength, setPreviousCommentsLength] = useState(selectedPost?.comments?.length);
 
-   
+   console.log(currentUser.posts.find(post => post.id === selectedPost?.id))
   const formatTimestamp = (timestamp) => {
     const timeDiff = new Date() - new Date(timestamp);
     const seconds = Math.floor(timeDiff / 1000);
@@ -156,17 +156,17 @@ const Profile = () => {
           posts:  posts
         };
         await updateDoc(userRef, updatedData);
-
-        setSelectedPost({
-          ...selectedPost,
-          comments: selectedPost.comments.filter(comment => comment?.commentId !== commentId)
-        });
-
+       
         console.log("Comment deleted successfully.");
     } catch (error) {
         console.error('Error deleting comment:', error);
     } finally{
       setIsDeletingComment(false)
+      setSelectedPost({
+        ...selectedPost,
+        comments: selectedPost.comments.filter(comment => comment?.commentId !== commentId)
+      });
+
     }
 };
 
@@ -622,7 +622,7 @@ const Profile = () => {
                                     <div className='flex h-full justify-start flex-col w-full'>
                                       <div className='flex items-center w-full gap-2'>
                                         <p className='text-nowrap font-medium overflow-hidden text-ellipsis'>{commenter?.userName}</p>
-                                        {(comment.userId === user?.uid || comment.userId === currentUser?.userName) && (
+                                        {(comment.userId === user?.uid || currentUser.userName === userProfile[0]?.userName) && (
                                             <p onClick={(event) => handleDeleteComment(event, comment.commentId, ownerUser)} className="text-[#c803fff0] max-w-[70px] w-full cursor-pointer mr-3 hover:text-red-500">
                                               <MdDeleteOutline title='delete this comment' size={25}/>
                                             </p>
@@ -695,20 +695,22 @@ const Profile = () => {
                                   <PulseLoader color='#F9008E' size={15} loading={true} />
                                 </div>
                               ) : (
-                                "Post"
+                                <h1 className='text-xl font-medium'>
+                                   Post
+                                </h1>
                               )}
                             </button>
                       </form> 
                     </div>
                     </div>
 
-              {/*Mobile Design   */}
-                    <div className="flex w-full max-w-[600px] flex-col lg:hidden bg-black h-full pb-11">
+                {/*Mobile Design   */}
+                  <div className="flex w-full max-w-[600px] flex-col lg:hidden bg-black h-full pb-11">
                     <div className="flex flex-col w-full h-full p-2">
-                      <h2 className=''>{selectedPost.caption}</h2>
+                      <h2>{selectedPost.caption}</h2>
                       <p className="text-sm text-gray-500">{selectedPost.hashtag}</p>
                    {/* Mobile Responsive Like and Comment */}
-                        <div className='flex items-center gap-10 p-4'>
+                        <div className='flex items-center gap-5 p-4'>
                     {/* Like Button */}
                             <div className='flex items-center justify-center space-x-1' onClick={(event) => {
                               handleLike(event, selectedPost, ownerUser);
@@ -776,7 +778,7 @@ const Profile = () => {
                                 <div className='flex h-full justify-start flex-col w-full'>
                                   <div className='flex items-center w-full gap-2'>
                                     <p className='text-nowrap font-medium overflow-hidden text-ellipsis'>{commenter?.userName}</p>
-                                    {(comment.userId === user?.uid || comment.userId === currentUser?.userName) && (
+                                    {(comment.userId === user?.uid || currentUser.userName === userProfile[0]?.userName) && (
                                         <p onClick={(event) => handleDeleteComment(event, comment.commentId, ownerUser)} className="text-[#c803fff0] max-w-[70px] w-full cursor-pointer mr-3 hover:text-red-500">
                                           <MdDeleteOutline title='delete this comment' size={25}/>
                                         </p>
@@ -825,7 +827,9 @@ const Profile = () => {
                       <PulseLoader color='#F9008E' size={15} loading={true} />
                     </div>
                   ) : (
-                    "Post"
+                    <h1 className='text-xl font-medium'>
+                      Post
+                    </h1>
                   )}
                 </button>
               </form> 
@@ -874,7 +878,7 @@ const Profile = () => {
                 )}
           </> : (
             <div className='flex w-full h-screen justify-center items-center'>
-              <FadeLoader color='#F9008E' size={200} loading={true} /> 
+              <FadeLoader color='#F9008E' loading={true} /> 
           </div>
           )}
 

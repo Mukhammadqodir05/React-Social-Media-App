@@ -16,7 +16,6 @@ import { useUserData } from '../../getUserData';
 import { MdDeleteOutline, MdClose } from "react-icons/md";
 import { FaCommentAlt } from "react-icons/fa";
 
-
 const ImageCard = ({ user, post }) => {
   const [authenticatedUser] = useAuthState(auth);
   const videoRef = useRef(null);
@@ -27,7 +26,6 @@ const ImageCard = ({ user, post }) => {
   const [commentText, setCommentText] = useState('');
   const commentsEndRef = useRef(null);
   const isPostDisabled = commentText.trim().length === 0;
-  const [previousCommentsLength, setPreviousCommentsLength] = useState(post?.comments.length);
   const [isDeletingComment, setIsDeletingComment] = useState(false);
 
   // Handle Like
@@ -85,8 +83,6 @@ const ImageCard = ({ user, post }) => {
       };
       
         commentedPost.comments.push(newComment);
-        setPreviousCommentsLength(commentedPost.comments.length); 
-        console.log( previousCommentsLength)
         const userRef = doc(db, "users", commentedUser?.uid);
         const updatedData = {
           posts: commentedUser.posts
@@ -129,7 +125,6 @@ const ImageCard = ({ user, post }) => {
        }
     };
   
-
   // Show video
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -166,12 +161,12 @@ const ImageCard = ({ user, post }) => {
 // Logic for scrolling to the latest comment
   useEffect(() => {
     if (commentsEndRef.current) {
-        if (post.comments.length >= previousCommentsLength) {
-          commentsEndRef.current.scrollTop = commentsEndRef.current.scrollHeight;
+        if (post.comments.length > 4) {
+            commentsEndRef.current.scrollTop = commentsEndRef.current.scrollHeight;
         }
-      }
-    }, [post.comments, previousCommentsLength]);
-    
+    }
+  }, [post.comments]);
+
   //  Format time
   const formatTimestamp = (timestamp) => {
     const timeDiff = new Date() - new Date(timestamp);
@@ -195,7 +190,6 @@ const ImageCard = ({ user, post }) => {
     const days = Math.floor(hours / 24);
     return `${days} days ago`;
   };
-  
 
   return (
     <div className='w-full  p-4 border-t borderBg mb-2'>
@@ -224,29 +218,28 @@ const ImageCard = ({ user, post }) => {
       </div>
       <div className='flex flex-col p-2 gap-5'>
       <div className='flex justify-center items-center'>
-      <div className='flex w-full max-w-[500px] max-h-[600px] border borderBg rounded-md'>
-      {post.type === 'image' ? (
-        
-        <img
-          src={post.media}
-          className="object-cover aspect-square w-full h-full"
-          loading='lazy'
-        />
-       ) : post.type === 'video' ? (
-        <video
-          ref={videoRef}
-          className=" w-full h-full max-w-[500px] max-h-[570px]"
-          autoPlay
-          loop
-          muted
-          controls
-          loading = "lazy"
-        >
-          <source src={post.media} type="video/mp4" />
-          Your browser does not support the video tag.
-        </video>
-      ) : ''}
-      
+      <div className='flex w-full max-w-[500px] max-h-[600px] border borderBg'>
+        {post.type === 'image' ? (
+          
+          <img
+            src={post.media}
+            className="object-cover aspect-square w-full h-full"
+            loading='lazy'
+          />
+        ) : post.type === 'video' ? (
+          <video
+            ref={videoRef}
+            className=" w-full h-full max-w-[500px] max-h-[570px]"
+            autoPlay
+            loop
+            muted
+            controls
+            loading = "lazy"
+          >
+            <source src={post.media} type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+        ) : ''}
       </div>
         </div>
         <div className='flex justify-around'>
@@ -290,7 +283,7 @@ const ImageCard = ({ user, post }) => {
                 <h2 className="text-white text-xl font-bold">Comments</h2>
                 <MdClose className='hover:text-cyan-300' onClick={() => setShowCommentForm(prev => ! prev)} size={25} title='close' />
               </div>
-              <div ref={commentsEndRef} className="h-full w-full justify-start items-start max-h-[350px] overflow-y-auto overflow-x-hidden">
+              <div ref={commentsEndRef} className="h-full w-full max-h-[350px] overflow-y-auto overflow-x-hidden justify-start items-start">
                 <div className='flex h-full flex-col w-full'>
                   {post.comments.length !== 0 ? (
                     post?.comments?.map((comment) => {
@@ -311,7 +304,7 @@ const ImageCard = ({ user, post }) => {
                           <div className='flex h-full justify-start flex-col w-full'>
                             <div className='flex items-center w-full gap-2'>
                               <p className='text-nowrap font-medium overflow-hidden text-ellipsis'>{commenter?.userName}</p>
-                              {comment.userId === authenticatedUser?.uid && (
+                              {(comment.userId === authenticatedUser?.uid ) && (
                                 <p onClick={(event) => handleDeleteComment(event, comment.commentId, user)} className="text-[#c803fff0] max-w-[70px] w-full cursor-pointer mr-3 hover:text-red-500">
                                   <MdDeleteOutline title='delete this comment' size={25}/>
                                 </p>
@@ -358,14 +351,15 @@ const ImageCard = ({ user, post }) => {
                       <PulseLoader color='#F9008E' size={15} loading={true} />
                     </div>
                   ) : (
-                    "Post"
+                     <h1 className='text-xl font-medium'>
+                              Post
+                    </h1>
                   )}
                 </button>
             </form> }
         </div>
-
-              
-        {isDeletingComment ? (
+        
+           {isDeletingComment ? (
                <div className="fixed top-0 left-0 z-50 w-full h-full flex items-center justify-center bg-black bg-opacity-50 p-2">
                   <FadeLoader color='#F9008E' size={200} loading={true} /> 
                 </div>
@@ -373,12 +367,9 @@ const ImageCard = ({ user, post }) => {
                 ''
               )
             }
-
     </div>
   );
 };
-
-
 
  const HomeFeed = () => {
   const [display, setDisplay] = useState(false);
@@ -407,10 +398,8 @@ const ImageCard = ({ user, post }) => {
     return () => unsubscribe();
   }, []);
 
-
-
   return (
-    <main className='flex flex-col items-center w-full h-full'>
+   <main className='flex flex-col items-center w-full h-full'>
      <div className='flex w-full items-center justify-between border-b borderBg'>
       <div
         onClick={() => {
@@ -452,10 +441,7 @@ const ImageCard = ({ user, post }) => {
         )
       }
     </main>
-    
-    );
-
- 
+  );
 };
 
 export default HomeFeed;
