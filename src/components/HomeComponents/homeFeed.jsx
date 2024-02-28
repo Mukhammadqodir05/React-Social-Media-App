@@ -27,6 +27,7 @@ const ImageCard = ({ user, post }) => {
   const commentsEndRef = useRef(null);
   const isPostDisabled = commentText.trim().length === 0;
   const [isDeletingComment, setIsDeletingComment] = useState(false);
+  
 
   // Handle Like
   const handleLike = async (event, likedPost, likedUser) => {
@@ -158,14 +159,16 @@ const ImageCard = ({ user, post }) => {
     };
   }, []);
   
+  
 // Logic for scrolling to the latest comment
   useEffect(() => {
     if (commentsEndRef.current) {
-        if (post.comments.length >= 4) {
+        if (post.comments.length > 4) {
             commentsEndRef.current.scrollTop = commentsEndRef.current.scrollHeight;
         }
     }
   }, [post.comments]);
+
 
   //  Format time
   const formatTimestamp = (timestamp) => {
@@ -371,6 +374,7 @@ const ImageCard = ({ user, post }) => {
     </div>
   );
 };
+
 
  const HomeFeed = () => {
   const [display, setDisplay] = useState(false);

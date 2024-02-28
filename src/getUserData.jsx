@@ -1,7 +1,7 @@
 import { createContext, useContext } from 'react';
 import { useState, useEffect } from 'react';
 import { db, auth } from "./firebase";
-import { query, where, getDocs, collection, onSnapshot, doc } from "firebase/firestore";
+import { query, where, getDocs, collection } from "firebase/firestore";
 import { useAuthState } from 'react-firebase-hooks/auth';
 
 const UserDataContext = createContext();
@@ -10,8 +10,7 @@ const GetUserData = ({ children }) => {
   const [allUsersData, setAllUsersData] = useState(null)
   const [userProfile, setUserProfile] = useState(null);
   const [user, loading] = useAuthState(auth);
-  const [ownerUser, setOwnerUser] = useState(null)
-
+ 
 
   useEffect(() => {
     const fetchAllData = async () => {
@@ -56,21 +55,9 @@ const GetUserData = ({ children }) => {
   }, [user, loading]);
 
 
-  // real-time database
-  useEffect(() => {
-    if (user) {
-        const unsubscribe = onSnapshot(doc(db, "users", user?.uid), (doc) => {
-            const userData = doc.data();
-            setOwnerUser(userData);
-        });
-
-        return () => unsubscribe();
-    }
-  }, [user]);
-
 
   return (
-    <UserDataContext.Provider value={{ userProfile, allUsersData, loading, ownerUser }}>
+    <UserDataContext.Provider value={{ userProfile, allUsersData, loading}}>
       {children}
     </UserDataContext.Provider>
   );

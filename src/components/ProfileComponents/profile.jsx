@@ -4,7 +4,7 @@ import { useUserData } from '../../getUserData';
 import { Link, useParams } from "react-router-dom";
 import { IoMdArrowRoundBack } from "react-icons/io";
 import{ auth, db, storage } from '../../firebase'
-import { doc, updateDoc, onSnapshot } from 'firebase/firestore';
+import { doc, updateDoc, onSnapshot, query, collection, where } from 'firebase/firestore';
 import { deleteObject, ref } from "firebase/storage";
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { IoPersonCircleSharp } from "react-icons/io5";
@@ -23,7 +23,7 @@ import { IoSettingsSharp } from "react-icons/io5";
 
 const Profile = () => {
   const {handleFollowAction, isFollowing} = FollowFunction()
-  const {userProfile, allUsersData, ownerUser} = useUserData();
+  const {userProfile, allUsersData } = useUserData();
   const {username} = useParams();
   const currentUser = allUsersData?.find(user => user.userName === username);
   const [user] = useAuthState(auth);
@@ -57,6 +57,21 @@ const Profile = () => {
   const commentsEndRef = useRef(null);
   const isPostDisabled = commentText.trim().length === 0;
   const [previousCommentsLength, setPreviousCommentsLength] = useState(selectedPost?.comments?.length);
+  const [ownerUser, setOwnerUser] = useState(null)
+
+  // real-time database
+  useEffect(() => {
+    if (username) {
+      const unsubscribe = onSnapshot(query(collection(db, "users"), where("userName", "==", username)), (snapshot) => {
+        snapshot.forEach((doc) => {
+          const userData = doc.data();
+          setOwnerUser(userData);
+        });
+      });
+  
+      return () => unsubscribe();
+    }
+  }, [username]);
 
    
   const formatTimestamp = (timestamp) => {
@@ -106,10 +121,10 @@ const Profile = () => {
     setIsCommenting(true);
 
     try {
-        const userRef = doc(db, "users", currentUser?.uid);
+        const userRef = doc(db, "users", ownerUser?.uid);
         const newComment = {
           userId: user.uid,
-          commentId: `${user.uid}-${Date.now()}`,
+          commentId: `${ownerUser?.uid}-${Date.now()}`,
           text: event.target.comment.value,
           timestamp: new Date().toISOString()
         };
@@ -120,7 +135,7 @@ const Profile = () => {
         };
 
         await updateDoc(userRef, {
-          posts: posts.map(post => post.id === commentedPost.id ? updatedPost : post)
+          posts: ownerUser?.posts?.map(post => post.id === commentedPost.id ? updatedPost : post)
         });
 
         commentedPost.comments.push(newComment);
@@ -141,11 +156,11 @@ const Profile = () => {
     }
     setIsDeletingComment(true)
 
-    const userRef = doc(db, "users", currentUser.uid);
+    const userRef = doc(db, "users", ownerUser?.uid);
     let updatedData = {};
 
     try {
-          posts.forEach(post => {
+          ownerUser.posts.forEach(post => {
             const commentsArray = post.comments;
             if (commentsArray) {
                 post.comments = commentsArray.filter(comment => comment?.commentId !== commentId);
@@ -153,7 +168,7 @@ const Profile = () => {
         });
         
         updatedData = {
-          posts:  posts
+          posts:  ownerUser?.posts
         };
         await updateDoc(userRef, updatedData);
        
@@ -169,6 +184,7 @@ const Profile = () => {
 
     }
 };
+
 
 // Logic for scrolling to the latest comment
   useEffect(() => {
@@ -211,9 +227,9 @@ const Profile = () => {
                   : [...likedPost.likes, user.uid];
   
                   
-                  const userRef = doc(db, "users", user?.uid);
+                  const userRef = doc(db, "users", ownerUser?.uid);
                   const updatedData = {
-                    posts: posts.map(post => post.id === likedPost.id ? { ...post, likes: updatedLikes } : post)
+                    posts: ownerUser?.posts.map(post => post.id === likedPost.id ? { ...post, likes: updatedLikes } : post)
                   };
                   setSelectedPost({
                       ...selectedPost,
@@ -237,10 +253,10 @@ const Profile = () => {
     setIsDeletingComment(true)
     try {
         setShowConfirmation(false);
-        const userRef = doc(db, "users", user.uid);
+        const userRef = doc(db, "users", user?.uid);
        
         if (clickedIndex !== -1) {
-            const postToDelete = posts[clickedIndex];
+            const postToDelete = ownerUser?.posts[clickedIndex];
             const mediaUrl = postToDelete.media;
             const storageRef = ref(storage, mediaUrl);
             await deleteObject(storageRef);
@@ -249,7 +265,7 @@ const Profile = () => {
             posts.splice(clickedIndex, 1);
 
             const updatedData = {
-                posts: posts,
+                posts: ownerUser?.posts,
             };
 
             await updateDoc(userRef, updatedData);
@@ -270,17 +286,17 @@ const Profile = () => {
     e.preventDefault();
 
     try {
-      const userRef = doc(db, "users", user.uid);
+      const userRef = doc(db, "users", user?.uid);
 
       if (clickedIndex !== -1) {
-        const postToEdit = posts[clickedIndex];
+        const postToEdit = ownerUser?.posts[clickedIndex];
 
         if (postToEdit) {
           postToEdit.caption = updatedCaption;
           postToEdit.hashtag = updatedHashtag;
 
           const updatedData = {
-            posts: posts,
+            posts: ownerUser?.posts,
           };
 
           await updateDoc(userRef, updatedData);
