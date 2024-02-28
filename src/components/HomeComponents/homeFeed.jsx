@@ -161,7 +161,7 @@ const ImageCard = ({ user, post }) => {
 // Logic for scrolling to the latest comment
   useEffect(() => {
     if (commentsEndRef.current) {
-        if (post.comments.length > 4) {
+        if (post.comments.length >= 4) {
             commentsEndRef.current.scrollTop = commentsEndRef.current.scrollHeight;
         }
     }
@@ -225,6 +225,7 @@ const ImageCard = ({ user, post }) => {
             src={post.media}
             className="object-cover aspect-square w-full h-full"
             loading='lazy'
+            style={{ userSelect: 'none' }}
           />
         ) : post.type === 'video' ? (
           <video
@@ -304,7 +305,7 @@ const ImageCard = ({ user, post }) => {
                           <div className='flex h-full justify-start flex-col w-full'>
                             <div className='flex items-center w-full gap-2'>
                               <p className='text-nowrap font-medium overflow-hidden text-ellipsis'>{commenter?.userName}</p>
-                              {(comment.userId === authenticatedUser?.uid || post.id.substring(0, 28) === authenticatedUser?.uid.substring(0, 28)) && (
+                              {(comment.userId === authenticatedUser?.uid || comment?.userId?.substring(0, 28) === authenticatedUser?.uid?.substring(0, 28)) && (
                                 <p onClick={(event) => handleDeleteComment(event, comment.commentId, user)} className="text-[#c803fff0] max-w-[70px] w-full cursor-pointer mr-3 hover:text-red-500">
                                   <MdDeleteOutline title='delete this comment' size={25}/>
                                 </p>
@@ -420,18 +421,18 @@ const ImageCard = ({ user, post }) => {
       </div>
      </div>
     
-      {!display ? 
+      { !display ? 
         <div className='w-full h-full overflow-y-auto'>
-          {allPosts.length !== 0 ? (
-            <>
-              {allPosts.map((postWithUser, index) => (
-                <ImageCard key={index} user={postWithUser.user} post={postWithUser.post} />
-              ))}
-            </>
-          ) : (
+          { allPosts.length === 0 ? (
             <div className='flex justify-center items-center w-full h-full'>
               <HashLoader color='#F9008E' size={200} loading={true} /> 
             </div>
+          ) : (
+            <>
+            { allPosts.map((postWithUser, index) => (
+              <ImageCard key={index} user={postWithUser.user} post={postWithUser.post} />
+            ))}
+           </>
           )}
         </div> 
         : (

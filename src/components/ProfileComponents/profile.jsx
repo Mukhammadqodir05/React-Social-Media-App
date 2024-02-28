@@ -106,7 +106,7 @@ const Profile = () => {
     setIsCommenting(true);
 
     try {
-        const userRef = doc(db, "users", user.uid);
+        const userRef = doc(db, "users", ownerUser?.uid);
         const newComment = {
           userId: user.uid,
           commentId: `${user.uid}-${Date.now()}`,
@@ -120,7 +120,7 @@ const Profile = () => {
         };
 
         await updateDoc(userRef, {
-          posts: ownerUser.posts.map(post => post.id === commentedPost.id ? updatedPost : post)
+          posts: ownerUser?.posts.map(post => post.id === commentedPost.id ? updatedPost : post)
         });
 
         commentedPost.comments.push(newComment);
@@ -171,7 +171,7 @@ const Profile = () => {
 };
 
 // Logic for scrolling to the latest comment
- useEffect(() => {
+  useEffect(() => {
     if (commentsEndRef.current) {
         if (selectedPost?.comments.length >= previousCommentsLength) {
           commentsEndRef.current.scrollTop = commentsEndRef.current.scrollHeight;
@@ -232,7 +232,9 @@ const Profile = () => {
   };
   
   // Delete The Post
-  const handleDeletePost = async () => {
+  const handleDeletePost = async (e) => {
+    e.preventDefault()
+    setIsDeletingComment(true)
     try {
         setShowConfirmation(false);
         const userRef = doc(db, "users", user.uid);
@@ -258,6 +260,8 @@ const Profile = () => {
         }
     } catch (error) {
         console.error('Error deleting post or media:', error);
+    } finally{
+      setIsDeletingComment(false)
     }
   };
 
