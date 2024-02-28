@@ -50,8 +50,6 @@ body, html {
   border-radius: 5px; 
 }
 
-
-
 .input::placeholder {
     color: rgb(201, 181, 181);
 }
@@ -252,5 +250,22 @@ body, html {
 
 .heart-beat {
   animation: heartBeat 1s ease-in-out, pulse 0.5s ease-in-out, birthdayParty 1s;
+}
+
+
+.skeleton {
+  animation: skeleton-loading 1s linear infinite alternate;
+}
+
+
+
+@keyframes skeleton-loading {
+  0% {
+    background-color: hsl(195, 3%, 75%);
+  }
+
+  100% {
+    background-color: hsl(0, 0%, 100%);
+  }
 }
 

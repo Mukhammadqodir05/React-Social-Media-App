@@ -246,7 +246,8 @@ const ImageCard = ({ user, post }) => {
           Your browser does not support the video tag.
         </video>
       ) : ''}
-    </div>
+      
+      </div>
         </div>
         <div className='flex justify-around'>
           <div className='flex items-center justify-center space-x-1' onClick={() => setShowCommentForm(prev => !prev)}>

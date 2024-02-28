@@ -8,7 +8,7 @@ import { doc, updateDoc, onSnapshot } from 'firebase/firestore';
 import { deleteObject, ref } from "firebase/storage";
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { IoPersonCircleSharp } from "react-icons/io5";
-import { FadeLoader, HashLoader, PulseLoader } from 'react-spinners';
+import { FadeLoader, PulseLoader } from 'react-spinners';
 import { MdDeleteOutline, MdClose } from "react-icons/md";
 import { BsThreeDots } from "react-icons/bs";
 import { LiaUserEditSolid } from "react-icons/lia";
@@ -22,9 +22,9 @@ import LogOut from '../../Auth/logout';
 import { IoSettingsSharp } from "react-icons/io5";
 
 const Profile = () => {
-  const { handleFollowAction, isFollowing } = FollowFunction()
-  const { userProfile, allUsersData } = useUserData();
-  const { username } = useParams();
+  const {handleFollowAction, isFollowing} = FollowFunction()
+  const {userProfile, allUsersData, ownerUser} = useUserData();
+  const {username} = useParams();
   const currentUser = allUsersData?.find(user => user.userName === username);
   const [user] = useAuthState(auth);
   const [followersCount, setFollowersCount] = useState(currentUser?.followers.length);
@@ -43,12 +43,11 @@ const Profile = () => {
   const [updatedCaption, setUpdatedCaption] = useState('');
   const [updatedHashtag, setUpdatedHashtag] = useState('');
   const [userBanner, setUserBanner] = useState(currentUser?.userBannerURL);
-  const [ userName, setUserName ] = useState(currentUser?.userName);
-  const [ userFollowing, setUserFollowing ] = useState(currentUser?.following);
-  const [ showFollowing, setShowFollowing ] = useState(false);
-  const [ userFollowers, setUserFollowers ] = useState(currentUser?.followers);
-  const [ showFollowers, setShowFollowers ] = useState(false);
-  const [authenticatedUser] = useAuthState(auth);
+  const [userName, setUserName] = useState(currentUser?.userName);
+  const [userFollowing, setUserFollowing] = useState(currentUser?.following);
+  const [showFollowing, setShowFollowing] = useState(false);
+  const [userFollowers, setUserFollowers] = useState(currentUser?.followers);
+  const [showFollowers, setShowFollowers] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const [isCommenting, setIsCommenting] = useState(false);
   const [showCommentForm, setShowCommentForm] = useState(false);
@@ -58,7 +57,7 @@ const Profile = () => {
   const commentsEndRef = useRef(null);
   const isPostDisabled = commentText.trim().length === 0;
   const [previousCommentsLength, setPreviousCommentsLength] = useState(selectedPost?.comments?.length);
-  
+
    
   const formatTimestamp = (timestamp) => {
     const timeDiff = new Date() - new Date(timestamp);
@@ -99,7 +98,6 @@ const Profile = () => {
     setClickedIndex(index);
   };
 
-
   // Add a comment
   const handleComment = async (event, commentedPost) => {
     if (event) {
@@ -110,8 +108,8 @@ const Profile = () => {
     try {
         const userRef = doc(db, "users", user.uid);
         const newComment = {
-          userId: authenticatedUser.uid,
-          commentId: `${authenticatedUser.uid}-${Date.now()}`,
+          userId: user.uid,
+          commentId: `${user.uid}-${Date.now()}`,
           text: event.target.comment.value,
           timestamp: new Date().toISOString()
         };
@@ -122,7 +120,7 @@ const Profile = () => {
         };
 
         await updateDoc(userRef, {
-          posts: userProfile[0].posts.map(post => post.id === commentedPost.id ? updatedPost : post)
+          posts: ownerUser.posts.map(post => post.id === commentedPost.id ? updatedPost : post)
         });
 
         commentedPost.comments.push(newComment);
@@ -134,8 +132,7 @@ const Profile = () => {
     } catch (error) {
       console.error('Error adding comment:', error);
     } 
-};
-
+  };
 
   // Handle Comment Delete
   const handleDeleteComment = async (event, commentId) => {
@@ -159,10 +156,12 @@ const Profile = () => {
           posts:  posts
         };
         await updateDoc(userRef, updatedData);
+
         setSelectedPost({
           ...selectedPost,
           comments: selectedPost.comments.filter(comment => comment?.commentId !== commentId)
         });
+
         console.log("Comment deleted successfully.");
     } catch (error) {
         console.error('Error deleting comment:', error);
@@ -171,7 +170,7 @@ const Profile = () => {
     }
 };
 
-
+// Logic for scrolling to the latest comment
  useEffect(() => {
     if (commentsEndRef.current) {
         if (selectedPost?.comments.length >= previousCommentsLength) {
@@ -180,7 +179,8 @@ const Profile = () => {
       }
     }, [selectedPost?.comments, previousCommentsLength]);
     
- 
+
+//  Real-time database
     useEffect(() => {
       const unsubscribe = onSnapshot(doc(db, "users", currentUser?.uid), (doc) => {
         setFollowersCount(doc.data().followers.length);
@@ -192,7 +192,6 @@ const Profile = () => {
         setUserName(doc.data().userName)
         setUserFollowing(doc.data().following)
         setUserFollowers(doc.data().followers)
-
       });
     
       return () => unsubscribe();
@@ -200,44 +199,38 @@ const Profile = () => {
 
 
     // Handle Like
-  const handleLike = async (event, likedPost, likedUser) => {
-    if (event) {
-      event.preventDefault();
-    }
-  
-    if (!likedUser || !likedPost) {
-      console.error("Liked user or liked post not found");
-      return;
-    }
-  
-    if (!likedPost.likes) {
-      likedPost.likes = [];
-    }
-  
-    try {
-      if (authenticatedUser && authenticatedUser?.uid) {
-        const updatedLikes = likedPost.likes.includes(authenticatedUser.uid)
-          ? likedPost.likes.filter((uid) => uid !== authenticatedUser.uid)
-          : [...likedPost.likes, authenticatedUser.uid];
-          setSelectedPost({
-            ...selectedPost,
-            likes: updatedLikes
-        });
-  
-        const userRef = doc(db, "users", likedUser?.uid);
-        await updateDoc(userRef, { posts: likedUser.posts.map(post => post.id === likedPost.id ? { ...likedPost, likes: updatedLikes } : post) });
-       
-         setIsAnimating(false);
-        console.log('Document updated successfully');
-      } else {
-        console.error("User authentication failed.");
+    const handleLike = async (event, likedPost) => {
+      if (event) {
+          event.preventDefault();
       }
-    } catch (error) {
-      console.error('Error updating document:', error);
-    }
-  };
+  
+      try {
+          if (user && user?.uid) {
+              const updatedLikes = likedPost.likes.includes(user.uid)
+                  ? likedPost.likes.filter((uid) => uid !== user.uid)
+                  : [...likedPost.likes, user.uid];
+  
+              setSelectedPost({
+                  ...selectedPost,
+                  likes: updatedLikes
+              });
+  
+              const userRef = doc(db, "users", ownerUser?.uid);
+              const updatedData = {
+                  posts: ownerUser.posts.map(post => post.id === likedPost.id ? { ...post, likes: updatedLikes } : post)
+              };
 
- 
+              await updateDoc(userRef, updatedData);
+              setIsAnimating(false);
+              console.log('Document updated successfully');
+          } else {
+              console.error("User authentication failed.");
+          }
+      } catch (error) {
+          console.error('Error updating document:', error);
+      }
+  };
+  
   // Delete The Post
   const handleDeletePost = async () => {
     try {
@@ -245,16 +238,16 @@ const Profile = () => {
         const userRef = doc(db, "users", user.uid);
        
         if (clickedIndex !== -1) {
-            const postToDelete = userProfile[0].posts[clickedIndex];
+            const postToDelete = ownerUser.posts[clickedIndex];
             const mediaUrl = postToDelete.media;
             const storageRef = ref(storage, mediaUrl);
             await deleteObject(storageRef);
 
             // Remove the post from the posts array using splice
-            userProfile[0].posts.splice(clickedIndex, 1);
+            ownerUser.posts.splice(clickedIndex, 1);
 
             const updatedData = {
-                posts: userProfile[0].posts,
+                posts: ownerUser.posts,
             };
 
             await updateDoc(userRef, updatedData);
@@ -329,10 +322,9 @@ const Profile = () => {
   ];
   const joinedDate = `Joined ${monthNames[timestamp.getMonth()]} ${timestamp.getFullYear()}`;
   
-
   return (
-   <main className="flex flex-col w-full items-center justify-center h-full pt-0 pb-10">
-      { userName === username ?  
+   <main className="flex flex-col w-full items-center justify-center h-full pt-0">
+     { userName === username ?  
        <>
          <div className="max-w-[900px] w-full h-full">
             <div className="flex gap-10 items-center w-full h-14 p-2">
@@ -630,8 +622,8 @@ const Profile = () => {
                                     <div className='flex h-full justify-start flex-col w-full'>
                                       <div className='flex items-center w-full gap-2'>
                                         <p className='text-nowrap font-medium overflow-hidden text-ellipsis'>{commenter?.userName}</p>
-                                        {(comment.userId === authenticatedUser?.uid || username === currentUser?.userName) && (
-                                            <p onClick={(event) => handleDeleteComment(event, comment.commentId, currentUser)} className="text-[#c803fff0] max-w-[70px] w-full cursor-pointer mr-3 hover:text-red-500">
+                                        {(comment.userId === user?.uid || comment.userId === currentUser?.userName) && (
+                                            <p onClick={(event) => handleDeleteComment(event, comment.commentId, ownerUser)} className="text-[#c803fff0] max-w-[70px] w-full cursor-pointer mr-3 hover:text-red-500">
                                               <MdDeleteOutline title='delete this comment' size={25}/>
                                             </p>
                                           )}
@@ -663,11 +655,11 @@ const Profile = () => {
                        </div>
                 {/* Like Button */}
                           <div className='flex items-center justify-center space-x-1' onClick={(event) => {
-                                handleLike(event, selectedPost, currentUser);
+                                handleLike(event, selectedPost);
                                 setIsAnimating(true);
                             }}>
-                           <div className={selectedPost.likes.includes(authenticatedUser?.uid) ? (isAnimating ? 'heart-beat cursor-pointer flex text-[#ff0404] rounded-full justify-center items-center' : 'cursor-pointer rounded-full text-[#ff0404]') : 'cursor-pointer rounded-full'}>
-                              {selectedPost.likes.includes(authenticatedUser?.uid) ?
+                           <div className={selectedPost.likes.includes(user?.uid) ? (isAnimating ? 'heart-beat cursor-pointer flex text-[#ff0404] rounded-full justify-center items-center' : 'cursor-pointer rounded-full text-[#ff0404]') : 'cursor-pointer rounded-full'}>
+                              {selectedPost.likes.includes(user?.uid) ?
                                   <ImHeart size={20} />
                                   : <FiHeart size={20} />
                               }
@@ -682,7 +674,7 @@ const Profile = () => {
                       </div>
                        <form
                         className='border-t border-b lg:flex hidden bg-black borderBg w-full h-[60px] items-center'
-                        onSubmit={(event) => handleComment(event, selectedPost, currentUser)}
+                        onSubmit={(event) => handleComment(event, selectedPost, ownerUser)}
                           >
                             <input
                               name="comment"
@@ -719,11 +711,11 @@ const Profile = () => {
                         <div className='flex items-center gap-10 p-4'>
                     {/* Like Button */}
                             <div className='flex items-center justify-center space-x-1' onClick={(event) => {
-                              handleLike(event, selectedPost, currentUser);
+                              handleLike(event, selectedPost, ownerUser);
                               setIsAnimating(true);
                               }}>
-                              <div className={selectedPost.likes.includes(authenticatedUser?.uid) ? (isAnimating ? 'heart-beat cursor-pointer flex text-[#ff0404] rounded-full justify-center items-center' : 'cursor-pointer rounded-full text-[#ff0404]') : 'cursor-pointer rounded-full'}>
-                                {selectedPost.likes.includes(authenticatedUser?.uid) ?
+                              <div className={selectedPost.likes.includes(user?.uid) ? (isAnimating ? 'heart-beat cursor-pointer flex text-[#ff0404] rounded-full justify-center items-center' : 'cursor-pointer rounded-full text-[#ff0404]') : 'cursor-pointer rounded-full'}>
+                                {selectedPost.likes.includes(user?.uid) ?
                                     <ImHeart size={20} />
                                     : <FiHeart size={20} />
                                 }
@@ -784,8 +776,8 @@ const Profile = () => {
                                 <div className='flex h-full justify-start flex-col w-full'>
                                   <div className='flex items-center w-full gap-2'>
                                     <p className='text-nowrap font-medium overflow-hidden text-ellipsis'>{commenter?.userName}</p>
-                                    {(comment.userId === authenticatedUser?.uid || username === currentUser?.userName) && (
-                                        <p onClick={(event) => handleDeleteComment(event, comment.commentId, currentUser)} className="text-[#c803fff0] max-w-[70px] w-full cursor-pointer mr-3 hover:text-red-500">
+                                    {(comment.userId === user?.uid || comment.userId === currentUser?.userName) && (
+                                        <p onClick={(event) => handleDeleteComment(event, comment.commentId, ownerUser)} className="text-[#c803fff0] max-w-[70px] w-full cursor-pointer mr-3 hover:text-red-500">
                                           <MdDeleteOutline title='delete this comment' size={25}/>
                                         </p>
                                       )}
@@ -812,7 +804,7 @@ const Profile = () => {
 
               <form
                 className='flex border-t bg-black borderBg w-full max-w-[600px] h-[60px] items-center'
-                onSubmit={(event) => handleComment(event, selectedPost, currentUser)}
+                onSubmit={(event) => handleComment(event, selectedPost, ownerUser)}
               >
                 <input
                   name="comment"
@@ -880,110 +872,109 @@ const Profile = () => {
                     </div>
                   </div>
                 )}
-              </> : (
-            <div>
-              <HashLoader color='#F9008E' size={200} loading={true} /> 
+          </> : (
+            <div className='flex w-full h-screen justify-center items-center'>
+              <FadeLoader color='#F9008E' size={200} loading={true} /> 
           </div>
           )}
 
-
         {/* Show following accounts here */} 
-            { showFollowing && 
-              <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-60 z-50 p-2">
-                <div className="flex flex-col bg-[#252525] w-full max-w-[400px] h-full max-h-[500px] rounded-lg overflow-hidden">
-                  <div className="flex flex-col justify-between items-center">
-                    <div className="flex w-full justify-between items-center p-3">
-                      <h2 className="text-white text-xl font-bold">Following</h2>
-                      <MdClose title="close" size={30} className="cursor-pointer rounded-full  hover:bg-slate-600 text-white" onClick={() => setShowFollowing(false)} />
-                    </div>
-                    <div className="flex w-full border-b borderBg" />
+          { showFollowing && 
+            <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-60 z-50 p-2">
+              <div className="flex flex-col bg-[#252525] w-full max-w-[400px] h-full max-h-[500px] rounded-lg overflow-hidden">
+                <div className="flex flex-col justify-between items-center">
+                  <div className="flex w-full justify-between items-center p-3">
+                    <h2 className="text-white text-xl font-bold">Following</h2>
+                    <MdClose title="close" size={30} className="cursor-pointer rounded-full  hover:bg-slate-600 text-white" onClick={() => setShowFollowing(false)} />
                   </div>
-                  <div className="p-2 overflow-y-auto pb-5">
-                  {userFollowing.length > 0 ? (
-                    userFollowing.map((userId, index) => {
-                      const followedUser = allUsersData?.find(user => user.uid === userId);
-                      return (
-                        <div key={userId} className="flex items-center justify-between p-2 border-b border-gray-800">
-                          <div onClick={() => setShowFollowing(false)} className="flex items-center gap-4 cursor-pointer">
+                  <div className="flex w-full border-b borderBg" />
+                </div>
+                <div className="p-2 overflow-y-auto pb-5">
+                {userFollowing.length > 0 ? (
+                  userFollowing.map((userId, index) => {
+                    const followedUser = allUsersData?.find(user => user.uid === userId);
+                    return (
+                      <div key={userId} className="flex items-center justify-between p-2 border-b border-gray-800">
+                        <div onClick={() => setShowFollowing(false)} className="flex items-center gap-4 cursor-pointer">
+                          <Link to={`/${followedUser?.userName}`}>
+                            {followedUser?.userPictureURL ? 
+                              <img
+                                src={followedUser?.userPictureURL}
+                                alt={followedUser?.fullName}
+                                className="rounded-full h-10 w-10"
+                              /> 
+                              : <div className="rounded-full bg-gray-300 flex items-center justify-center h-10 w-10"><IoPersonCircleSharp size={40} /></div>
+                            }
+                          </Link>
+                          <div>
                             <Link to={`/${followedUser?.userName}`}>
-                              {followedUser?.userPictureURL ? 
-                                <img
-                                  src={followedUser?.userPictureURL}
-                                  alt={followedUser?.fullName}
-                                  className="rounded-full h-10 w-10"
-                                /> 
-                                : <div className="rounded-full bg-gray-300 flex items-center justify-center h-10 w-10"><IoPersonCircleSharp size={40} /></div>
-                              }
+                              <p className="text-white font-bold">{followedUser?.fullName}</p>
+                              <p className="text-gray-500 text-base">@{followedUser?.userName}</p>
                             </Link>
-                            <div>
-                              <Link to={`/${followedUser?.userName}`}>
-                                <p className="text-white font-bold">{followedUser?.fullName}</p>
-                                <p className="text-gray-500 text-base">@{followedUser?.userName}</p>
-                              </Link>
-                            </div>
                           </div>
                         </div>
-                      );
-                    })
-                  ) : (
-                    <div className="flex font-bold text-xl justify-center items-center h-[400px] w-full text-white">
-                      No following yet
-                    </div>
-                  )}
+                      </div>
+                    );
+                  })
+                ) : (
+                  <div className="flex font-bold text-xl justify-center items-center h-[400px] w-full text-white">
+                    No following yet
                   </div>
+                )}
                 </div>
               </div>
-            }
+            </div>
+          }
 
-            {/* Show followers accounts here */} 
-            { showFollowers && 
-              <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-60 z-50 p-2">
-                <div className="flex flex-col bg-[#252525] w-full max-w-[400px] h-full max-h-[500px] rounded-lg overflow-hidden">
-                  <div className="flex flex-col justify-between items-center">
-                    <div className="flex w-full justify-between items-center p-3">
-                      <h2 className="text-white text-xl font-bold">Followers</h2>
-                      <MdClose title="close" size={30} className="cursor-pointer rounded-full  hover:bg-slate-600 text-white" onClick={() => setShowFollowers(false)} />
-                    </div>
-                    <div className="flex w-full border-b borderBg" />
+          {/* Show followers accounts here */} 
+          { showFollowers && 
+            <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-60 z-50 p-2">
+              <div className="flex flex-col bg-[#252525] w-full max-w-[400px] h-full max-h-[500px] rounded-lg overflow-hidden">
+                <div className="flex flex-col justify-between items-center">
+                  <div className="flex w-full justify-between items-center p-3">
+                    <h2 className="text-white text-xl font-bold">Followers</h2>
+                    <MdClose title="close" size={30} className="cursor-pointer rounded-full  hover:bg-slate-600 text-white" onClick={() => setShowFollowers(false)} />
                   </div>
-                  <div className="p-2 overflow-y-auto pb-5">
-                  { userFollowers.length > 0 ? (
-                    userFollowers.map((userId, index) => {
-                      const followerUser = allUsersData?.find(user => user.uid === userId);
-                      return (
-                        <div key={userId} className="flex items-center justify-between p-2 border-b border-gray-800">
-                          <div onClick={() => setShowFollowers(false)} className="flex items-center gap-4 cursor-pointer">
+                  <div className="flex w-full border-b borderBg" />
+                </div>
+                <div className="p-2 overflow-y-auto pb-5">
+                { userFollowers.length > 0 ? (
+                  userFollowers.map((userId, index) => {
+                    const followerUser = allUsersData?.find(user => user.uid === userId);
+                    return (
+                      <div key={userId} className="flex items-center justify-between p-2 border-b border-gray-800">
+                        <div onClick={() => setShowFollowers(false)} className="flex items-center gap-4 cursor-pointer">
+                          <Link to={`/${followerUser?.userName}`}>
+                            {followerUser?.userPictureURL ? 
+                              <img
+                                src={followerUser?.userPictureURL}
+                                alt={followerUser?.fullName}
+                                className="rounded-full h-10 w-10"
+                              /> 
+                              : <div className="rounded-full bg-gray-300 flex items-center justify-center h-10 w-10"><IoPersonCircleSharp size={40} /></div>
+                            }
+                          </Link>
+                          <div>
                             <Link to={`/${followerUser?.userName}`}>
-                              {followerUser?.userPictureURL ? 
-                                <img
-                                  src={followerUser?.userPictureURL}
-                                  alt={followerUser?.fullName}
-                                  className="rounded-full h-10 w-10"
-                                /> 
-                                : <div className="rounded-full bg-gray-300 flex items-center justify-center h-10 w-10"><IoPersonCircleSharp size={40} /></div>
-                              }
+                              <p className="text-white font-bold">{followerUser?.fullName}</p>
+                              <p className="text-gray-500 text-base">@{followerUser?.userName}</p>
                             </Link>
-                            <div>
-                              <Link to={`/${followerUser?.userName}`}>
-                                <p className="text-white font-bold">{followerUser?.fullName}</p>
-                                <p className="text-gray-500 text-base">@{followerUser?.userName}</p>
-                              </Link>
-                            </div>
                           </div>
                         </div>
-                      );
-                    })
-                  ) : (
-                    <div className="flex font-bold text-xl justify-center items-center h-[400px] w-full text-white">
-                      No followers yet
-                    </div>
-                  )}
+                      </div>
+                    );
+                  })
+                ) : (
+                  <div className="flex font-bold text-xl justify-center items-center h-[400px] w-full text-white">
+                    No followers yet
                   </div>
+                )}
                 </div>
               </div>
-            }
-     </main>
-   );
+            </div>
+          }
+    </main>
+  );
 }
 
 export default Profile;

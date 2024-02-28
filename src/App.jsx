@@ -12,7 +12,6 @@ const App = () => {
   const switchForm = (FormSwitch) => setCurrentPage(FormSwitch);
   const [user, loading] = useAuthState(auth);
 
-
   useEffect(() => {
     if (!loading && user) {
       setCurrentPage('Home');
@@ -21,7 +20,7 @@ const App = () => {
 
   return (
     <main className='flex w-full items-center justify-center h-screen text-white overflow-hidden'>
-      {loading ? (
+      { loading ? (
        <Refresh />
       ) : user ? (
         <Home />
@@ -30,7 +29,6 @@ const App = () => {
       ) : (
         <SignIn onFormSwitch={switchForm} />
       )}
-
     </main>
   );
 };
