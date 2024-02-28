@@ -32,5 +32,8 @@ Trendmedia is a cutting-edge social media platform that connects users from arou
 - React-router-dom
 - React-spinners
 
+## Check out
+Demo: https://trendmedia.vercel.app/
+
 ## Contributing
 We welcome contributions from the community to help improve Trendmedia. If you have any suggestions, bug reports, or feature requests, please open an issue or submit a pull request.
