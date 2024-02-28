@@ -106,7 +106,7 @@ const Profile = () => {
     setIsCommenting(true);
 
     try {
-        const userRef = doc(db, "users", ownerUser?.uid);
+        const userRef = doc(db, "users", currentUser?.uid);
         const newComment = {
           userId: user.uid,
           commentId: `${user.uid}-${Date.now()}`,
@@ -120,7 +120,7 @@ const Profile = () => {
         };
 
         await updateDoc(userRef, {
-          posts: ownerUser?.posts.map(post => post.id === commentedPost.id ? updatedPost : post)
+          posts: posts.map(post => post.id === commentedPost.id ? updatedPost : post)
         });
 
         commentedPost.comments.push(newComment);
@@ -181,7 +181,7 @@ const Profile = () => {
     
 
 //  Real-time database
-    useEffect(() => {
+  useEffect(() => {
       const unsubscribe = onSnapshot(doc(db, "users", currentUser?.uid), (doc) => {
         setFollowersCount(doc.data().followers.length);
         setFollowingCount(doc.data().following.length);
@@ -199,7 +199,7 @@ const Profile = () => {
 
 
     // Handle Like
-    const handleLike = async (event, likedPost) => {
+  const handleLike = async (event, likedPost) => {
       if (event) {
           event.preventDefault();
       }
@@ -210,15 +210,15 @@ const Profile = () => {
                   ? likedPost.likes.filter((uid) => uid !== user.uid)
                   : [...likedPost.likes, user.uid];
   
-              setSelectedPost({
-                  ...selectedPost,
-                  likes: updatedLikes
-              });
-  
-              const userRef = doc(db, "users", ownerUser?.uid);
-              const updatedData = {
-                  posts: ownerUser.posts.map(post => post.id === likedPost.id ? { ...post, likes: updatedLikes } : post)
-              };
+                  
+                  const userRef = doc(db, "users", user?.uid);
+                  const updatedData = {
+                    posts: posts.map(post => post.id === likedPost.id ? { ...post, likes: updatedLikes } : post)
+                  };
+                  setSelectedPost({
+                      ...selectedPost,
+                      likes: updatedLikes
+                  });
 
               await updateDoc(userRef, updatedData);
               setIsAnimating(false);
@@ -240,16 +240,16 @@ const Profile = () => {
         const userRef = doc(db, "users", user.uid);
        
         if (clickedIndex !== -1) {
-            const postToDelete = ownerUser.posts[clickedIndex];
+            const postToDelete = posts[clickedIndex];
             const mediaUrl = postToDelete.media;
             const storageRef = ref(storage, mediaUrl);
             await deleteObject(storageRef);
 
             // Remove the post from the posts array using splice
-            ownerUser.posts.splice(clickedIndex, 1);
+            posts.splice(clickedIndex, 1);
 
             const updatedData = {
-                posts: ownerUser.posts,
+                posts: posts,
             };
 
             await updateDoc(userRef, updatedData);

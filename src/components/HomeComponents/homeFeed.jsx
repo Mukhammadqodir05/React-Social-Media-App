@@ -423,16 +423,16 @@ const ImageCard = ({ user, post }) => {
     
       { !display ? 
         <div className='w-full h-full overflow-y-auto'>
-          { allPosts.length === 0 ? (
-            <div className='flex justify-center items-center w-full h-full'>
-              <HashLoader color='#F9008E' size={200} loading={true} /> 
-            </div>
-          ) : (
+          { allPosts.length !== 0 ? (
             <>
             { allPosts.map((postWithUser, index) => (
               <ImageCard key={index} user={postWithUser.user} post={postWithUser.post} />
             ))}
            </>
+          ) : (
+            <div className='flex justify-center items-center w-full h-full'>
+              <HashLoader color='#F9008E' size={200} loading={true} /> 
+            </div>
           )}
         </div> 
         : (
