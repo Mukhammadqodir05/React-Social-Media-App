@@ -4,7 +4,6 @@ import { db, auth } from "./firebase";
 import { query, where, getDocs, collection, onSnapshot, doc } from "firebase/firestore";
 import { useAuthState } from 'react-firebase-hooks/auth';
 
-
 const UserDataContext = createContext();
 
 const GetUserData = ({ children }) => {
@@ -29,7 +28,6 @@ const GetUserData = ({ children }) => {
     };
     fetchAllData(); 
   }, [])
-
 
 
   useEffect(() => {

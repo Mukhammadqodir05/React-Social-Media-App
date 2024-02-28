@@ -58,7 +58,7 @@ const Profile = () => {
   const isPostDisabled = commentText.trim().length === 0;
   const [previousCommentsLength, setPreviousCommentsLength] = useState(selectedPost?.comments?.length);
 
-   console.log(currentUser.posts.find(post => post.id === selectedPost?.id))
+   
   const formatTimestamp = (timestamp) => {
     const timeDiff = new Date() - new Date(timestamp);
     const seconds = Math.floor(timeDiff / 1000);
