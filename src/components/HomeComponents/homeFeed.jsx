@@ -304,7 +304,7 @@ const ImageCard = ({ user, post }) => {
                           <div className='flex h-full justify-start flex-col w-full'>
                             <div className='flex items-center w-full gap-2'>
                               <p className='text-nowrap font-medium overflow-hidden text-ellipsis'>{commenter?.userName}</p>
-                              {(comment.userId === authenticatedUser?.uid ) && (
+                              {(comment.userId === authenticatedUser?.uid || post.id.substring(0, 28) === authenticatedUser?.uid.substring(0, 28)) && (
                                 <p onClick={(event) => handleDeleteComment(event, comment.commentId, user)} className="text-[#c803fff0] max-w-[70px] w-full cursor-pointer mr-3 hover:text-red-500">
                                   <MdDeleteOutline title='delete this comment' size={25}/>
                                 </p>
