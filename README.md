@@ -1,5 +1,8 @@
 # Trendmedia Social Media Platform
 
+## Check Out the Demo
+Explore Trendmedia: Demo Link (https://trendmedia.vercel.app/)
+
 ## Description
 Trendmedia is a modern social media platform designed to connect users worldwide through trending topics, interactive content, and engaging features. Whether you're interested in staying informed about the latest trends, sharing your opinions with a global audience, or connecting with individuals who share your interests, Trendmedia offers a comprehensive platform to meet your social networking needs.
 
@@ -34,9 +37,6 @@ Trendmedia is a modern social media platform designed to connect users worldwide
 
 ## What I Learned Building This Project
 Building Trendmedia has been an insightful journey that has taught me valuable lessons in web development and social media platforms. Throughout this project, I have honed my skills in React.js, user interface design, application state management, and integrating with Firebase for backend services. Additionally, I have gained a deeper understanding of creating engaging user experiences, utilizing third-party libraries like React-icons and React-spinners, and optimizing application performance.
-
-## Check Out the Demo
-Explore Trendmedia: Demo Link (https://trendmedia.vercel.app/)
 
 ## Contributing
 We encourage contributions from the community to enhance Trendmedia further. If you have any suggestions, bug reports, or feature requests, please feel free to open an issue or submit a pull request. Your input is valuable in shaping the future of Trendmedia and making it an even better social media platform for users worldwide.
