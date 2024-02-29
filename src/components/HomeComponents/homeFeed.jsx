@@ -24,7 +24,7 @@ const ImageCard = ({ user, post }) => {
   const [isCommenting, setIsCommenting] = useState(false);
   const [showCommentForm, setShowCommentForm] = useState(false);
   const [commentText, setCommentText] = useState('');
-  const commentsEndRef = useRef(null);
+  const commentsContainerRef = useRef(null);
   const isPostDisabled = commentText.trim().length === 0;
   const [isDeletingComment, setIsDeletingComment] = useState(false);
   
@@ -160,13 +160,11 @@ const ImageCard = ({ user, post }) => {
   }, []);
   
   
-// Logic for scrolling to the latest comment
+  // Logic for scrolling to the latest comment
   useEffect(() => {
-    if (commentsEndRef.current) {
-        if (post.comments.length > 4) {
-            commentsEndRef.current.scrollTop = commentsEndRef.current.scrollHeight;
-        }
-    }
+      if (commentsContainerRef.current && post.comments.length > 4) {
+          commentsContainerRef.current.scrollTop = commentsContainerRef.current.scrollHeight;
+      }
   }, [post.comments]);
 
 
@@ -287,7 +285,7 @@ const ImageCard = ({ user, post }) => {
                 <h2 className="text-white text-xl font-bold">Comments</h2>
                 <MdClose className='hover:text-cyan-300' onClick={() => setShowCommentForm(prev => ! prev)} size={25} title='close' />
               </div>
-              <div ref={commentsEndRef} className="h-full w-full max-h-[350px] overflow-y-auto overflow-x-hidden justify-start items-start">
+              <div ref={commentsContainerRef} className="h-full comments-container w-full max-h-[350px] overflow-y-auto overflow-x-hidden justify-start items-start">
                 <div className='flex h-full flex-col w-full'>
                   {post.comments.length !== 0 ? (
                     post?.comments?.map((comment) => {
