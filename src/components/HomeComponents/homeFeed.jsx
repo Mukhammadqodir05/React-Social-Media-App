@@ -91,7 +91,6 @@ const ImageCard = ({ user, post }) => {
         await updateDoc(userRef, updatedData);
         setIsCommenting(false)
         setCommentText('')
-        commentsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     } else {
         console.error("User authentication failed.");
     }
