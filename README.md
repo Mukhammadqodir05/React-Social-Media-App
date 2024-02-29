@@ -13,6 +13,9 @@ Trendmedia is a modern social media platform designed to connect users worldwide
 - Global Reach: Connect with users from diverse backgrounds and cultures.
 - Customizable Profiles: Personalize your profile to reflect your interests and personality.
 
+## Screenshots
+![alt text](Trendmedia.png)
+
 ## Installation
 1. Clone the Repository: git clone https://github.com/Mukhammadqodir05/React-Social-Media-App.git
 2. Install Dependencies: npm install
