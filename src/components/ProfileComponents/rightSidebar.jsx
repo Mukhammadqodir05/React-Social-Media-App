@@ -6,15 +6,17 @@ import { IoPersonCircleSharp } from "react-icons/io5";
 const RightSideBar = () => {
   const { allUsersData, userProfile } = useUserData();
 
-  // Calculate the number of posts made by each user
-  const usersWithPostCount = allUsersData?.filter(user => user.userName !== userProfile[0]?.userName).map(user => ({
+  // Filter out users without posts and calculate the number of posts made by each user
+  const usersWithPostCount = allUsersData?.filter(user => user.posts).map(user => ({
     ...user,
     postsCount: user.posts.length
   }));
 
-  // Sort users based on the number of posts they have
-  const sortedUsers = usersWithPostCount.sort((a, b) => b.postsCount - a.postsCount).slice(0, 5);
-
+  const sortedUsers = usersWithPostCount
+    .filter(user => user.userName !== userProfile[0]?.userName)
+    .sort((a, b) => b.postsCount - a.postsCount)
+    .slice(0, 5);
+    
   return (
     <main className='flex flex-col items-center w-full h-full p-1'>
       {sortedUsers.length > 0 && (

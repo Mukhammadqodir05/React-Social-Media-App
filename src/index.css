@@ -58,10 +58,6 @@ body, html {
     background-image: linear-gradient(to right top, #3e1a7a, #49207d, #53267f, #5d2c82, #663385, #69338a, #6b338e, #6e3393, #6a2c9b, #6525a3, #5e1dab, #5515b4);
 }
 
-.mainBg{
-  background-image: linear-gradient(to right top, #1c0c24, #1e0d28, #200e2b, #220f2f, #240f33, #250f35, #250f36, #260f38, #250f38, #251038, #241038, #241038);
-}
-
 .borderBg{
   border-color: #4d4a50;
 }

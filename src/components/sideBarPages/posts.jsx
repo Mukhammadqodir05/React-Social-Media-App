@@ -23,7 +23,6 @@ const Post = () => {
   const videoRef = useRef();
   
 
-
   const handleUploadData = async (e) => {
     e.preventDefault();
     setLoading(true)
@@ -99,14 +98,14 @@ const Post = () => {
                   ref={fileRef}
                   onChange={(e) => {
                     const file = e.target.files[0];
-                    if (file.name.match(/\.(jpg|jpeg|png|gif)$/)) {
+                    if (file.name.match(/\.(JPG|jpg|Jpeg|jpeg|Png|png|Gif|gif)$/)) {
                       const reader = new FileReader();
                       reader.onload = function(event) {
                         setSelectedFiles(event.target.result);
                       };
                       reader.readAsDataURL(file);
                       setType('image');
-                    } else if (file.name.match(/\.(mp4|webm|avi|mov)$/)) {
+                    } else if (file.name.match(/\.(MP4|mp4|Webm|webm|Avi|avi|Mov|mov)$/)) {
                       setVideo(URL.createObjectURL(file))
                       const reader = new FileReader();
                       reader.onload = function(event) {

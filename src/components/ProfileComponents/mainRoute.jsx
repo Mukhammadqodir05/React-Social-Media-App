@@ -9,7 +9,7 @@ const MainProfileRoute = () => {
   const [user, loading] = useAuthState(auth);
 
   return (
-    <main className='flex w-full items-center justify-center h-screen mainBg text-white overflow-hidden'>
+    <main className='flex w-full items-center justify-center h-screen overflow-hidden'>
       {loading ? (
         <Refresh />
       ) : user ? (

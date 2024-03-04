@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef} from 'react';
 import { FiBarChart2 } from "react-icons/fi";
-import { TbHeartShare } from "react-icons/tb";
+import { TbHeartShare, TbPlayerPlayFilled } from "react-icons/tb";
 import { Link } from 'react-router-dom';
 import { IoPersonCircleSharp } from "react-icons/io5";
 import Explore from '../sideBarPages/explore';
@@ -27,7 +27,7 @@ const ImageCard = ({ user, post }) => {
   const commentsContainerRef = useRef(null);
   const isPostDisabled = commentText.trim().length === 0;
   const [isDeletingComment, setIsDeletingComment] = useState(false);
-  
+  const [showPauseIcon, setShowPauseIcon] = useState(false);
 
   // Handle Like
   const handleLike = async (event, likedPost, likedUser) => {
@@ -100,7 +100,7 @@ const ImageCard = ({ user, post }) => {
   };
 
     // Handle Comment Delete
-  const handleDeleteComment = async (event, commentId, postOwner) => {
+    const handleDeleteComment = async (event, commentId, postOwner) => {
       if (event) {
         event.preventDefault();
       }
@@ -127,15 +127,14 @@ const ImageCard = ({ user, post }) => {
   
   // Show video
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
+    const observer = new IntersectionObserver ( (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.play();
-            entry.target.muted = true; 
+            setShowPauseIcon(false)
           } else {
             entry.target.pause();
-            entry.target.muted = true;
+            setShowPauseIcon(true)
           }
         });
       },
@@ -217,31 +216,34 @@ const ImageCard = ({ user, post }) => {
          </div>
       </div>
       <div className='flex flex-col p-2 gap-5'>
-      <div className='flex justify-center items-center'>
-      <div className='flex w-full max-w-[500px] max-h-[600px] border borderBg'>
-        {post.type === 'image' ? (
-          
-          <img
-            src={post.media}
-            className="object-cover aspect-square w-full h-full"
-            loading='lazy'
-            style={{ userSelect: 'none' }}
-          />
-        ) : post.type === 'video' ? (
-          <video
-            ref={videoRef}
-            className=" w-full h-full max-w-[500px] max-h-[570px]"
-            autoPlay
-            loop
-            muted
-            controls
-            loading = "lazy"
-          >
-            <source src={post.media} type="video/mp4" />
-            Your browser does not support the video tag.
-          </video>
-        ) : ''}
-      </div>
+       <div className='flex justify-center items-center'>
+        <div className="w-full justify-center items-center flex flex-col max-w-[500px] max-h-[600px] border borderBg relative">
+          {showPauseIcon && 
+            <div className="absolute flex items-center bg-black rounded-full bg-opacity-50 p-2">
+                <TbPlayerPlayFilled size={70}/>
+            </div>
+            }
+            { post.type === 'video' ? (
+                <video className="w-full bg-black cursor-pointer max-w-[500px] h-[570px] aspect-square" 
+                  autoPlay
+                  ref={videoRef}
+                  loop
+                    onClick={(e) => {
+                        if (e.target.paused) {
+                            e.target.play();
+                            setShowPauseIcon(false);
+                        } else {
+                            e.target.pause();
+                            setShowPauseIcon(true);
+                        }
+                    }}
+                >
+                    <source src={post.media} type="video/mp4" />
+                </video>
+            ) : post.type === 'image' ? (
+                <img className="object-cover w-full h-full aspect-square" src={post.media} alt="Selected Post" />
+            ) : null }
+         </div>
         </div>
         <div className='flex justify-around'>
           <div className='flex items-center justify-center space-x-1' onClick={() => setShowCommentForm(prev => !prev)}>
@@ -306,8 +308,8 @@ const ImageCard = ({ user, post }) => {
                             <div className='flex items-center w-full gap-2'>
                               <p className='text-nowrap font-medium overflow-hidden text-ellipsis'>{commenter?.userName}</p>
                               {(comment.userId === authenticatedUser?.uid || comment?.userId?.substring(0, 28) === authenticatedUser?.uid?.substring(0, 28)) && (
-                                <p onClick={(event) => handleDeleteComment(event, comment.commentId, user)} className="text-[#c803fff0] max-w-[70px] w-full cursor-pointer mr-3 hover:text-red-500">
-                                  <MdDeleteOutline title='delete this comment' size={25}/>
+                                <p onClick={(event) => handleDeleteComment(event, comment.commentId, user)} className="text-white max-w-[70px] w-full cursor-pointer mr-3 hover:text-red-500">
+                                  <MdDeleteOutline title='delete this comment' size={20}/>
                                 </p>
                               )}
                             </div>

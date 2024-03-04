@@ -17,7 +17,7 @@ import { TbPlayerPlayFilled } from "react-icons/tb";
 import { SlUserFollowing } from "react-icons/sl";
 import { ImHeart } from "react-icons/im";
 import { FiHeart } from "react-icons/fi";
-import { FaCommentAlt } from "react-icons/fa";
+import { FaCommentAlt, FaPlayCircle } from "react-icons/fa";
 import LogOut from '../../Auth/logout';
 import { IoSettingsSharp } from "react-icons/io5";
 
@@ -425,7 +425,6 @@ const Profile = () => {
                       </div>
                     )}
 
-
                    <div className="p-2 mt-[80px] w-full">
                     <h1 className="text-xl font-medium">{currentUser.fullName}</h1>
                     <p className="text-xl text-gray-500">@{currentUser.userName}</p>
@@ -449,7 +448,6 @@ const Profile = () => {
                       </div>
                     </div>
                   </div>
-              
 
                   <div className="flex p-2 gap-5 mt-2 max-w-[400px] overflow-hidden ">
                     <div onClick={() => setShowFollowing(true)} title="following" className="flex cursor-pointer gap-1">
@@ -481,13 +479,18 @@ const Profile = () => {
                                   loading = 'lazy'
                               />
                             ) : post.type === 'video' ? (
-                                <video
-                                  className="object-cover aspect-square w-full h-full cursor-pointer"
-                                  onClick={() => handleVideoClick(post, index)}
-                                  loading = 'lazy'
-                                >
-                                  <source src={post.media} type="video/mp4" />
+                              <>
+                              <video
+                                className="object-cover aspect-square w-full h-full cursor-pointer"
+                                onClick={() => handleVideoClick(post, index)}
+                                loading="lazy"
+                              >
+                                <source src={post.media} type="video/mp4" />
                               </video>
+                              <div className="absolute top-2 right-2">
+                                <FaPlayCircle color="#fff" size={30} />
+                              </div>
+                            </>
                             ) : null}
                             </div>
                           ))}
@@ -643,8 +646,8 @@ const Profile = () => {
                                       <div className='flex items-center w-full gap-2'>
                                         <p className='text-nowrap font-medium overflow-hidden text-ellipsis'>{commenter?.userName}</p>
                                         {(comment.userId === user?.uid || currentUser.userName === userProfile[0]?.userName) && (
-                                            <p onClick={(event) => handleDeleteComment(event, comment.commentId, ownerUser)} className="text-[#c803fff0] max-w-[70px] w-full cursor-pointer mr-3 hover:text-red-500">
-                                              <MdDeleteOutline title='delete this comment' size={25}/>
+                                            <p onClick={(event) => handleDeleteComment(event, comment.commentId, ownerUser)} className="text-white max-w-[70px] w-full cursor-pointer mr-3 hover:text-red-500">
+                                              <MdDeleteOutline title='delete this comment' size={20}/>
                                             </p>
                                           )}
 
@@ -799,8 +802,8 @@ const Profile = () => {
                                   <div className='flex items-center w-full gap-2'>
                                     <p className='text-nowrap font-medium overflow-hidden text-ellipsis'>{commenter?.userName}</p>
                                     {(comment.userId === user?.uid || currentUser.userName === userProfile[0]?.userName) && (
-                                        <p onClick={(event) => handleDeleteComment(event, comment.commentId, ownerUser)} className="text-[#c803fff0] max-w-[70px] w-full cursor-pointer mr-3 hover:text-red-500">
-                                          <MdDeleteOutline title='delete this comment' size={25}/>
+                                        <p onClick={(event) => handleDeleteComment(event, comment.commentId, ownerUser)} className="text-white max-w-[70px] w-full cursor-pointer mr-3 hover:text-red-500">
+                                          <MdDeleteOutline title='delete this comment' size={20}/>
                                         </p>
                                       )}
 
