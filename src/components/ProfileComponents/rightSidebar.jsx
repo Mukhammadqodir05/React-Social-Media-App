@@ -2,7 +2,7 @@ import React from 'react';
 import { useUserData } from '../../getUserData';
 import { Link } from 'react-router-dom';
 import { IoPersonCircleSharp } from "react-icons/io5";
-import Footer from '../Footer';
+
 
 const RightSideBar = () => {
   const { allUsersData, userProfile } = useUserData();
@@ -55,10 +55,7 @@ const RightSideBar = () => {
           </div>
         </div>
       )}
-      
-      <div>
-        <Footer />
-      </div>
+
     </main>
   );
 };
