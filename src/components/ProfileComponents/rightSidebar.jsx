@@ -2,6 +2,7 @@ import React from 'react';
 import { useUserData } from '../../getUserData';
 import { Link } from 'react-router-dom';
 import { IoPersonCircleSharp } from "react-icons/io5";
+import Footer from '../Footer';
 
 const RightSideBar = () => {
   const { allUsersData, userProfile } = useUserData();
@@ -18,7 +19,7 @@ const RightSideBar = () => {
     .slice(0, 5);
     
   return (
-    <main className='flex flex-col items-center w-full h-full p-1'>
+    <main className='flex flex-col gap-4 items-center w-full h-full p-1'>
       {sortedUsers.length > 0 && (
         <div className='w-full mt-4'>
           <div className='bg-black p-4 rounded-md shadow'>
@@ -54,6 +55,10 @@ const RightSideBar = () => {
           </div>
         </div>
       )}
+      
+      <div>
+        <Footer />
+      </div>
     </main>
   );
 };

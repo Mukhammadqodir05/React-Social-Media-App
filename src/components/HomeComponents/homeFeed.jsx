@@ -127,35 +127,36 @@ const ImageCard = ({ user, post }) => {
   
   // Show video
   useEffect(() => {
-    const observer = new IntersectionObserver ( (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.play();
-            setShowPauseIcon(false)
-          } else {
-            entry.target.pause();
-            setShowPauseIcon(true)
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.play();
+          if (!entry.target.paused) { 
+            setShowPauseIcon(false);
           }
-        });
-      },
-      {
-        root: null,
-        rootMargin: '0px',
-        threshold: 0.5,
-      }
-    );
-
+        } else {
+          entry.target.pause();
+          if (entry.target.paused) { 
+            setShowPauseIcon(true);
+          }
+        }
+      });
+    }, {
+      root: null,
+      rootMargin: '0px',
+      threshold: 0.5,
+    });
+  
     if (videoRef.current) {
       observer.observe(videoRef.current);
     }
-    
-
+  
     return () => {
       if (videoRef.current) {
         observer.unobserve(videoRef.current);
       }
     };
-  }, []);
+  }, [videoRef, post.media, setShowPauseIcon]);
   
   
   // Logic for scrolling to the latest comment

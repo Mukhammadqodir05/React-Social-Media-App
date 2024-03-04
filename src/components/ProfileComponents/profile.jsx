@@ -249,38 +249,41 @@ const Profile = () => {
   
   // Delete The Post
   const handleDeletePost = async (e) => {
-    e.preventDefault()
-    setIsDeletingComment(true)
+    e.preventDefault();
+    setIsDeletingComment(true);
     try {
-        setShowConfirmation(false);
-        const userRef = doc(db, "users", user?.uid);
-       
-        if (clickedIndex !== -1) {
-            const postToDelete = ownerUser?.posts[clickedIndex];
-            const mediaUrl = postToDelete.media;
-            const storageRef = ref(storage, mediaUrl);
-            await deleteObject(storageRef);
-
-            // Remove the post from the posts array using splice
-            posts.splice(clickedIndex, 1);
-
-            const updatedData = {
-                posts: ownerUser?.posts,
-            };
-
-            await updateDoc(userRef, updatedData);
-            console.log('Post and media deleted successfully');
-            setIsPostSelected(false);
-        } else {
-            console.log('Post not found in the user\'s posts array');
-        }
+      setShowConfirmation(false);
+      const userRef = doc(db, "users", user?.uid);
+  
+      if (clickedIndex !== -1) {
+        const postToDelete = ownerUser?.posts[clickedIndex];
+        const mediaUrl = postToDelete.media;
+        const storageRef = ref(storage, mediaUrl);
+  
+        // Remove the post from the posts array using splice
+        posts.splice(clickedIndex, 1);
+  
+        const updatedData = {
+          posts: posts,
+        };
+         
+        await updateDoc(userRef, updatedData);
+        console.log('Post deleted successfully');
+        setIsDeletingComment(false);
+  
+        // Delete the media URL from storage after updating the document
+        await deleteObject(storageRef);
+        console.log('Media deleted successfully');
+  
+        setIsPostSelected(false);
+      } else {
+        console.log('Post not found in the user\'s posts array');
+      }
     } catch (error) {
-        console.error('Error deleting post or media:', error);
-    } finally{
-      setIsDeletingComment(false)
+      console.error('Error deleting post or media:', error);
     }
   };
-
+  
 // Edit The Post
   const handleEditPost = async (e) => {
     e.preventDefault();
@@ -468,7 +471,7 @@ const Profile = () => {
                 {/* Posts here */}
                   <div className="flex w-full border-t borderBg border-gray-300 "></div>
                     {posts.length !== 0 ? (
-                      <div className="grid grid-cols-3 gap-1 w-full p-1 pb-20">
+                      <div className="grid grid-cols-3 gap-1 w-full p-1 pb-40">
                         {posts.map((post, index) => (
                           <div key={post.id} className="relative">
                             {post.type === 'image' ? (
