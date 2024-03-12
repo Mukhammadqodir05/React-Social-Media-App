@@ -1,6 +1,6 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { auth, db, storage } from '../../firebase';
-import { doc, updateDoc } from 'firebase/firestore';
+import { collection, doc, onSnapshot, query, updateDoc, where } from 'firebase/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useUserData } from '../../getUserData';
 import { TbCameraPlus } from "react-icons/tb";
@@ -25,7 +25,21 @@ const UpdateProfile = () => {
   const { username } = useParams();
   const currentUser = allUsersData?.find(user => user.userName === username);
   const [doesBannerExist, setDoesBannerExist] = useState(currentUser?.userBannerURL);
- 
+  const [ownerUser, setOwnerUser] = useState(null)
+
+
+  useEffect(() => {
+    if (username) {
+      const unsubscribe = onSnapshot(query(collection(db, "users"), where("userName", "==", username)), (snapshot) => {
+        snapshot.forEach((doc) => {
+          const userData = doc.data();
+          setOwnerUser(userData);
+        });
+      });
+  
+      return () => unsubscribe();
+    }
+  }, [username]);
 
   // FULLNAME limitation
   const MAX_FULLNAME_LENGTH = 30;
@@ -46,22 +60,22 @@ const UpdateProfile = () => {
   const remainingCharacters = MAX_BIO_LENGTH - bio.length;
   
 // LOCATION limitation
-const MAX_LOCATION_LENGTH = 25;
-const handleLocationChange = (e) => {
-  const inputLocation = e.target.value;
-  const limitedLocation = inputLocation.substring(0, MAX_LOCATION_LENGTH); 
-  setLocation(limitedLocation);
-};
-const remainingLocationCharacters = MAX_LOCATION_LENGTH - location.length;
+  const MAX_LOCATION_LENGTH = 25;
+  const handleLocationChange = (e) => {
+    const inputLocation = e.target.value;
+    const limitedLocation = inputLocation.substring(0, MAX_LOCATION_LENGTH); 
+    setLocation(limitedLocation);
+  };
+  const remainingLocationCharacters = MAX_LOCATION_LENGTH - location.length;
 
-// WEBSITE limitation
-const MAX_WEBSITE_LENGTH = 60;
-const handleWebsiteChange = (e) => {
-  const inputWebsite = e.target.value;
-  const limitedWebsite = inputWebsite.substring(0, MAX_WEBSITE_LENGTH ); 
-  setWebsite(limitedWebsite);
+  // WEBSITE limitation
+  const MAX_WEBSITE_LENGTH = 60;
+  const handleWebsiteChange = (e) => {
+    const inputWebsite = e.target.value;
+    const limitedWebsite = inputWebsite.substring(0, MAX_WEBSITE_LENGTH ); 
+    setWebsite(limitedWebsite);
 };
-const remainingWebsiteCharacters = MAX_WEBSITE_LENGTH  - website.length;
+ const remainingWebsiteCharacters = MAX_WEBSITE_LENGTH  - website.length;
 
 
   // Handle Update The User Data
@@ -88,7 +102,7 @@ const remainingWebsiteCharacters = MAX_WEBSITE_LENGTH  - website.length;
         location: location || currentUser.location,
         website: website || currentUser.website,
         userPictureURL: URL || currentUser.userPictureURL,
-        userBannerURL: BannerURL || currentUser.userBannerURL
+        userBannerURL: BannerURL || ownerUser.userBannerURL
       };
   
       await updateDoc(userRef, newData);
@@ -111,7 +125,7 @@ const remainingWebsiteCharacters = MAX_WEBSITE_LENGTH  - website.length;
         await deleteObject(storageRef);
       
         await updateDoc(userRef, {
-          userBannerURL: ''
+          userBannerURL: currentUser.userBannerURL = ''
         });
 
         console.log('Banner image deleted successfully');

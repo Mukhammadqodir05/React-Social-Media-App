@@ -4,7 +4,7 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { BsPersonCircle } from 'react-icons/bs';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { setDoc,doc} from 'firebase/firestore';
-import { BeatLoader, FadeLoader, PulseLoader } from 'react-spinners';
+import { BeatLoader } from 'react-spinners';
 
 const SignUp = (props) => {
   const [fullName, setFullName] = useState('');
